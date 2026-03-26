@@ -110,7 +110,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
     - **Type**: `feat`, `docs`, `test`, `refactor`, `style`, `build`, `ci`, `chore`
     - **Scope** (optional): A noun describing the section of the codebase
     - **Description**: Short imperative summary, keeping the full first line at or under 50 characters
-    - **Body** (optional): Bulleted list summarizing what the group contains. Reference the original commits being folded in.
+    - **Body** (optional): Bulleted list summarizing what the group contains. Do NOT reference original commit SHAs -- the compacted history should stand on its own.
 
 ### Phase 4: Resolve Shared Files
 
@@ -223,8 +223,6 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
     - First change bullet
     - Second change bullet
-
-    Compacted from: <sha1>, <sha2>, <sha3>
     EOF
     )"
     ```

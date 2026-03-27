@@ -14,19 +14,7 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
 
 | Keyword | Behavior |
 | ------- | -------- |
-| `wip` | Jump to the WIP Shortcut |
 | `full` | Jump to the Full Commit Shortcut |
-
-## WIP Shortcut
-
-When the user invokes `/omni.commit wip`, execute immediately without analysis or confirmation:
-
-```sh
-git add -A
-git commit -m "wip: checkpoint"
-```
-
-Report the result and stop. Do not proceed to the phases below.
 
 ## Full Commit Shortcut
 

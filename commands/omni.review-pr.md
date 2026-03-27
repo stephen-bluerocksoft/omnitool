@@ -332,7 +332,9 @@ The review body should follow this structure:
 <Blocker and Critical findings, or "No must-fix findings.">
 
 ### Bugs Found
-<Logic defects with trigger/impact/fix, or "No defects found.">
+<ONLY include this section if logic defects were found. Each entry: trigger, impact, fix.
+Omit this entire section (header and body) when there are no defects.
+Never use this section for positive commentary on correct code.>
 
 ### Recommended
 <Major findings as a consolidated list grouped by category, or "No recommendations.">

@@ -1,4 +1,4 @@
-# omni.review-pr
+# omni.pr.review
 
 ## User Input
 

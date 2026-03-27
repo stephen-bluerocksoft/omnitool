@@ -4,7 +4,7 @@ This file guides AI coding agents working on the Omnitool repository.
 
 ## Project Overview
 
-Omnitool is a personal collection of AI coding tools, commands, and workflows. It installs slash commands to Cursor for use across all projects.
+Omnitool is a personal collection of AI coding tools, commands, agents, and workflows. It installs slash commands and agents to Cursor for use across all projects.
 
 This is a **content-only repository** -- it contains Markdown files, shell scripts, and a Makefile. There is no application code, no package manager, and no test suite.
 
@@ -18,6 +18,7 @@ This is a **content-only repository** -- it contains Markdown files, shell scrip
 
 ```text
 omnitool/
+  agents/     # Subagent definitions (installed to ~/.cursor/agents/)
   commands/   # Slash commands (installed to ~/.cursor/commands/)
   scripts/    # Installation scripts
 ```
@@ -35,6 +36,7 @@ omnitool/
 | Content Type | Pattern | Example |
 | ------------ | ------- | ------- |
 | Commands | `omni.{action}.md` | `omni.commit.md` |
+| Agents | `{purpose}.md` | `repo-test-auditor.md` |
 
 ## Creating New Commands
 
@@ -44,12 +46,19 @@ omnitool/
 4. Update `README.md` to list the new command
 5. Run `make install` to deploy
 
+## Creating New Agents
+
+1. Create `agents/{purpose}.md`
+2. Include YAML frontmatter with `name` and `description`
+3. Update `README.md` to list the new agent
+4. Run `make install` to deploy
+
 ## Installation
 
-Commands are copied to `~/.cursor/commands/` by `scripts/install.sh`. The install is idempotent and safe to run alongside the BRS Codex installer.
+Commands are copied to `~/.cursor/commands/` and agents to `~/.cursor/agents/` by `scripts/install.sh`. The install is idempotent and safe to run alongside the BRS Codex installer.
 
 ## Do NOT
 
 - Add emojis to any Markdown file
 - Place persistent files in `temp/` -- it is gitignored
-- Skip updating `README.md` when adding new commands
+- Skip updating `README.md` when adding new commands or agents

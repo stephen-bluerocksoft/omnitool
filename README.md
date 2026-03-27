@@ -10,24 +10,31 @@ Named after the [omni-tool](https://masseffect.fandom.com/wiki/Omni-tool) from M
 make install
 ```
 
-This copies all commands to `~/.cursor/commands/` so they are available globally via `/omni.command-name` in Cursor.
+This copies commands to `~/.cursor/commands/` and agents to `~/.cursor/agents/` so they are available globally in Cursor.
 
 ## Commands
 
 | Command | Description |
 | ------- | ----------- |
-| `/omni.add-feature` | Run the spec-first development workflow for a feature or change |
-| `/omni.align-spec` | Audit alignment between spec artifacts and implementation |
+| `/omni.spec.create` | Create spec artifacts for a feature using the spec-first workflow |
+| `/omni.spec.implement` | Implement a feature from its spec with post-implementation verification |
+| `/omni.spec.align` | Audit and sync spec artifacts with the actual implementation |
 | `/omni.commit` | Analyze changes and create logically grouped conventional commits |
 | `/omni.compact` | Compact a feature branch's noisy commit history into clean, logical commits |
 | `/omni.create-pr` | Create a pull request from the current branch using gh CLI |
 | `/omni.review-pr` | Comprehensive PR review with inline GitHub comments |
 | `/omni.timetrack` | Generate a timetrack entry summarizing work for management |
 
+## Agents
+
+| Agent | Description |
+| ----- | ----------- |
+| `repo-test-auditor` | Repo-aware test auditor that discovers existing test patterns and validates new tests follow them |
+
 ## Installation
 
 ```bash
-# Install commands
+# Install commands and agents
 make install
 
 # Pull latest and reinstall
@@ -40,3 +47,9 @@ make update
 2. Use `$ARGUMENTS` to capture user input
 3. Add it to the table above
 4. Run `make install`
+
+## Adding a New Agent
+
+1. Create `agents/{name}.md` with `name` and `description` in YAML frontmatter
+2. Add it to the agents table above
+3. Run `make install`

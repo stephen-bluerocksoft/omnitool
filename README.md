@@ -19,7 +19,7 @@ This copies commands to `~/.cursor/commands/` and agents to `~/.cursor/agents/` 
 | `/omni.spec.create` | Create spec artifacts for a feature using the spec-first workflow |
 | `/omni.spec.implement` | Implement a feature from its spec with post-implementation verification |
 | `/omni.spec.align` | Audit and sync spec artifacts with the actual implementation |
-| `/omni.commit` | Analyze changes and create logically grouped conventional commits |
+| `/omni.commit` | Checkpoint changes as logically grouped conventional commits (compact-before-PR workflow) |
 | `/omni.compact` | Compact a feature branch's noisy commit history into clean, logical commits |
 | `/omni.pr.create` | Create a pull request from the current branch using gh CLI |
 | `/omni.pr.review` | Comprehensive PR review with inline GitHub comments |

@@ -1,8 +1,8 @@
 ---
-description: Run the spec-first development workflow for a feature or change
+description: Create spec artifacts for a feature using the spec-first development workflow
 ---
 
-# omni.add-feature
+# omni.spec.create
 
 ## User Input
 
@@ -12,18 +12,18 @@ $ARGUMENTS
 
 You **MUST** use the user input as the feature description. If empty, ask the user what feature they want to build before proceeding.
 
-This command ALWAYS creates a new spec. Even if an existing spec directory seems related, create a new spec — do NOT modify or extend existing specs.
+This command ALWAYS creates a new spec. Even if an existing spec directory seems related, create a new spec -- do NOT modify or extend existing specs.
 
 ## Context-Optimization Strategy
 
 This command delegates heavy spec-creation work to dedicated **sub-agents** via the Task tool, preserving the main conversation context for later implementation. The main agent handles orchestration and the interactive clarify step only.
 
-- **Step 2** uses `subagent_type: "spec-creator"` — knows the speckit specify workflow
-- **Step 4** uses `subagent_type: "spec-planner"` — knows plan, tasks, analyze, remediate, and test coverage
+- **Step 2** uses `subagent_type: "spec-creator"` -- knows the speckit specify workflow
+- **Step 4** uses `subagent_type: "spec-planner"` -- knows plan, tasks, analyze, remediate, and test coverage
 
 ## Step 1: Verify Speckit Initialization
 
-Check if speckit command files exist **in the current project/workspace root directory** at `<project-root>/.cursor/commands/speckit.*.md` (e.g., `speckit.specify.md`, `speckit.plan.md`). Do NOT check `~/.cursor/commands/` — that is the user-level directory where this command lives, not the project directory.
+Check if speckit command files exist **in the current project/workspace root directory** at `<project-root>/.cursor/commands/speckit.*.md` (e.g., `speckit.specify.md`, `speckit.plan.md`). Do NOT check `~/.cursor/commands/` -- that is the user-level directory where this command lives, not the project directory.
 
 **Important**: The `.cursor` directory is a dotfile directory. Glob's `**/` recursion skips dotfile directories, so you MUST use the `target_directory` parameter to search inside it explicitly.
 
@@ -49,7 +49,7 @@ The `spec-creator` agent already knows the speckit workflow, file locations, and
 
 Wait for completion. Capture the **branch name** and **spec directory path** from the response.
 
-## Step 3: Clarify (Main Agent — Interactive)
+## Step 3: Clarify (Main Agent -- Interactive)
 
 This step requires user interaction, so it stays in the main context. Keep it concise.
 
@@ -83,14 +83,14 @@ Wait for completion.
    - Include a table of analysis findings that were addressed and how each was resolved
    - List any LOW findings accepted with rationale
    - Confirm test tasks are present for each user story
-   - Ask the user to review the spec artifacts and confirm they want to proceed with implementation
-   - Your response for this step MUST be a text message only — no tool calls, no file edits, no implementation
+   - Tell the user to run `/omni.spec.implement` when they are ready to begin implementation
+   - Your response for this step MUST be a text message only -- no tool calls, no file edits, no implementation
 
-**Implementation is NOT part of this command** — it begins only when the user explicitly runs it in a subsequent turn.
+**Implementation is NOT part of this command.** Use `/omni.spec.implement` to execute the tasks.
 
 ## Notes
 
-- Steps 1, 3, and 5 run in the main context (lightweight — verification, Q&A, summary only)
+- Steps 1, 3, and 5 run in the main context (lightweight -- verification, Q&A, summary only)
 - Steps 2 and 4 run in dedicated sub-agents (heavy lifting stays out of main context)
 - The main context retains only: user input, clarify Q&A, and two sub-agent summaries
 - This leaves maximum context budget available for subsequent implementation

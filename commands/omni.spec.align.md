@@ -1,4 +1,4 @@
-# omni.align-spec
+# omni.spec.align
 
 ## User Input
 

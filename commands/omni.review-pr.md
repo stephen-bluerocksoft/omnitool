@@ -163,7 +163,6 @@ Run **every search below** across all changed files. These are deterministic che
 | ------- | -------------- | -------- |
 | Per-call resource creation | HTTP clients, DB connections, or sessions instantiated per-call instead of shared/pooled | Major |
 | Timer/listener leaks | `setTimeout`/`setInterval`/`addEventListener` without cleanup | Major |
-| Missing env var fallback | `os.environ["KEY"]` without `.get()` or try/except | Minor |
 
 #### Step 2: Logic and Correctness Analysis
 
@@ -226,6 +225,11 @@ For **each** changed file in the inventory, in order:
 
 **Reporting threshold: 7/10.** Only findings scoring 7 or above survive to the output. Pattern scan findings are exempt -- they are deterministic.
 
+**Reporting tiers**: Findings are routed by severity to minimize noise on the PR diff:
+
+- **Blocker / Critical**: Posted as inline comments on the PR diff (Step 4) AND listed in the review body (Step 5)
+- **Major**: Included only in the review body "Recommended" section as a consolidated list -- no inline comments
+
 **Priority ordering**: Review security-sensitive files first (auth, config, Dockerfile, infrastructure manifests).
 
 **Scope discipline**: All findings must be relevant to the changed code. Do not flag issues in unchanged surrounding code.
@@ -275,7 +279,7 @@ Before posting anything to GitHub, verify every finding:
 Based on verified findings, determine the verdict NOW -- you need it for Step 4.
 
 - **REQUEST CHANGES**: One or more Blocker or Critical findings exist, OR one or more Critical/Confirmed bugs exist
-- **APPROVE**: No Blocker or Critical findings. Major/Minor findings may exist -- they are advisory and do not block
+- **APPROVE**: No Blocker or Critical findings. Major findings may exist -- they are advisory and do not block
 
 #### Step 3: Get the HEAD Commit SHA
 
@@ -287,9 +291,9 @@ gh pr view <number> --json headRefOid -q .headRefOid
 
 #### Step 4: Post Inline Comments to GitHub
 
-**You MUST execute a `gh api` command for each finding that maps to a specific line in the diff.** Do not merely describe what you would post. Run the commands.
+**Post inline comments only for Blocker and Critical findings.** Major findings are reported in the review body (Step 5), not as inline comments. Execute a `gh api` command for each Blocker or Critical finding that maps to a specific line in the diff.
 
-For each finding with a file path and line number, execute:
+For each Blocker or Critical finding with a file path and line number, execute:
 
 ```bash
 gh api repos/<owner>/<repo>/pulls/<number>/comments \
@@ -331,7 +335,7 @@ The review body should follow this structure:
 <Logic defects with trigger/impact/fix, or "No defects found.">
 
 ### Recommended
-<Major and Minor findings, or "No recommendations.">
+<Major findings as a consolidated list grouped by category, or "No recommendations.">
 
 ### Verdict
 <APPROVE or REQUEST CHANGES with justification>
@@ -381,14 +385,14 @@ Posted:   <N> inline comments, 1 review
 
 ### Findings Included in Review Body
 
-List any cross-cutting findings that were included in the `gh pr review` body because they could not be tied to a specific diff line:
+List Major findings and any cross-cutting findings that were included in the `gh pr review` body:
 
 ```text
-- [Severity] <description>
-- [Severity] <description>
+- [Major] <description>
+- [Major] <description>
 ```
 
-If all findings were posted as inline comments, write: "All findings posted as inline comments."
+If no findings were routed to the review body, write: "No review body findings."
 
 ### Link
 

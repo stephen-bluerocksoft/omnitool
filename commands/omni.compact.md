@@ -58,9 +58,66 @@ All git commands that modify repository state (reset, add, commit, branch) requi
    - If the user did not include `--force` in `$ARGUMENTS`, ask for explicit confirmation before proceeding.
    - If the remote has commits not in the local branch, **STOP** -- the branches have diverged and compaction could lose remote-only changes.
 
-### Phase 2: Capture Context
+### Phase 2: Lint and Auto-fix
 
-5. **Create a backup branch** before any destructive operation:
+5. **Detect the repo's linter(s)**. Check the repository root for configuration files (run these checks in parallel):
+
+   | Linter | Detection Files |
+   | ------ | --------------- |
+   | Ruff | `pyproject.toml` (has `[tool.ruff]`), `ruff.toml`, `.ruff.toml` |
+   | ESLint | `eslint.config.*`, `.eslintrc.*`, `package.json` (has `"eslint"` in devDependencies) |
+   | Prettier | `.prettierrc*`, `package.json` (has `"prettier"` in devDependencies) |
+   | golangci-lint | `.golangci.yml`, `.golangci.yaml`, `.golangci.toml` |
+   | cargo clippy | `Cargo.toml` |
+   | RuboCop | `.rubocop.yml` |
+   | pre-commit | `.pre-commit-config.yaml` |
+
+   Also check `Makefile` for a `lint`, `format`, `fmt`, or `check` target. If the repo has a `Makefile` with one of these targets, prefer that over individual tool invocation since it represents the project's canonical lint pipeline.
+
+6. **Run detected linters with auto-fix**. For each detected linter, run its fix/format command against the files changed on this branch:
+
+   ```sh
+   # Get list of files changed on this branch
+   git diff --name-only <merge-base>..HEAD
+   ```
+
+   Then run the appropriate fix commands (only on changed files when the tool supports file arguments):
+
+   | Linter | Fix Command |
+   | ------ | ----------- |
+   | Ruff | `ruff check --fix <files>` then `ruff format <files>` |
+   | ESLint | `npx eslint --fix <files>` |
+   | Prettier | `npx prettier --write <files>` |
+   | golangci-lint | `golangci-lint run --fix <files>` |
+   | cargo clippy | `cargo clippy --fix --allow-dirty` |
+   | RuboCop | `rubocop -a <files>` |
+   | Makefile target | `make lint` or `make format` (these typically operate on the whole project) |
+
+   If a linter is detected but its binary is not installed, skip it and warn the user (do not fail the compaction over a missing tool).
+
+7. **Commit linter changes if any exist**:
+
+   ```sh
+   git status --porcelain
+   ```
+
+   - If there are changes, stage and commit them:
+
+     ```sh
+     git add -A
+     git commit -m "$(cat <<'EOF'
+     style: apply linter auto-fixes
+     EOF
+     )"
+     ```
+
+     Report to the user: "Linter auto-fixes applied and committed. These changes will be folded into the appropriate logical groups during compaction."
+
+   - If there are no changes, report: "Linters passed -- no fixes needed." and continue.
+
+### Phase 3: Capture Context
+
+8. **Create a backup branch** before any destructive operation:
 
    ```sh
    git branch <current-branch>-backup-$(date +%Y%m%d%H%M%S)
@@ -68,7 +125,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
    Report the backup branch name to the user.
 
-6. **Capture the original commit log** with full detail. This is the Rosetta Stone for attributing changes to logical groups:
+9. **Capture the original commit log** with full detail. This is the Rosetta Stone for attributing changes to logical groups:
 
    ```sh
    git log --format="%H %s" <merge-base>..HEAD
@@ -76,19 +133,19 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
    Store the list of SHAs and subjects in memory.
 
-7. **Capture per-commit file lists** so you know which original commits touched which files:
+10. **Capture per-commit file lists** so you know which original commits touched which files:
 
-   ```sh
-   git show --stat --format="" <sha>
-   ```
+    ```sh
+    git show --stat --format="" <sha>
+    ```
 
-   Run this for every commit SHA from step 6. Build a mapping: `file -> [list of original commits that touched it]`.
+    Run this for every commit SHA from step 9. Build a mapping: `file -> [list of original commits that touched it]`.
 
-8. **Identify shared files** -- files touched by more than one original commit. These require hunk-level analysis later. Files touched by only one commit are trivially attributed.
+11. **Identify shared files** -- files touched by more than one original commit. These require hunk-level analysis later. Files touched by only one commit are trivially attributed.
 
-### Phase 3: Analyze and Group
+### Phase 4: Analyze and Group
 
-9. **Read the original commit subjects** and group them into logical clusters. Each cluster represents one compacted commit. Grouping rules:
+12. **Read the original commit subjects** and group them into logical clusters. Each cluster represents one compacted commit. Grouping rules:
 
    | Signal | Grouping Logic |
    | ------ | -------------- |
@@ -101,26 +158,26 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
    **Key rule**: Review-driven `fix:` commits are **folded into** their parent `feat:` or `refactor:` group. The fix commits are artifacts of the review process, not distinct logical changes. Their code changes belong with the feature they were fixing.
 
-10. **For each logical group, determine its files**:
+13. **For each logical group, determine its files**:
 
     - **Exclusive files** (touched by commits in only this group): Assign directly.
-    - **Shared files** (touched by commits in multiple groups): These need hunk-level analysis in Phase 4.
+    - **Shared files** (touched by commits in multiple groups): These need hunk-level analysis in Phase 5.
 
-11. **For each logical group**, determine the compacted commit metadata:
+14. **For each logical group**, determine the compacted commit metadata:
     - **Type**: `feat`, `docs`, `test`, `refactor`, `style`, `build`, `ci`, `chore`
     - **Scope** (optional): A noun describing the section of the codebase
     - **Description**: Short imperative summary, keeping the full first line at or under 50 characters
     - **Body** (optional): Bulleted list summarizing what the group contains. Do NOT reference original commit SHAs -- the compacted history should stand on its own.
 
-### Phase 4: Resolve Shared Files
+### Phase 5: Resolve Shared Files
 
-12. **For each shared file**, read the full diff from the merge-base to determine which hunks belong to which group:
+15. **For each shared file**, read the full diff from the merge-base to determine which hunks belong to which group:
 
     ```sh
     git diff <merge-base>..HEAD -- <shared-file>
     ```
 
-13. **Attribute hunks using two tiers**:
+16. **Attribute hunks using two tiers**:
 
     a. **Mechanical matching (primary)**: For each original commit that touched the file, read its patch:
 
@@ -132,13 +189,13 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
     b. **AI semantic fallback**: When mechanical matching fails (e.g., a review fix modified the same lines as the original feature, so the collapsed diff has only the final version), read the hunk content and the relevant commit messages to determine which logical group the hunk belongs to based on intent.
 
-14. **For each shared file, prepare per-group patches**. Write each group's hunks to a temporary patch file. These will be used during execution to stage only the relevant hunks.
+17. **For each shared file, prepare per-group patches**. Write each group's hunks to a temporary patch file. These will be used during execution to stage only the relevant hunks.
 
     If a hunk genuinely cannot be split (interleaved line-by-line changes from two different concerns within the same hunk), assign the entire hunk to the **primary** group (the one with the most changes in the file) and note this in the commit body.
 
-### Phase 5: Present Plan
+### Phase 6: Present Plan
 
-15. **Show the compaction plan** to the user before executing:
+18. **Show the compaction plan** to the user before executing:
 
     ```
     Compaction Plan
@@ -173,27 +230,27 @@ All git commands that modify repository state (reset, add, commit, branch) requi
       - path/to/file2: hunks split between Commit 1 and Commit 2
     ```
 
-16. **Ask the user to confirm** before proceeding:
+19. **Ask the user to confirm** before proceeding:
     - "Proceed with compaction? (yes/no/edit)"
     - If "edit", ask what to change and revise the plan
     - If "no", delete the backup branch and stop
-    - If "yes" or "proceed", continue to Phase 6
+    - If "yes" or "proceed", continue to Phase 7
 
-### Phase 6: Execute
+### Phase 7: Execute
 
-17. **Soft reset to merge-base**:
+20. **Soft reset to merge-base**:
 
     ```sh
     git reset --soft <merge-base>
     ```
 
-18. **Unstage everything** so changes move to the working tree:
+21. **Unstage everything** so changes move to the working tree:
 
     ```sh
     git reset HEAD
     ```
 
-19. **Execute each compacted commit sequentially**. For each logical group:
+22. **Execute each compacted commit sequentially**. For each logical group:
 
     a. **Stage exclusive files** (files belonging entirely to this group):
 
@@ -233,7 +290,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
     git log --oneline -1
     ```
 
-20. **After all commits**, stage and commit any remaining unstaged changes that were missed. This is a safety net -- if attribution missed something, it goes into a final `chore: compact remainder` commit rather than being lost.
+23. **After all commits**, stage and commit any remaining unstaged changes that were missed. This is a safety net -- if attribution missed something, it goes into a final `chore: compact remainder` commit rather than being lost.
 
     ```sh
     git status --porcelain
@@ -241,9 +298,9 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
     If there are remaining changes, stage and commit them. If the working tree is clean, continue.
 
-### Phase 7: Verify
+### Phase 8: Verify
 
-21. **Verify tree equivalence**. The compacted branch must produce the exact same code as the backup:
+24. **Verify tree equivalence**. The compacted branch must produce the exact same code as the backup:
 
     ```sh
     git diff <backup-branch>..HEAD
@@ -258,7 +315,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
       Report the failure and the diff to the user.
 
-22. **Show final summary**:
+25. **Show final summary**:
 
     ```
     Compaction Summary

@@ -21,7 +21,8 @@ This command reserves the main agent's context budget for **implementation and r
 - **Step 3** (sub-agents): verification runs in parallel, outside main context
 - **Step 4** (main): remediation -- fixing issues while implementation is still in context
 - **Step 5** (sub-agent): spec alignment runs outside main context
-- **Step 6** (main): text-only summary
+- **Step 6** (main): run full test suite and fix regressions
+- **Step 7** (main): text-only summary
 
 ## Step 1: Verify Prerequisites
 
@@ -114,11 +115,52 @@ The agent reads all spec artifacts, compares them against the implementation, an
 
 Wait for completion. Capture the deviation summary.
 
-## Step 6: Summary (Main Agent -- Text Only)
+## Step 6: Run Full Test Suite (Main Agent)
+
+Run the complete test suite. Fix **all** failures -- not just regressions introduced by the current changes. Pre-existing failures are tech debt that compounds; if the suite surfaces them, fix them now.
+
+### 6a: Detect Test Layers
+
+Check which test layers exist by looking for these indicators:
+
+| Layer | Detection | Run Command |
+| ----- | --------- | ----------- |
+| Backend (pytest) | `pytest.ini`, `pyproject.toml [tool.pytest]`, or `tests/` with `.py` test files | `cd backend && pytest` (activate venv first) |
+| Frontend (Jest/Vitest) | `package.json` with `test` script in frontend dir | `cd frontend && npm test -- --watchAll=false` |
+| E2E (Playwright) | `playwright.config.ts`, `playwright.config.js`, or `e2e/` directory with `.spec.ts` files | `cd e2e && npx playwright test` (or project-root-level `npx playwright test` depending on config location) |
+
+Only run layers that actually exist. If a layer's detection files are absent, skip it.
+
+### 6b: Run Tests
+
+Run all detected test layers. Independent layers (backend, frontend, E2E) can be launched in parallel using separate Shell calls with `block_until_ms: 0` to background them, then monitor each for completion.
+
+For each layer:
+
+1. Activate any required environment (venv for Python, node_modules for JS)
+2. Run the test command
+3. Capture the full output including pass/fail counts
+
+### 6c: Fix All Failures
+
+**If all layers pass**: record results and proceed to Step 7.
+
+**If any layer has failures** -- whether introduced by this implementation or pre-existing:
+
+1. Read the failure output to identify every failing test and its root cause
+2. Fix the failures in code -- prioritize fixing the implementation over modifying tests, unless the test itself has a bug (e.g., stale mocks, missing context providers, incorrect assertions)
+3. Re-run ONLY the layers that had failures
+4. Repeat until all tests pass
+
+Do NOT dismiss failures as "pre-existing" or "unrelated to this change." A green suite is the goal. If 37 frontend tests fail because of a missing `useAuth` context wrapper, fix them.
+
+**Cap at 3 remediation cycles.** If failures persist after 3 cycles, stop and include the remaining failures in the summary as unresolved items with root-cause analysis for each.
+
+## Step 7: Summary (Main Agent -- Text Only)
 
 **OUTPUT a summary and END your turn. Do NOT call any more tools.**
 
-Present the combined results from all verification and alignment steps:
+Present the combined results from all verification, alignment, and test steps:
 
 ### Implementation
 
@@ -140,6 +182,17 @@ Present the combined results from all verification and alignment steps:
 - Pattern deviations found and fixed: N
 - Unresolved issues: N (list if any)
 
+### Test Suite Results
+
+For each layer that was run, report:
+
+- **Backend**: X passed, Y failed (or "all passed")
+- **Frontend**: X passed, Y failed (or "all passed")
+- **E2E (Playwright)**: X passed, Y failed (or "all passed")
+- Failures found and fixed: N (note which were pre-existing vs. introduced)
+- Remediation cycles used: N of 3
+- Unresolved failures: N (list with root-cause analysis if any)
+
 ### Spec Alignment
 
 - Deviations found and resolved: N
@@ -148,6 +201,6 @@ Present the combined results from all verification and alignment steps:
 
 ### Next Steps
 
-Suggest the user review the changes, run the test suite, and commit when satisfied. If there are unresolved issues from the remediation cap, list them as action items.
+Suggest the user review the changes and commit when satisfied. If there are unresolved issues from any remediation cap (Step 4 or Step 6), list them as action items. Do NOT suggest running the test suite -- it has already been run.
 
 Your response for this step MUST be a text message only -- no tool calls, no file edits.

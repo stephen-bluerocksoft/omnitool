@@ -20,6 +20,7 @@ This is a **content-only repository** -- it contains Markdown files, shell scrip
 omnitool/
   agents/     # Subagent definitions (installed to ~/.cursor/agents/)
   commands/   # Slash commands (installed to ~/.cursor/commands/)
+  rules/      # User rules (paste into Cursor Settings > General > Rules for AI)
   scripts/    # Installation scripts
 ```
 

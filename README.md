@@ -31,6 +31,17 @@ This copies commands to `~/.cursor/commands/` and agents to `~/.cursor/agents/` 
 | ----- | ----------- |
 | `repo-test-auditor` | Repo-aware test auditor that discovers existing test patterns and validates new tests follow them |
 
+## User Rules
+
+Cursor user rules that apply globally across all projects. Each file in `rules/` is one rule -- paste its contents into **Cursor Settings > General > Rules for AI** as a separate entry.
+
+| Rule | Purpose |
+| ---- | ------- |
+| `global-defaults` | Conventional commits, Python venv, temp files |
+| `spec-first-development` | Speckit workflow, constitution compliance, branch naming |
+| `task-management` | Task splitting, completion verification, sub-agent verification |
+| `documentation-from-codebase` | Source documentation from code, never fabricate |
+
 ## Installation
 
 ```bash

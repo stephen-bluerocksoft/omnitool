@@ -40,7 +40,7 @@ Cursor user rules that apply globally across all projects. Each file in `rules/`
 | `global-defaults` | Conventional commits, Python venv, temp files |
 | `spec-first-development` | Speckit workflow, constitution compliance, branch naming |
 | `task-management` | Task splitting, completion verification, sub-agent verification |
-| `documentation-from-codebase` | Source documentation from code, never fabricate |
+| `documentation-standards` | Source documentation from code, never fabricate |
 
 ## Installation
 

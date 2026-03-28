@@ -1,4 +1,4 @@
-# Documentation from Codebase
+# Documentation Standards
 
 All documentation MUST be sourced strictly from the codebase. Never fabricate content.
 

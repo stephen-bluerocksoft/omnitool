@@ -8,6 +8,10 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty). The user may provide a PR number, a full GitHub PR URL, or scope hints (e.g., "focus on the auth changes", "ignore the test refactoring", "this is a clinical application"). If no PR is specified, auto-detect from the current branch.
 
+## Execution Constraint
+
+Do NOT use the Task tool to delegate work to subagents. Execute all steps sequentially in the main agent context. Subagents default to a lesser model (Composer 2) that degrades quality for judgment-intensive work.
+
 ## Overview
 
 Perform a comprehensive PR review that combines standards enforcement with logic correctness analysis. This command reads the full PR thread to understand intent before judging the code -- findings are anchored to what the PR is trying to accomplish, not just what the code looks like.

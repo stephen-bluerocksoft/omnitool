@@ -12,6 +12,10 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty). The user may specify a spec number or name (e.g., "005", "admin-api"), a branch name, or specific tasks to implement (e.g., "just phase 2", "T005-T010 only").
 
+## Execution Constraint
+
+Do NOT use the Task tool to delegate work to subagents. Execute all steps sequentially in the main agent context. Subagents default to a lesser model (Composer 2) that degrades quality for judgment-intensive work.
+
 ## Step 1: Verify Prerequisites
 
 1. Run `git branch --show-current` to get the current branch

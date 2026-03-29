@@ -14,6 +14,10 @@ You **MUST** use the user input as the feature description. If empty, ask the us
 
 This command ALWAYS creates a new spec. Even if an existing spec directory seems related, create a new spec -- do NOT modify or extend existing specs.
 
+## Execution Constraint
+
+Do NOT use the Task tool to delegate work to subagents. Execute all steps sequentially in the main agent context. Subagents default to a lesser model (Composer 2) that degrades quality for judgment-intensive work.
+
 ## Step 1: Verify Speckit Initialization
 
 Check if speckit command files exist **in the current project/workspace root directory** at `<project-root>/.cursor/commands/speckit.*.md` (e.g., `speckit.specify.md`, `speckit.plan.md`). Do NOT check `~/.cursor/commands/` -- that is the user-level directory where this command lives, not the project directory.

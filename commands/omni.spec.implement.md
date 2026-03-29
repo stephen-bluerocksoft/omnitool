@@ -12,18 +12,6 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty). The user may specify a spec number or name (e.g., "005", "admin-api"), a branch name, or specific tasks to implement (e.g., "just phase 2", "T005-T010 only").
 
-## Context-Optimization Strategy
-
-This command reserves the main agent's context budget for **implementation and remediation** -- the two steps that benefit most from full codebase awareness. All other work is delegated to sub-agents:
-
-- **Step 1** (main): lightweight prerequisite checks
-- **Step 2** (main): implementation -- the core work that needs full context
-- **Step 3** (sub-agents): verification runs in parallel, outside main context
-- **Step 4** (main): remediation -- fixing issues while implementation is still in context
-- **Step 5** (sub-agent): spec alignment runs outside main context
-- **Step 6** (main): run full test suite and fix regressions
-- **Step 7** (main): text-only summary
-
 ## Step 1: Verify Prerequisites
 
 1. Run `git branch --show-current` to get the current branch
@@ -37,7 +25,7 @@ This command reserves the main agent's context budget for **implementation and r
 
 If any prerequisite fails, tell the user what is missing and suggest running `/omni.spec.create` first.
 
-## Step 2: Implement (Main Agent Context)
+## Step 2: Implement
 
 Read the project's `speckit.implement.md` command file at `<project-root>/.cursor/commands/speckit.implement.md` and follow its instructions to execute tasks from `tasks.md`.
 
@@ -52,70 +40,138 @@ If `speckit.implement.md` does not exist in the project, implement tasks directl
 5. Execute tasks in dependency order, respecting `[P]` parallel markers where possible
 6. Mark each task as `[X]` in `tasks.md` as you complete it
 
-This step stays in the main context because implementation requires full codebase awareness and iterative file editing.
+## Step 3: Post-Implementation Verification
 
-## Step 3: Post-Implementation Verification (Sub-Agents in Parallel)
+After implementation is complete, verify the work directly. Execute both verification passes sequentially.
 
-Launch **two sub-agents in parallel** via the Task tool. Both run concurrently to minimize wait time.
+### 3a: Task Verification
 
-### Sub-Agent A: `spec-task-verifier`
+Verify that every task marked `[X]` in `tasks.md` has real, functioning implementation:
 
-Launch with `subagent_type: "spec-task-verifier"`.
+1. **Parse tasks** -- extract every task marked `[X]`. For each, record the task ID, description, file paths mentioned, keywords that identify the deliverable, and whether the task says "create/add" or "update/modify".
 
-The prompt needs:
+2. **Grep for evidence** -- for each claimed-complete task:
+   - Check that all file paths mentioned in the task actually exist
+   - Grep target directories for keywords from the task description -- zero hits means no evidence
+   - If the task specifies concrete outputs (e.g., "add 3 tests"), count them
+   - If the task says "create," verify the file is new; if "update," verify it was changed
 
-1. The spec directory path (e.g., `specs/005-my-feature/`)
-2. The workspace root path (absolute path)
+3. **Functional validation** -- for tasks where files exist:
+   - Read the file and check that imported modules/packages exist
+   - Look for TODO comments, `pass` statements, `NotImplementedError`, empty function bodies, or stub implementations
+   - If the task involves test files, lint or typecheck them
+   - If the task involves connecting components (routes, middleware, DI), verify the wiring in entry point files
 
-The agent reads `tasks.md`, greps for evidence of each completed task, validates implementations are functional, and reports phantom completions or broken implementations. You do NOT need to explain the verification process in the prompt.
+4. **Cross-reference with spec** -- read `spec.md` acceptance criteria and verify at least one verified task backs each criterion. Flag uncovered acceptance criteria.
 
-### Sub-Agent B: `repo-test-auditor`
+Record results as: verified tasks, phantom completions (marked done but no evidence), broken implementations (files exist but incomplete), and uncovered acceptance criteria.
 
-Launch with `subagent_type: "repo-test-auditor"`.
+### 3b: Test Audit
 
-The prompt needs:
+Audit test coverage and pattern consistency for changed code:
 
-1. The workspace root path (absolute path)
-2. The base branch to diff against (usually `main`)
+1. **Discover test setup** -- find test directories and identify the test framework from config files (`pytest.ini`, `jest.config.*`, `vitest.config.*`, etc.). Read 3-5 existing test files and extract naming patterns, directory structure, fixture/import patterns, assertion style, and mocking approach.
 
-The agent discovers the repo's test framework and conventions, identifies changed source files, and audits test coverage and pattern consistency. You do NOT need to explain the audit process in the prompt.
+2. **Identify changed code** -- run `git diff main --name-only --diff-filter=AM`, filter to source files only, and determine each file's expected test location based on discovered conventions.
 
-Wait for both to complete. Capture their reports.
+3. **Audit tests** -- for each changed source file, check:
+   - Does the expected test file exist?
+   - Does it follow the repo's naming, fixture, and assertion patterns?
+   - Does it cover the source file's public API?
+   - Does it compile/parse without errors?
 
-## Step 4: Remediation Loop (Main Agent)
+Record results as: missing tests, pattern deviations, and coverage gaps.
 
-Review the reports from both verification agents.
+## Step 4: Remediation Loop
 
-**If both agents report zero issues**: skip to Step 5.
+Review the results from both verification passes (Step 3a and 3b).
 
-**If either agent reports issues**:
+**If both passes report zero issues**: skip to Step 5.
 
-1. Read the specific failures from each report
+**If either pass found issues**:
+
+1. Read the specific failures from each result set
 2. Fix the issues in code:
    - Phantom completions: implement the missing functionality
    - Broken implementations: fix the broken code
    - Missing tests: add tests following the repo's conventions
    - Pattern deviations: update tests to match repo patterns
 3. Mark any newly completed tasks as `[X]` in `tasks.md`
-4. Re-launch ONLY the agent(s) that reported failures, with the same parameters
-5. Review the new reports
+4. Re-run ONLY the verification pass(es) that found failures
+5. Review the new results
 
 **Cap at 2 remediation cycles.** If issues persist after 2 cycles, include them in the summary as unresolved items rather than looping indefinitely.
 
-## Step 5: Align Spec (Sub-Agent)
+## Step 5: Align Spec
 
-Launch a **Task** sub-agent with `subagent_type: "spec-aligner"`.
+Update spec artifacts so they accurately describe what was built. The implementation is the source of truth.
 
-The prompt needs:
+### 5a: Read All Spec Artifacts
 
-1. The spec directory path (e.g., `specs/005-my-feature/`)
-2. The workspace root path (absolute path)
+Read every file in the spec directory and extract:
 
-The agent reads all spec artifacts, compares them against the implementation, and updates spec artifacts to match what was built. You do NOT need to explain the alignment process in the prompt.
+| Artifact | What to extract |
+| -------- | --------------- |
+| `spec.md` | Requirements (FR-NNN), user stories, acceptance scenarios, edge cases, assumptions |
+| `plan.md` | Key technical decisions, project structure listing, architecture |
+| `contracts/` | API contracts -- request/response schemas, status codes, event types |
+| `data-model.md` | Entities, fields, relationships, constraints |
+| `research.md` | Decisions, rationale, resolved/unresolved open items |
+| `tasks.md` | Task breakdown, completion status, dependency graph |
+| `quickstart.md` | Setup steps, validation scenarios |
 
-Wait for completion. Capture the deviation summary.
+Record the last FR ID and last task ID so new IDs continue sequentially.
 
-## Step 6: Run Full Test Suite (Main Agent)
+### 5b: Read the Actual Implementation
+
+1. Read the project structure from `plan.md` and read every file listed there in full
+2. Find files not in the plan using `git diff main --name-only` and `git diff main --stat`. Read any unlisted implementation files (not IDE config, lockfiles, etc.)
+3. For each endpoint, function, or module described in the spec, read the implementation and note what it actually does
+
+### 5c: Identify Deviations
+
+Compare spec claims against implementation reality. For each deviation, record the category, spec claim, and implementation reality:
+
+| Category | What to look for |
+| -------- | ---------------- |
+| Behavior changes | Endpoint/function does more or less than spec says |
+| New features | Implemented functionality not mentioned in any spec artifact |
+| Modified signatures | Function parameters, return types, API contracts changed from spec |
+| New files | Scripts, tooling, config files added but not in project structure |
+| Removed features | Spec describes functionality that was not implemented or was removed |
+| Edge cases | New edge cases discovered and handled during implementation |
+| Assumptions invalidated | Spec assumptions that turned out wrong during implementation |
+| Data model changes | Fields added/removed, types changed, new relationships |
+
+Do NOT flag trivial differences (variable naming, internal refactoring that preserves behavior). Focus on deviations that would mislead someone reading the spec.
+
+### 5d: Update Spec Artifacts
+
+For **each** deviation, update the spec to match what was built:
+
+| Artifact | What to update |
+| -------- | -------------- |
+| `spec.md` | Add/update functional requirements (FR-NNN), acceptance scenarios, edge cases, assumptions |
+| `contracts/` | Update request/response schemas, status codes, handled event types. Add new contract files if new APIs were introduced |
+| `plan.md` | Update key technical decisions, project structure listing. Add new files. Remove files that were not created |
+| `research.md` | Add new decisions with rationale. Remove or update invalidated decisions |
+| `tasks.md` | Mark completed tasks as `[X]`. Add new tasks for work done outside the original plan |
+| `quickstart.md` | Add validation scenarios for new behavior. Update setup steps if they changed |
+| `data-model.md` | Update entities, fields, relationships, constraints to match actual schema |
+
+Rules: new FRs get sequential IDs, new tasks get sequential IDs, cross-reference new FRs in the tasks that implement them, preserve existing content that is still accurate, match the style of existing content.
+
+### 5e: Self-Verification
+
+1. Confirm every deviation has a corresponding spec update
+2. Verify new FR and task IDs are sequential with no gaps or duplicates
+3. Verify new tasks reference the FRs they implement and vice versa
+4. Confirm every spec update reflects actual implemented behavior, not aspirational work
+5. Confirm artifacts do not contradict each other after all updates
+
+Record: deviations found by category, artifacts updated, and remaining gaps.
+
+## Step 6: Run Full Test Suite
 
 Run the complete test suite. Fix **all** failures -- not just regressions introduced by the current changes. Pre-existing failures are tech debt that compounds; if the suite surfaces them, fix them now.
 
@@ -156,7 +212,7 @@ Do NOT dismiss failures as "pre-existing" or "unrelated to this change." A green
 
 **Cap at 3 remediation cycles.** If failures persist after 3 cycles, stop and include the remaining failures in the summary as unresolved items with root-cause analysis for each.
 
-## Step 7: Summary (Main Agent -- Text Only)
+## Step 7: Summary (Text Only)
 
 **OUTPUT a summary and END your turn. Do NOT call any more tools.**
 
@@ -169,13 +225,13 @@ Present the combined results from all verification, alignment, and test steps:
 
 ### Verification Results
 
-**Task Verification** (from spec-task-verifier):
+**Task Verification**:
 - Verified: N tasks
 - Phantom completions found and fixed: N
 - Broken implementations found and fixed: N
 - Unresolved issues: N (list if any)
 
-**Test Audit** (from repo-test-auditor):
+**Test Audit**:
 - Framework detected: [name]
 - Tests present: N of N changed source files
 - Missing tests found and added: N

@@ -20,17 +20,20 @@ Do NOT use the Task tool to delegate work to subagents. Execute all steps sequen
 
 ## Step 1: Verify Speckit Initialization
 
-Check if speckit command files exist **in the current project/workspace root directory** at `<project-root>/.cursor/commands/speckit.*.md` (e.g., `speckit.specify.md`, `speckit.plan.md`). Do NOT check `~/.cursor/commands/` -- that is the user-level directory where this command lives, not the project directory.
+**Dotfile directory warning**: Both `.specify/` and `.cursor/` are dotfile directories. Glob's `**/` recursion silently skips dotfile directories, which causes false negatives. Use `ls` via the Shell tool to check for these directories -- never rely on Glob alone.
 
-**Important**: The `.cursor` directory is a dotfile directory. Glob's `**/` recursion skips dotfile directories, so you MUST use the `target_directory` parameter to search inside it explicitly.
+Run these checks from the project root:
 
-If the project's `.cursor/commands/` directory does NOT contain any `speckit.*.md` files:
+1. `ls -d .specify/ .cursor/commands/speckit.*.md 2>/dev/null` to detect both the speckit data directory and command files
+2. Do NOT check `~/.cursor/commands/` -- that is the user-level directory where this command lives, not the project directory
 
-1. `cp .specify/memory/constitution.md /tmp/constitution-backup.md`
+If `.cursor/commands/speckit.*.md` files already exist, continue to Step 2.
+
+If they do NOT exist, initialize speckit:
+
+1. `cp .specify/memory/constitution.md /tmp/constitution-backup.md` (skip if `.specify/` does not exist yet)
 2. `specify init --here --ai cursor-agent --force`
-3. `cp /tmp/constitution-backup.md .specify/memory/constitution.md`
-
-If speckit commands already exist in the project, continue.
+3. `cp /tmp/constitution-backup.md .specify/memory/constitution.md` (skip if no backup was made)
 
 ## Step 2: Create Feature Spec
 

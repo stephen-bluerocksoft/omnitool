@@ -82,23 +82,48 @@ All git and gh commands that modify state (push, pr create) require write permis
    ```markdown
    ## Summary
 
-   <1-3 bullet points describing what this PR does and why>
+   <Bullet list -- one bullet per distinct deliverable in the PR. Each bullet
+   should name the concrete artifact (file, flag, endpoint, page) and state
+   what it does. Aim for completeness: a reviewer reading only the Summary
+   should know every deliverable.>
 
-   ## Changes
+   ## Context
 
-   <Bulleted list of key changes, grouped logically>
+   <1-2 paragraphs explaining WHY this change exists. What problem was hit,
+   what gap was discovered, or what product need drove it. Mention any PRs
+   this supersedes or relates to.>
+
+   ## <Area: short description>
+
+   <For each logically distinct change area (feature, subsystem, module),
+   create a separate section with a descriptive heading. Include:
+   - A paragraph explaining what it does and any design decisions
+   - Security, performance, or compatibility notes when relevant
+   - A **Changes:** sub-list naming the specific files or components touched>
+
+   **Changes:**
+   - `path/to/file.ext` -- what was added or changed
+   - `path/to/other.ext` (new) -- brief description
+
+   ## <Another area: short description>
+
+   ...repeat for each distinct area...
 
    ## Test plan
 
-   <How to verify the changes work -- checklist format>
+   <Checklist of verification steps, specific to the changes in this PR.
+   Use `- [ ]` for items the reviewer should check.>
    ```
 
    Guidelines:
-   - The Summary should explain the "why", not just the "what"
-   - Changes should be derived from the actual commit messages and diff
-   - Test plan should be actionable and specific to the changes
-   - If a spec exists for the branch (check `specs/<branch-name>/`), reference acceptance criteria from `spec.md`
-   - Do NOT fabricate changes -- only describe what is actually in the diff
+   - **Summary** lists deliverables, not motivations. Each bullet names a file, flag, route, or capability.
+   - **Context** explains the "why" -- the problem, gap, or product need. Reference related PRs or issues.
+   - **Change sections** group related work under descriptive headings (e.g., "Frontend: welcome page", "Auth: multi-domain support", "CLI: new --workflow-dirs flag"). One section per logical area.
+   - Within each change section, include a `**Changes:**` sub-list that names specific files with brief annotations. Mark new files with `(new)`.
+   - Omit a change section if the PR is truly single-purpose -- but most PRs that touch multiple areas benefit from the structure.
+   - Test plan should be actionable and specific to the changes.
+   - If a spec exists for the branch (check `specs/<branch-name>/`), reference acceptance criteria from `spec.md`.
+   - Do NOT fabricate changes -- only describe what is actually in the diff.
 
 9. **If the branch name matches a spec folder** (e.g., branch `017-infra-cleanup` has `specs/017-infra-cleanup/`):
    - Read `spec.md` for user stories and acceptance criteria

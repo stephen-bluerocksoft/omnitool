@@ -33,13 +33,26 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
    git log --since="<start>" --until="<end>" --all --stat --format="%h %s" --reverse
    ```
 
-4. **Check for merged PRs** in the current repo:
+4. **Check for merged PRs** in the current repo (metadata for attribution, not just listing):
 
    ```sh
-   gh pr list --state merged --search "merged:>=<start-date>" --json number,title,mergedAt,url --limit 50
+   gh pr list --state merged --search "merged:>=<start-date>" --json number,title,mergedAt,url,author,mergedBy,reviews --limit 50
    ```
 
-   If `gh` is not available or fails, skip this step gracefully.
+   For **each PR** you might mention in the timetrack, resolve the user's role before writing copy. When in doubt, use `gh pr view <number> --json author,mergedBy,reviews,commits` for the current repo, or `gh pr view <number> -R owner/repo --json ...` for other repositories, or the Pulls API. You need whether the authenticated user **authored**, **merged**, **reviewed** (submitted review), or only has **commits** on the branch.
+
+   If `gh` is not available or fails, rely on commit authorship only and **do not** imply PR merges the user did not author or merge.
+
+4b. **Attribution rules for PRs** (prevents reviewing others' work from reading as your delivery):
+
+   | Evidence | How to phrase (plain text) |
+   | -------- | -------------------------- |
+   | User is PR **author** (or their commits are the substantive change) | Delivery language is OK: what shipped, outcomes, "in PR #N" if helpful. |
+   | User **reviewed** (appears in `reviews`) but is **not** the author | **Must** lead with review role: e.g. "Code review on PR #N:" or "Reviewed PR #N (repo name):" then summarize **what the PR changes** without implying you wrote it. Do **not** use "Merged PR #N to..." for review-only work. |
+   | User is **mergedBy** but **not** author | Say **merged** or **integrated** and name that it came from another contributor/team if known (e.g. "Merged PR #N from contributor X ..." or "Integrated PR #N ..."). Do not describe the feature work as if you implemented it unless your commits are in that PR. |
+   | PR merged in range but user's only tie is review | Same as review row: explicit **review** framing only. |
+
+   **Anti-pattern to avoid**: Phrases like "Merged PR 45 to strengthen CI..." when the user's role was **reviewer** -- that reads as you shipped the change. Replace with review-first wording and, where useful, a short nod to authorship ("author's PR", "contributor PR", or the author's login if appropriate for your audience).
 
 ### Phase 2b: Gather Context (All Repos)
 
@@ -117,8 +130,9 @@ The user pastes the timetrack into a system that **does not support markdown**. 
    - Group related commits into a single bullet rather than listing each commit
    - Use plain language; avoid jargon (no "enum", "migration", "dependency injection")
    - Lead with the *what* and *why*, not the *how*
-   - Mention merged PRs by number where relevant
-   - Do NOT fabricate work -- only describe what is in the actual commit history
+   - When referencing a PR, **match language to role** (see step 4b): reviewed vs authored vs merged-by-you. Never describe reviewed-only PRs as your own merge or implementation.
+   - Mention PR numbers where relevant, with correct attribution
+   - Do NOT fabricate work -- only describe what is in the actual commit history and PR metadata
 
 10. **Present the timetrack** as copy-ready plain text in the assistant response. Do **not** wrap the timetrack in markdown code fences or any other markdown -- the user should be able to copy it straight into their timetracking tool.
 
@@ -130,4 +144,4 @@ The user pastes the timetrack into a system that **does not support markdown**. 
 - **Keep it concise** -- each theme should be 1-3 sentences, not paragraphs.
 - **Management-friendly language** -- translate technical changes into business outcomes.
 - **Respect date boundaries** -- only include commits within the requested range.
-- **Include PR references** -- mention PR numbers when a merge occurred.
+- **Include PR references** -- mention PR numbers when relevant, with **correct attribution** (review vs author vs merger per step 4b).

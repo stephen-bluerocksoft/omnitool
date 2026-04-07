@@ -20,6 +20,8 @@ Perform a comprehensive PR review that combines standards enforcement with logic
 
 This command replaces the sequential `brs.review` then `brs.hunt` workflow for GitHub PRs. It applies both analytical lenses in a single pass and delivers feedback directly to GitHub.
 
+**Local repository**: Before reading files on disk, check out the PR head locally (`gh pr checkout` fetches when needed). After the review is fully posted to GitHub, return to the branch or commit you started from, then delete **that same local branch** — the PR head you checked out for this review (`REVIEWED_BRANCH`) — with `git branch -d` when safe. Do not leave that cleanup to the user as optional "you can delete later" advice; Step 6 performs it (or records skip/failure).
+
 ## Instructions
 
 Execute the review as **three sequential phases**. Do NOT skip any phase.
@@ -106,6 +108,33 @@ Before judging code, understand what the PR is trying to do and why.
    - **Prior review feedback**: Has this PR been reviewed before? What was requested?
 
    This narrative drives Phase 2 -- it tells you what to look for and what the author intended.
+
+6a. **Check out the PR head locally** (fetch if needed, then review on that tree). Do this **before** step 7 so full-file reads match the PR.
+
+   1. **Record where to return** after the review:
+
+      ```bash
+      STARTING_BRANCH=$(git branch --show-current)
+      STARTING_SHA=$(git rev-parse HEAD)
+      ```
+
+      If `STARTING_BRANCH` is empty, you were in detached `HEAD`; restore with `STARTING_SHA` later.
+
+   2. **Working tree**: If there are unstaged or staged changes, stop and tell the user to stash, commit, or discard. Do not checkout over a dirty tree without explicit user consent.
+
+   3. **Fetch and checkout** (handles same-repo and fork PRs):
+
+      ```bash
+      gh pr checkout <number>
+      ```
+
+   4. **Record the local branch name** used for this PR (for cleanup):
+
+      ```bash
+      REVIEWED_BRANCH=$(git branch --show-current)
+      ```
+
+      If checkout fails, stop and report the error; do not assume the working tree matches the PR.
 
 7. **Read every changed file in full** on the checked-out branch -- not just the diff. Context reveals whether changes are consistent with surrounding code, whether error handling matches existing patterns, and whether file length limits are exceeded.
 
@@ -333,11 +362,13 @@ The review body should follow this structure:
 <2-3 sentences: what the PR does, overall assessment>
 
 ### Must Fix
-<Blocker and Critical findings, or "No must-fix findings.">
+<One short line per Blocker/Critical: what is wrong and where. If full trigger/impact/fix
+for a logic bug lives under Bugs Found, do not repeat that narrative here — only a headline.>
 
 ### Bugs Found
-<ONLY include this section if logic defects were found. Each entry: trigger, impact, fix.
-Omit this entire section (header and body) when there are no defects.
+<ONLY when logic/behavior defects need a trigger/impact/fix story. Omit this entire section
+when Must Fix is sufficient on its own, when there are no defects, or when it would only
+repeat Must Fix in longer form (pick one depth per finding — not both).
 Never use this section for positive commentary on correct code.>
 
 ### Recommended
@@ -346,6 +377,13 @@ Never use this section for positive commentary on correct code.>
 ### Verdict
 <APPROVE or REQUEST CHANGES with justification>
 ```
+
+**Must Fix vs Bugs Found** (dedupe and depth):
+
+1. Every Blocker and Critical **must** appear in **Must Fix** (even if also a logic bug).
+2. **Bugs Found** is optional. Use it only for logic/behavior defects where **trigger, impact, fix** adds clarity beyond a one-liner.
+3. **Do not duplicate** the same finding at full depth in both sections. If you use **Bugs Found** for an item, keep the matching **Must Fix** line to a **headline** (name the defect; no second full explanation). If the issue is clear from a short **Must Fix** line alone, **omit Bugs Found** for that item — and **omit the entire Bugs Found section** when nothing needs the long form.
+4. Blocker/Critical findings that are **not** logic bugs (e.g. hardcoded secret, policy violation) belong in **Must Fix** only — not again under **Bugs Found**.
 
 Execute the appropriate command:
 
@@ -369,16 +407,45 @@ EOF
 
 **After submitting**, confirm to the user what was posted.
 
+#### Step 6: Restore previous branch and delete local review branch
+
+After all review `gh` commands in this phase succeed:
+
+1. **Checkout the starting ref**:
+
+   - If `STARTING_BRANCH` is non-empty: `git checkout "$STARTING_BRANCH"`
+   - If `STARTING_BRANCH` is empty (detached at start): `git checkout "$STARTING_SHA"`
+
+2. **Delete the local PR head branch used for this review** (`REVIEWED_BRANCH` — the branch `gh pr checkout` put you on; the local copy of the branch this PR is from). That is the branch to remove, not some other ref. Use `git branch -d` when `REVIEWED_BRANCH` is non-empty:
+
+   ```bash
+   git branch -d "$REVIEWED_BRANCH"
+   ```
+
+   **Skip `git branch -d`** when:
+
+   - `REVIEWED_BRANCH` is empty (`gh pr checkout` left detached `HEAD` -- there is no local branch name to delete)
+   - `REVIEWED_BRANCH` equals `STARTING_BRANCH` (you started on the PR head; removing it would delete the branch you were already using)
+
+   If `git branch -d` refuses because the branch is not fully merged, report Git's message and leave the branch in place. Do not use `git branch -D` unless the user explicitly asks to force-delete.
+
+3. **User-facing summary (Git)**: State the **exact branch name** `REVIEWED_BRANCH` when reporting deleted / skipped / left. Example: `Deleted local review branch 047-datastore-mcp-server` or `Left branch 047-datastore-mcp-server: not merged`.
+
+   **Do not** tell the user they may delete the PR branch "later" with `git branch -D <name>` as generic housekeeping. Step 6 already performed cleanup or explained why the branch remains. Suggesting redundant manual deletion contradicts the workflow and reads as if the command did not remove the checkout branch.
+
 ## Local Output
 
 After executing all `gh` commands, show the user a brief confirmation of what was posted. This is a summary -- the real review lives on the PR in GitHub.
 
 **Tone**: Direct and terse.
 
+**Git line**: Must match Step 6 — include **`REVIEWED_BRANCH` by name** (e.g. `Deleted REVIEWED_BRANCH`, `Skipped delete (started on same branch)`, `Left REVIEWED_BRANCH: not merged`). Never add a separate suggestion to remove the PR head branch later with `-D`; that duplicates or overrides Step 6.
+
 ```text
 PR:       <owner/repo>#<number> — <title>
 Verdict:  <APPROVE|REQUEST CHANGES>
 Posted:   <N> inline comments, 1 review
+Git:      Restored to <branch or detached SHA>; <deleted|skipped|left> local review branch <REVIEWED_BRANCH>: <reason if needed>
 ```
 
 ### Inline Comments Posted

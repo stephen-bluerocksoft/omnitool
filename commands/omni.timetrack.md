@@ -134,7 +134,7 @@ The user pastes the timetrack into a system that **does not support markdown**. 
    - Mention PR numbers where relevant, with correct attribution
    - Do NOT fabricate work -- only describe what is in the actual commit history and PR metadata
 
-10. **Present the timetrack** as copy-ready plain text in the assistant response. Do **not** wrap the timetrack in markdown code fences or any other markdown -- the user should be able to copy it straight into their timetracking tool.
+10. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Cursor renders bare `-` lines as markdown bullets, which strips the dash on copy-paste. A code block preserves the characters exactly and provides a one-click copy button.
 
 11. **If no commits exist** for the date range (local or cross-repo), report that clearly and suggest checking a different date.
 

@@ -97,9 +97,15 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
 
 The user pastes the timetrack into a system that **does not support markdown**. The **deliverable** must be plain text: no `#` headings, no `**bold**`, no backticks, no markdown lists other than lines starting with `-` and a space.
 
-9. **Write the timetrack entry** using this structure:
+9. **Determine the day of week** for each date using a shell command -- do NOT attempt to calculate it mentally:
 
-   - First line: `YYYY-MM-DD (Day of Week)`
+   ```sh
+   date -j -f "%Y-%m-%d" "YYYY-MM-DD" "+%A"
+   ```
+
+10. **Write the timetrack entry** using this structure:
+
+   - First line: `YYYY-MM-DD (Day of Week)` (using the shell-verified day name from step 9)
    - Blank line, then a repo or project name as a single line (ALL CAPS or Title Case is fine).
    - Blank line, then each **theme** as a short title line (plain text only).
    - Under each theme, one or more lines starting with `-` and a space (1-2 sentences each).
@@ -134,9 +140,9 @@ The user pastes the timetrack into a system that **does not support markdown**. 
    - Mention PR numbers where relevant, with correct attribution
    - Do NOT fabricate work -- only describe what is in the actual commit history and PR metadata
 
-10. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Cursor renders bare `-` lines as markdown bullets, which strips the dash on copy-paste. A code block preserves the characters exactly and provides a one-click copy button.
+11. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Cursor renders bare `-` lines as markdown bullets, which strips the dash on copy-paste. A code block preserves the characters exactly and provides a one-click copy button.
 
-11. **If no commits exist** for the date range (local or cross-repo), report that clearly and suggest checking a different date.
+12. **If no commits exist** for the date range (local or cross-repo), report that clearly and suggest checking a different date.
 
 ## Important Rules
 

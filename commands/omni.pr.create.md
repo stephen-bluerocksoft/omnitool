@@ -82,24 +82,18 @@ All git and gh commands that modify state (push, pr create) require write permis
    ```markdown
    ## Summary
 
-   <Bullet list -- one bullet per distinct deliverable in the PR. Each bullet
-   should name the concrete artifact (file, flag, endpoint, page) and state
-   what it does. Aim for completeness: a reviewer reading only the Summary
-   should know every deliverable.>
-
-   ## Context
-
-   <1-2 paragraphs explaining WHY this change exists. What problem was hit,
-   what gap was discovered, or what product need drove it. Mention any PRs
-   this supersedes or relates to.>
+   <1-3 bullet points describing what this PR delivers at a conceptual level.
+   Each bullet should state a capability, behavior change, or outcome -- NOT
+   list individual files. A reviewer reading only the Summary should understand
+   the scope and purpose of the PR in 10 seconds.>
 
    ## <Area: short description>
 
    <For each logically distinct change area (feature, subsystem, module),
-   create a separate section with a descriptive heading. Include:
-   - A paragraph explaining what it does and any design decisions
-   - Security, performance, or compatibility notes when relevant
-   - A **Changes:** sub-list naming the specific files or components touched>
+   create a separate section with a descriptive heading. Start with a paragraph
+   explaining what it does, why, and any design decisions. Include security,
+   performance, or compatibility notes when relevant. End with a **Changes:**
+   sub-list naming the specific files or components touched.>
 
    **Changes:**
    - `path/to/file.ext` -- what was added or changed
@@ -116,9 +110,8 @@ All git and gh commands that modify state (push, pr create) require write permis
    ```
 
    Guidelines:
-   - **Summary** lists deliverables, not motivations. Each bullet names a file, flag, route, or capability.
-   - **Context** explains the "why" -- the problem, gap, or product need. Reference related PRs or issues.
-   - **Change sections** group related work under descriptive headings (e.g., "Frontend: welcome page", "Auth: multi-domain support", "CLI: new --workflow-dirs flag"). One section per logical area.
+   - **Summary** is conceptual, not exhaustive. State capabilities and outcomes, not files. 1-3 bullets max. Do NOT duplicate the per-section Changes lists.
+   - **Change sections** group related work under descriptive headings (e.g., "Frontend: welcome page", "Auth: multi-domain support", "CLI: new --workflow-dirs flag"). One section per logical area. Each section should open with motivation and design rationale.
    - Within each change section, include a `**Changes:**` sub-list that names specific files with brief annotations. Mark new files with `(new)`.
    - Omit a change section if the PR is truly single-purpose -- but most PRs that touch multiple areas benefit from the structure.
    - Test plan should be actionable and specific to the changes.

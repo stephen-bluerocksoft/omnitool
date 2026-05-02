@@ -18,6 +18,7 @@ This copies commands to `~/.cursor/commands/` and agents to `~/.cursor/agents/` 
 | ------- | ----------- |
 | `/omni.spec.create` | Create spec artifacts for a feature using the spec-first workflow |
 | `/omni.spec.implement` | Implement a feature from its spec with post-implementation verification |
+| `/omni.plan.implement` | Execute a Cursor Plan Mode plan with verification and proactive test creation |
 | `/omni.spec.align` | Audit and sync spec artifacts with the actual implementation |
 | `/omni.commit` | Checkpoint changes as logically grouped conventional commits (compact-before-PR workflow) |
 | `/omni.compact` | Compact a feature branch's noisy commit history into clean, logical commits |

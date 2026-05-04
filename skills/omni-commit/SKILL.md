@@ -1,16 +1,12 @@
 ---
-description: Checkpoint changes as logically grouped conventional commits (designed for compact-before-PR workflow)
+name: omni-commit
+description: Checkpoint changes as logically grouped conventional commits. Use when ready to commit staged or unstaged changes.
+disable-model-invocation: true
 ---
 
-## User Input
+## Shortcuts
 
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may specify which files to commit, a commit message hint, or ask to commit only specific changes.
-
-**Shortcuts**: Check the user's input for these keywords (case-insensitive) before proceeding to the standard flow:
+Check the user's message for these keywords (case-insensitive) before proceeding to the standard flow:
 
 | Keyword | Behavior |
 | ------- | -------- |
@@ -18,7 +14,7 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
 
 ## Full Commit Shortcut
 
-When the user invokes `/omni.commit full` (with optional additional hints after `full`), produce **polished, permanent commits** that will not be compacted. This is for commits landing directly on `main`/`dev`, hotfixes, one-off changes, or any branch where `/omni.compact` will not run.
+When the user invokes `/omni-commit full` (with optional additional hints after `full`), produce **polished, permanent commits** that will not be compacted. This is for commits landing directly on `main`/`dev`, hotfixes, one-off changes, or any branch where `/omni-compact` will not run.
 
 Follow the same Phase 1 and Phase 2 as the standard flow, with these differences:
 
@@ -75,7 +71,7 @@ All git commands that modify repository state (add, commit, reset, etc.) require
 
 ## Context
 
-This command creates **incremental checkpoint commits** during feature branch development. These commits are not the final history -- the branch will be compacted with `/omni.compact` before PR. The goal is **well-labeled checkpoints that give compact good grouping signals**, not polished commit messages.
+This command creates **incremental checkpoint commits** during feature branch development. These commits are not the final history -- the branch will be compacted with `/omni-compact` before PR. The goal is **well-labeled checkpoints that give compact good grouping signals**, not polished commit messages.
 
 What matters: **type**, **scope**, and a clear one-line description.
 What does not matter: detailed body text, footers, or multi-paragraph explanations.
@@ -218,5 +214,5 @@ What does not matter: detailed body text, footers, or multi-paragraph explanatio
 - **Never commit to main/master** without warning the user first. If on main/master, warn and ask for confirmation.
 - **Respect .gitignore**: Do not stage files that should be ignored.
 - **Submodule awareness**: If changes are inside a git submodule (e.g., `ood/ondemand/`), note that the submodule must be committed separately from the parent repo's submodule pointer update.
-- **Checkpoint mindset** (default mode): These commits will be rewritten by `/omni.compact` before PR. Focus on good labels (type + scope), not polished prose.
+- **Checkpoint mindset** (default mode): These commits will be rewritten by `/omni-compact` before PR. Focus on good labels (type + scope), not polished prose.
 - **Permanent mindset** (`full` mode): These commits are the final history. Invest in clear body text that explains what and why.

@@ -1,12 +1,10 @@
+---
+name: omni-pr-review
+description: Perform a comprehensive PR review with inline GitHub comments and a formal verdict. Use when reviewing a pull request.
+disable-model-invocation: true
+---
+
 # omni.pr.review
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may provide a PR number, a full GitHub PR URL, or scope hints (e.g., "focus on the auth changes", "ignore the test refactoring", "this is a clinical application"). If no PR is specified, auto-detect from the current branch.
 
 ## Execution Constraint
 

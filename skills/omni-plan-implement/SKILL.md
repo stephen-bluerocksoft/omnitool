@@ -1,16 +1,10 @@
 ---
-description: Execute a Cursor Plan Mode plan with post-implementation verification and proactive test creation
+name: omni-plan-implement
+description: Execute a Cursor Plan Mode plan with post-implementation verification and proactive test creation. Use when ready to implement from a .plan.md file.
+disable-model-invocation: true
 ---
 
 # omni.plan.implement
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may specify a plan name (e.g., "fix e2e test flakes"), a file path, or specific todos to implement (e.g., "just the tests todo", "skip docs").
 
 ## Execution Constraint
 
@@ -20,12 +14,12 @@ Do NOT use the Task tool to delegate work to subagents. Execute all steps sequen
 
 Locate the `.plan.md` file to execute:
 
-1. **If `$ARGUMENTS` contains a file path** (ends in `.plan.md` or contains `/`): read that file directly.
+1. **If the user's message contains a file path** (ends in `.plan.md` or contains `/`): read that file directly.
 
 2. **Otherwise, auto-detect**:
    a. Search the workspace for `*.plan.md` files using `ls *.plan.md .cursor/plans/*.plan.md 2>/dev/null`
    b. If no workspace plans found, search `~/.cursor/plans/` using `ls -t ~/.cursor/plans/*.plan.md 2>/dev/null | head -20`
-   c. If `$ARGUMENTS` is not empty, filter candidates by matching the user input against filenames (case-insensitive partial match)
+   c. If the user provided input, filter candidates by matching it against filenames (case-insensitive partial match)
    d. If multiple candidates remain, pick the most recently modified file. If the top candidates were modified within 60 seconds of each other, list them and ask the user which one to use.
 
 3. **Read the plan file**. Parse:

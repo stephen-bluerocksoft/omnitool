@@ -1,16 +1,10 @@
 ---
-description: Implement a feature from its spec artifacts with post-implementation verification
+name: omni-spec-implement
+description: Implement a feature from its spec artifacts with post-implementation verification. Use when ready to implement tasks from a spec.
+disable-model-invocation: true
 ---
 
 # omni.spec.implement
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may specify a spec number or name (e.g., "005", "admin-api"), a branch name, or specific tasks to implement (e.g., "just phase 2", "T005-T010 only").
 
 ## Execution Constraint
 
@@ -27,7 +21,7 @@ Do NOT use the Task tool to delegate work to subagents. Execute all steps sequen
 4. Read `tasks.md` and count incomplete tasks (lines with `[ ]`). If zero incomplete tasks remain, inform the user and stop.
 5. If the user specified a subset of tasks, note which tasks to implement. Otherwise, implement all incomplete tasks.
 
-If any prerequisite fails, tell the user what is missing and suggest running `/omni.spec.create` first.
+If any prerequisite fails, tell the user what is missing and suggest running `/omni-spec-create` first.
 
 ## Step 2: Implement
 

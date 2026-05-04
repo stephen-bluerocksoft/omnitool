@@ -4,7 +4,7 @@ This file guides AI coding agents working on the Omnitool repository.
 
 ## Project Overview
 
-Omnitool is a personal collection of AI coding tools, commands, agents, and workflows. It installs slash commands and agents to Cursor for use across all projects.
+Omnitool is a personal collection of AI coding tools, skills, agents, and workflows. It installs skills and agents to Cursor for use across all projects.
 
 This is a **content-only repository** -- it contains Markdown files, shell scripts, and a Makefile. There is no application code, no package manager, and no test suite.
 
@@ -19,7 +19,7 @@ This is a **content-only repository** -- it contains Markdown files, shell scrip
 ```text
 omnitool/
   agents/     # Subagent definitions (installed to ~/.cursor/agents/)
-  commands/   # Slash commands (installed to ~/.cursor/commands/)
+  skills/     # Skill directories ({name}/SKILL.md, installed globally)
   rules/      # User rules (paste into Cursor Settings > General > Rules for AI)
   scripts/    # Installation scripts
 ```
@@ -36,30 +36,32 @@ omnitool/
 
 | Content Type | Pattern | Example |
 | ------------ | ------- | ------- |
-| Commands | `omni.{action}.md` | `omni.commit.md` |
+| Skills | `{name}/SKILL.md` within `skills/` | `omni-commit/SKILL.md` |
 | Agents | `{purpose}.md` | `repo-test-auditor.md` |
 
-## Creating New Commands
+## Creating New Skills
 
-1. Create `commands/omni.{action}.md`
-2. Include YAML frontmatter with `description`
-3. Use `$ARGUMENTS` for user input capture
-4. Update `README.md` to list the new command
+1. Create `skills/{name}/SKILL.md`
+2. Include YAML frontmatter with `name`, `description`, and `disable-model-invocation: true`
+3. Add skill instructions
+4. Update `README.md` to list the new skill
 5. Run `make install` to deploy
 
 ## Creating New Agents
 
 1. Create `agents/{purpose}.md`
-2. Include YAML frontmatter with `name` and `description`
-3. Update `README.md` to list the new agent
-4. Run `make install` to deploy
+2. Include YAML frontmatter with `name`, `description`, and optionally `model` and `readonly`
+3. Set `model: inherit` (default, uses parent model) or a specific model ID
+4. Set `readonly: true` for agents that only read and report
+5. Update `README.md` to list the new agent
+6. Run `make install` to deploy
 
 ## Installation
 
-Commands are copied to `~/.cursor/commands/` and agents to `~/.cursor/agents/` by `scripts/install.sh`. The install is idempotent and safe to run alongside the BRS Codex installer.
+Skills are copied to `~/.cursor/skills/` and agents to `~/.cursor/agents/` by `scripts/install.sh`. The install is idempotent and safe to run alongside the BRS Codex installer.
 
 ## Do NOT
 
 - Add emojis to any Markdown file
 - Place persistent files in `temp/` -- it is gitignored
-- Skip updating `README.md` when adding new commands or agents
+- Skip updating `README.md` when adding new skills or agents

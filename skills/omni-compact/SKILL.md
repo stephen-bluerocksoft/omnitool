@@ -1,14 +1,8 @@
 ---
-description: Compact a feature branch's noisy commit history into clean, logical commits
+name: omni-compact
+description: Compact a feature branch's noisy commit history into clean, logical commits. Use when a branch is ready for PR and needs history cleanup.
+disable-model-invocation: true
 ---
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may specify a base branch (e.g., "base: main"), acknowledge force push (`--force`), or provide grouping hints.
 
 ## Permissions
 
@@ -26,10 +20,10 @@ All git commands that modify repository state (reset, add, commit, branch) requi
    ```
 
    - If on `main` or `master`, **STOP**. Compaction must be done on a feature branch.
-   - If there are uncommitted changes, **STOP**. All changes must be committed before compacting. Suggest the user run `/omni.commit` first.
+   - If there are uncommitted changes, **STOP**. All changes must be committed before compacting. Suggest the user run `/omni-commit` first.
 
 2. **Determine base branch**. Resolve in this order:
-   - Explicitly provided by the user in `$ARGUMENTS` (e.g., "base: dev")
+   - Explicitly provided by the user in the user's message (e.g., "base: dev")
    - Default: `dev` if it exists, otherwise `main`
 
    Find the merge-base:
@@ -55,7 +49,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
    ```
 
    - If the branch has been pushed to the remote, **warn the user** that compaction will rewrite history and require a force push.
-   - If the user did not include `--force` in `$ARGUMENTS`, ask for explicit confirmation before proceeding.
+   - If the user did not include `--force` in the user's message, ask for explicit confirmation before proceeding.
    - If the remote has commits not in the local branch, **STOP** -- the branches have diverged and compaction could lose remote-only changes.
 
 ### Phase 2: Lint and Auto-fix

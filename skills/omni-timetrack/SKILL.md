@@ -1,20 +1,14 @@
 ---
-description: Generate a timetrack entry summarizing today's work for upper management
+name: omni-timetrack
+description: Generate a timetrack entry summarizing work for upper management. Use when reporting daily or weekly work to management.
+disable-model-invocation: true
 ---
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may specify a date range, a specific date, a project filter, or a desired level of detail.
 
 ## Outline
 
 ### Phase 1: Determine Date Range
 
-1. **Parse date from user input**. If `$ARGUMENTS` contains a date or date range, use it. Otherwise default to **today** (current calendar date).
+1. **Parse date from user input**. If the user's message contains a date or date range, use it. Otherwise default to **today** (current calendar date).
 
 2. **Resolve the date(s)** into `--since` / `--until` flags for git log. Examples:
 

@@ -1,14 +1,8 @@
 ---
-description: Create a pull request from the current branch using gh CLI
+name: omni-pr-create
+description: Create a pull request from the current branch using gh CLI. Use when ready to open a PR for review.
+disable-model-invocation: true
 ---
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may specify a target base branch, a title hint, reviewers, or other PR options.
 
 ## Permissions
 
@@ -30,7 +24,7 @@ All git and gh commands that modify state (push, pr create) require write permis
    - If there are uncommitted changes, warn the user and ask whether to proceed or commit first.
 
 2. **Determine base branch**. The base branch is resolved in this order:
-   - Explicitly provided by the user in `$ARGUMENTS` (e.g., "into dev", "base: main")
+   - Explicitly provided by the user in the user's message (e.g., "into dev", "base: main")
    - The branch's upstream tracking branch (if set)
    - Default: `main`
 
@@ -71,7 +65,7 @@ All git and gh commands that modify state (push, pr create) require write permis
    Read the full commit messages (subjects and bodies) to understand the complete scope of changes.
 
 7. **Determine PR title**:
-   - If the user provided a title hint in `$ARGUMENTS`, use it
+   - If the user provided a title hint in the user's message, use it
    - If the branch has a single commit, use that commit's subject as the title
    - If the branch has multiple commits, synthesize a title that captures the overall change
    - Title should follow conventional commit format if the project uses it
@@ -162,7 +156,7 @@ All git and gh commands that modify state (push, pr create) require write permis
     )"
     ```
 
-    c. If the user specified reviewers in `$ARGUMENTS`, add them:
+    c. If the user specified reviewers in the user's message, add them:
     ```sh
     gh pr edit <pr-number> --add-reviewer <reviewer1>,<reviewer2>
     ```
@@ -178,5 +172,5 @@ All git and gh commands that modify state (push, pr create) require write permis
 - **Never create PRs to main/master** without confirming the base branch with the user.
 - **Never fabricate changes** -- all PR content must be derived from the actual diff and commit history.
 - **Respect spec-first workflow** -- if a spec exists for the branch, reference it.
-- **Do not commit** -- this command only creates PRs from existing commits. Use `/omni.commit` first if changes are uncommitted.
+- **Do not commit** -- this command only creates PRs from existing commits. Use `/omni-commit` first if changes are uncommitted.
 - **Check for secrets** -- if the diff contains files that might have secrets (`.env`, `credentials.*`, `*secret*`), warn the user before pushing.

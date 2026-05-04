@@ -1,6 +1,6 @@
 #!/bin/bash
 # Omnitool - Installation Script
-# Copies personal commands to Cursor global directory
+# Copies personal skills and agents to Cursor global directory
 
 set -e
 set -o pipefail
@@ -8,15 +8,24 @@ shopt -s nullglob
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
-COMMANDS_DIR="$REPO_DIR/commands"
+SKILLS_DIR="$REPO_DIR/skills"
 AGENTS_DIR="$REPO_DIR/agents"
 
-CURSOR_COMMANDS_DIR="$HOME/.cursor/commands"
+CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
 CURSOR_AGENTS_DIR="$HOME/.cursor/agents"
 
 DEPRECATED_COMMANDS=(
-    "omni.add-feature.md"  # replaced by omni.spec.create.md
-    "omni.align-spec.md"   # replaced by omni.spec.align.md
+    "omni.add-feature.md"    # old deprecated
+    "omni.align-spec.md"     # old deprecated
+    "omni.commit.md"         # migrated to skills
+    "omni.compact.md"        # migrated to skills
+    "omni.pr.create.md"      # migrated to skills
+    "omni.pr.review.md"      # migrated to skills
+    "omni.spec.create.md"    # migrated to skills
+    "omni.spec.align.md"     # migrated to skills
+    "omni.spec.implement.md" # migrated to skills
+    "omni.plan.implement.md" # migrated to skills
+    "omni.timetrack.md"      # migrated to skills
 )
 
 echo "Omnitool Installer"
@@ -50,6 +59,31 @@ install_files() {
     echo "  Installed $count files to $label"
 }
 
+install_skills() {
+    local source_dir="$1"
+    local target_dir="$2"
+    local label="$3"
+
+    mkdir -p "$target_dir"
+
+    local count=0
+    for skill_dir in "$source_dir"/*/; do
+        if [ -f "$skill_dir/SKILL.md" ]; then
+            skill_name=$(basename "$skill_dir")
+            target="$target_dir/$skill_name"
+
+            if [ -d "$target" ]; then
+                rm -rf "$target"
+            fi
+
+            cp -r "$skill_dir" "$target"
+            count=$((count + 1))
+        fi
+    done
+
+    echo "  Installed $count skills to $label"
+}
+
 cleanup_deprecated() {
     local target_dir="$1"
     shift
@@ -63,10 +97,10 @@ cleanup_deprecated() {
 }
 
 echo "Cleaning up deprecated files..."
-cleanup_deprecated "$CURSOR_COMMANDS_DIR" "${DEPRECATED_COMMANDS[@]}"
+cleanup_deprecated "$HOME/.cursor/commands" "${DEPRECATED_COMMANDS[@]}"
 
-echo "Installing commands..."
-install_files "$COMMANDS_DIR" "$CURSOR_COMMANDS_DIR" "Cursor (~/.cursor/commands)"
+echo "Installing skills..."
+install_skills "$SKILLS_DIR" "$CURSOR_SKILLS_DIR" "Cursor (~/.cursor/skills)"
 
 echo "Installing agents..."
 install_files "$AGENTS_DIR" "$CURSOR_AGENTS_DIR" "Cursor (~/.cursor/agents)"
@@ -74,11 +108,10 @@ install_files "$AGENTS_DIR" "$CURSOR_AGENTS_DIR" "Cursor (~/.cursor/agents)"
 echo ""
 echo "Installation complete!"
 echo ""
-echo "Available commands (use with /omni.<command-name>):"
-for cmd_file in "$COMMANDS_DIR"/*.md; do
-    if [ -f "$cmd_file" ]; then
-        filename=$(basename "$cmd_file" .md)
-        echo "  /$filename"
+echo "Available skills:"
+for skill_dir in "$SKILLS_DIR"/*/; do
+    if [ -f "$skill_dir/SKILL.md" ]; then
+        echo "  $(basename "$skill_dir")"
     fi
 done
 echo ""

@@ -1,6 +1,6 @@
 # Omnitool
 
-Personal AI coding toolkit -- commands, workflows, and tools that augment agentic development in Cursor.
+Personal AI coding toolkit -- skills, workflows, and tools that augment agentic development in Cursor.
 
 Named after the [omni-tool](https://masseffect.fandom.com/wiki/Omni-tool) from Mass Effect: a universal device that does everything.
 
@@ -10,21 +10,21 @@ Named after the [omni-tool](https://masseffect.fandom.com/wiki/Omni-tool) from M
 make install
 ```
 
-This copies commands to `~/.cursor/commands/` and agents to `~/.cursor/agents/` so they are available globally in Cursor.
+This copies skills to `~/.cursor/skills/` and agents to `~/.cursor/agents/` so they are available globally in Cursor.
 
-## Commands
+## Skills
 
-| Command | Description |
-| ------- | ----------- |
-| `/omni.spec.create` | Create spec artifacts for a feature using the spec-first workflow |
-| `/omni.spec.implement` | Implement a feature from its spec with post-implementation verification |
-| `/omni.plan.implement` | Execute a Cursor Plan Mode plan with verification and proactive test creation |
-| `/omni.spec.align` | Audit and sync spec artifacts with the actual implementation |
-| `/omni.commit` | Checkpoint changes as logically grouped conventional commits (compact-before-PR workflow) |
-| `/omni.compact` | Compact a feature branch's noisy commit history into clean, logical commits |
-| `/omni.pr.create` | Create a pull request from the current branch using gh CLI |
-| `/omni.pr.review` | Comprehensive PR review with inline GitHub comments |
-| `/omni.timetrack` | Generate a timetrack entry summarizing work for management |
+| Skill | Description |
+| ----- | ----------- |
+| `omni-spec-create` | Create spec artifacts for a feature using the spec-first workflow |
+| `omni-spec-implement` | Implement a feature from its spec with post-implementation verification |
+| `omni-plan-implement` | Execute a Cursor Plan Mode plan with verification and proactive test creation |
+| `omni-spec-align` | Audit and sync spec artifacts with the actual implementation |
+| `omni-commit` | Checkpoint changes as logically grouped conventional commits (compact-before-PR workflow) |
+| `omni-compact` | Compact a feature branch's noisy commit history into clean, logical commits |
+| `omni-pr-create` | Create a pull request from the current branch using gh CLI |
+| `omni-pr-review` | Comprehensive PR review with inline GitHub comments |
+| `omni-timetrack` | Generate a timetrack entry summarizing work for management |
 
 ## Agents
 
@@ -46,22 +46,23 @@ Cursor user rules that apply globally across all projects. Each file in `rules/`
 ## Installation
 
 ```bash
-# Install commands and agents
+# Install skills and agents
 make install
 
 # Pull latest and reinstall
 make update
 ```
 
-## Adding a New Command
+## Adding a New Skill
 
-1. Create `commands/omni.{action}.md` with a `description` in YAML frontmatter
-2. Use `$ARGUMENTS` to capture user input
+1. Create `skills/{name}/SKILL.md` with `name`, `description`, and `disable-model-invocation: true` in YAML frontmatter
+2. Add skill instructions
 3. Add it to the table above
 4. Run `make install`
 
 ## Adding a New Agent
 
-1. Create `agents/{name}.md` with `name` and `description` in YAML frontmatter
-2. Add it to the agents table above
-3. Run `make install`
+1. Create `agents/{name}.md` with YAML frontmatter: `name`, `description`, and optionally `model`, `readonly`
+2. Set `readonly: true` for agents that only read and report (auditors, validators)
+3. Add it to the agents table above
+4. Run `make install`

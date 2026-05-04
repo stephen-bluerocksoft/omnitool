@@ -1,16 +1,10 @@
 ---
-description: Create spec artifacts for a feature using the spec-first development workflow
+name: omni-spec-create
+description: Create spec artifacts for a feature using the spec-first development workflow. Use when starting a new feature that needs specification.
+disable-model-invocation: true
 ---
 
 # omni.spec.create
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** use the user input as the feature description. If empty, ask the user what feature they want to build before proceeding.
 
 This command ALWAYS creates a new spec. Even if an existing spec directory seems related, create a new spec -- do NOT modify or extend existing specs.
 
@@ -128,10 +122,10 @@ Review tasks.md and verify every user story has at least one corresponding test 
    - Include a table of analysis findings that were addressed and how each was resolved
    - List any LOW findings accepted with rationale
    - Confirm test tasks are present for each user story
-   - Tell the user to run `/omni.spec.implement` when they are ready to begin implementation
+   - Tell the user to run `/omni-spec-implement` when they are ready to begin implementation
    - Your response for this step MUST be a text message only -- no tool calls, no file edits, no implementation
 
-**Implementation is NOT part of this command.** Use `/omni.spec.implement` to execute the tasks.
+**Implementation is NOT part of this command.** Use `/omni-spec-implement` to execute the tasks.
 
 ## Notes
 

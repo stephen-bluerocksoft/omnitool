@@ -1,12 +1,10 @@
+---
+name: omni-spec-align
+description: Audit alignment between spec artifacts and actual implementation, updating specs to match reality. Use when implementation has evolved past the spec.
+disable-model-invocation: true
+---
+
 # omni.spec.align
-
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty). The user may specify a spec number or name (e.g., "005", "admin-api"), a branch name, or specific areas to focus on (e.g., "just the contracts", "data model only").
 
 ## Execution Constraint
 

@@ -28,9 +28,7 @@ This copies skills to `~/.cursor/skills/` and agents to `~/.cursor/agents/` so t
 
 ## Agents
 
-| Agent | Description |
-| ----- | ----------- |
-| `repo-test-auditor` | Repo-aware test auditor that discovers existing test patterns and validates new tests follow them |
+No agents currently shipped -- `repo-test-auditor` was consolidated into the BRS Codex `test-auditor`.
 
 ## User Rules
 
@@ -62,7 +60,9 @@ make update
 
 ## Adding a New Agent
 
-1. Create `agents/{name}.md` with YAML frontmatter: `name`, `description`, and optionally `model`, `readonly`
-2. Set `readonly: true` for agents that only read and report (auditors, validators)
+1. Start from [`templates/agent-template.md`](templates/agent-template.md): copy it to `agents/{name}.md`, remove the introductory wrapper and outer fenced block so the file begins with YAML frontmatter, then fill in `name`, `description`, and optionally `model`, `readonly`
+2. Set `readonly: true` for agents that only read and report (auditors, validators); set `readonly: false` explicitly when the agent writes files or runs state-changing commands
 3. Add it to the agents table above
 4. Run `make install`
+
+See [AGENTS.md](AGENTS.md) for field reference and conventions.

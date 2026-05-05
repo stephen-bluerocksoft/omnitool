@@ -23,7 +23,7 @@ This copies skills to `~/.cursor/skills/` and agents to `~/.cursor/agents/` so t
 | `omni-commit` | Checkpoint changes as logically grouped conventional commits (compact-before-PR workflow) |
 | `omni-compact` | Compact a feature branch's noisy commit history into clean, logical commits |
 | `omni-pr-create` | Create a pull request from the current branch using gh CLI |
-| `omni-pr-review` | Comprehensive PR review with inline GitHub comments |
+
 | `omni-timetrack` | Generate a timetrack entry summarizing work for management |
 
 ## Agents

@@ -28,6 +28,10 @@ DEPRECATED_COMMANDS=(
     "omni.timetrack.md"      # migrated to skills
 )
 
+DEPRECATED_AGENTS=(
+    "repo-test-auditor.md"   # consolidated into BRS test-auditor
+)
+
 echo "Omnitool Installer"
 echo "=================="
 echo ""
@@ -98,6 +102,7 @@ cleanup_deprecated() {
 
 echo "Cleaning up deprecated files..."
 cleanup_deprecated "$HOME/.cursor/commands" "${DEPRECATED_COMMANDS[@]}"
+cleanup_deprecated "$CURSOR_AGENTS_DIR" "${DEPRECATED_AGENTS[@]}"
 
 echo "Installing skills..."
 install_skills "$SKILLS_DIR" "$CURSOR_SKILLS_DIR" "Cursor (~/.cursor/skills)"

@@ -12,31 +12,23 @@ Do NOT use the Task tool to delegate work to subagents. Execute all steps sequen
 
 ## Step 1: Verify Prerequisites
 
-1. Run `git branch --show-current` to get the current branch
-2. Verify the branch matches a `specs/` directory (e.g., branch `005-my-feature` matches `specs/005-my-feature/`). If not on a feature branch, check user input for a spec reference and `git checkout` the matching branch.
-3. Verify these files exist in the spec directory:
+**Dotfile directory warning**: `.specify/` and `.cursor/` are dotfile directories. Glob's `**/` recursion silently skips them. Use `ls` via the Shell tool -- never rely on Glob alone.
+
+1. Run `ls -d .specify/ .cursor/skills/speckit-implement/ 2>/dev/null` to confirm speckit is initialized
+2. Run `git branch --show-current` to get the current branch
+3. Verify the branch matches a `specs/` directory (e.g., branch `005-my-feature` matches `specs/005-my-feature/`). If not on a feature branch, check user input for a spec reference and `git checkout` the matching branch.
+4. Verify these files exist in the spec directory:
    - `spec.md` (required)
    - `plan.md` (required)
    - `tasks.md` (required)
-4. Read `tasks.md` and count incomplete tasks (lines with `[ ]`). If zero incomplete tasks remain, inform the user and stop.
-5. If the user specified a subset of tasks, note which tasks to implement. Otherwise, implement all incomplete tasks.
+5. Read `tasks.md` and count incomplete tasks (lines with `[ ]`). If zero incomplete tasks remain, inform the user and stop.
+6. If the user specified a subset of tasks, note which tasks to implement. Otherwise, implement all incomplete tasks.
 
 If any prerequisite fails, tell the user what is missing and suggest running `/omni-spec-create` first.
 
 ## Step 2: Implement
 
-Read the project's `speckit.implement.md` command file at `<project-root>/.cursor/commands/speckit.implement.md` and follow its instructions to execute tasks from `tasks.md`.
-
-**Important**: The `.cursor` directory is a dotfile directory. Glob's `**/` recursion skips dotfile directories, so you MUST use the `target_directory` parameter to search inside it explicitly.
-
-If `speckit.implement.md` does not exist in the project, implement tasks directly:
-
-1. Read `tasks.md` in full
-2. Read `plan.md` for architecture context and project structure
-3. Read `spec.md` for requirements and acceptance criteria
-4. Read `data-model.md` and `contracts/` if they exist
-5. Execute tasks in dependency order, respecting `[P]` parallel markers where possible
-6. Mark each task as `[X]` in `tasks.md` as you complete it
+Read the speckit-implement skill at `<project-root>/.cursor/skills/speckit-implement/SKILL.md` and follow its instructions to execute tasks from `tasks.md`.
 
 ## Step 3: Post-Implementation Verification
 

@@ -18,12 +18,12 @@ Do NOT use the Task tool to delegate work to subagents. Execute all steps sequen
 
 Run these checks from the project root:
 
-1. `ls -d .specify/ .cursor/commands/speckit.*.md 2>/dev/null` to detect both the speckit data directory and command files
-2. Do NOT check `~/.cursor/commands/` -- that is the user-level directory where this command lives, not the project directory
+1. `ls -d .specify/ .cursor/skills/speckit-specify/ 2>/dev/null` to detect both the speckit data directory and skill files
+2. Do NOT check `~/.cursor/skills/` -- that is the user-level directory where this command lives, not the project directory
 
-If `.cursor/commands/speckit.*.md` files already exist, continue to Step 2.
+If `.cursor/skills/speckit-specify/SKILL.md` already exists, continue to Step 2.
 
-If they do NOT exist, initialize speckit:
+If it does NOT exist, initialize speckit:
 
 1. `cp .specify/memory/constitution.md /tmp/constitution-backup.md` (skip if `.specify/` does not exist yet)
 2. `specify init --here --ai cursor-agent --force`
@@ -31,48 +31,33 @@ If they do NOT exist, initialize speckit:
 
 ## Step 2: Create Feature Spec
 
-1. Read the speckit specify command at `<project-root>/.cursor/commands/speckit.specify.md` for the detailed workflow instructions
-2. Run `.specify/scripts/bash/create-new-feature.sh --json --short-name "<short-name>" "<description>"` using the user's feature description
-   - Derive the `short-name` from the feature description (lowercase, hyphenated, concise)
-   - If a specific spec number was requested, add `--number N` to the command
-3. Follow the speckit.specify.md instructions to fill `spec.md`:
-   - Use the template at `.specify/templates/spec-template.md`
-   - Write user stories, requirements, acceptance criteria, and success metrics based on the feature description
-4. Create `specs/<branch-name>/checklists/requirements.md` and validate the checklist against the spec
-5. Record the **branch name** and **spec directory path** for subsequent steps
+Read the speckit-specify skill at `<project-root>/.cursor/skills/speckit-specify/SKILL.md` and follow its instructions to create the feature spec, including handling any clarifying questions it surfaces.
 
-## Step 3: Clarify (Interactive)
+Record the **branch name** and **spec directory path** from the skill's output for subsequent steps.
 
-1. Read the `spec.md` file created in Step 2
-2. Look for `[NEEDS CLARIFICATION]` markers and genuine ambiguities
-3. Ask the user targeted questions in a single focused batch
-4. Encode answers back into `spec.md`
+## Step 3: Plan, Tasks, and Analysis
 
-If there are no ambiguities or markers, state that and move on. Do not invent questions for the sake of having them.
+Execute these phases in order using the spec directory from Step 2:
 
-## Step 4: Plan, Tasks, and Analysis
-
-Execute these phases in order using the spec directory and branch from Step 2:
-
-### 4a: Plan
+### 3a: Plan
 
 1. Run `git checkout <branch>` to ensure you are on the feature branch
-2. Read and follow `<project-root>/.cursor/commands/speckit.plan.md`
+2. Read and follow `<project-root>/.cursor/skills/speckit-plan/SKILL.md`
 3. This fills: plan.md, research.md, data-model.md, contracts/, quickstart.md
 
-### 4b: Tasks
+### 3b: Tasks
 
-1. Read and follow `<project-root>/.cursor/commands/speckit.tasks.md`
+1. Read and follow `<project-root>/.cursor/skills/speckit-tasks/SKILL.md`
 2. This generates tasks.md from the plan
 
-### 4c: Checklist
+### 3c: Checklist
 
-1. Read and follow `<project-root>/.cursor/commands/speckit.checklist.md`
+1. Read and follow `<project-root>/.cursor/skills/speckit-checklist/SKILL.md`
 
-### 4d: Analyze and Remediate
+### 3d: Analyze and Remediate
 
-1. Read and follow `<project-root>/.cursor/commands/speckit.analyze.md`
-2. Remediate ALL findings using these severity rules:
+1. Read and follow `<project-root>/.cursor/skills/speckit-analyze/SKILL.md`
+2. Remediate ALL findings from the analysis report using these severity rules:
 
 **CRITICAL/HIGH** -- Blockers. For each finding:
 
@@ -105,7 +90,7 @@ When resolving conflicts between artifacts, higher authority wins:
 5. `specs/[feature]/contracts/` - API contracts
 6. `specs/[feature]/tasks.md` - Task breakdown
 
-### 4e: Enforce Test Coverage
+### 3e: Enforce Test Coverage
 
 Review tasks.md and verify every user story has at least one corresponding test task:
 
@@ -114,7 +99,7 @@ Review tasks.md and verify every user story has at least one corresponding test 
 - Follow the project's test framework (check plan.md Technical Context)
 - If test tasks are missing, add them
 
-## Step 5: Verify and Summarize
+## Step 4: Verify and Summarize
 
 1. Run `git branch --show-current` to confirm you are on the feature branch matching the spec folder name
 2. **OUTPUT a summary and END your turn. Do NOT call any more tools.**

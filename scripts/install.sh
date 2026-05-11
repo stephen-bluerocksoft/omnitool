@@ -1,6 +1,6 @@
 #!/bin/bash
 # Omnitool - Installation Script
-# Copies personal skills and agents to Cursor global directory
+# Copies personal skills and agents to Cursor and Claude global directories
 
 set -e
 set -o pipefail
@@ -13,6 +13,11 @@ AGENTS_DIR="$REPO_DIR/agents"
 
 CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
 CURSOR_AGENTS_DIR="$HOME/.cursor/agents"
+CURSOR_COMMANDS_DIR="$HOME/.cursor/commands"
+
+CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
+CLAUDE_AGENTS_DIR="$HOME/.claude/agents"
+CLAUDE_COMMANDS_DIR="$HOME/.claude/commands"
 
 DEPRECATED_COMMANDS=(
     "omni.add-feature.md"    # old deprecated
@@ -101,14 +106,18 @@ cleanup_deprecated() {
 }
 
 echo "Cleaning up deprecated files..."
-cleanup_deprecated "$HOME/.cursor/commands" "${DEPRECATED_COMMANDS[@]}"
+cleanup_deprecated "$CURSOR_COMMANDS_DIR" "${DEPRECATED_COMMANDS[@]}"
 cleanup_deprecated "$CURSOR_AGENTS_DIR" "${DEPRECATED_AGENTS[@]}"
+cleanup_deprecated "$CLAUDE_COMMANDS_DIR" "${DEPRECATED_COMMANDS[@]}"
+cleanup_deprecated "$CLAUDE_AGENTS_DIR" "${DEPRECATED_AGENTS[@]}"
 
 echo "Installing skills..."
 install_skills "$SKILLS_DIR" "$CURSOR_SKILLS_DIR" "Cursor (~/.cursor/skills)"
+install_skills "$SKILLS_DIR" "$CLAUDE_SKILLS_DIR" "Claude (~/.claude/skills)"
 
 echo "Installing agents..."
 install_files "$AGENTS_DIR" "$CURSOR_AGENTS_DIR" "Cursor (~/.cursor/agents)"
+install_files "$AGENTS_DIR" "$CLAUDE_AGENTS_DIR" "Claude (~/.claude/agents)"
 
 echo ""
 echo "Installation complete!"

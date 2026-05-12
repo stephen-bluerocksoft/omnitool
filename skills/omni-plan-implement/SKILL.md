@@ -6,10 +6,6 @@ disable-model-invocation: true
 
 # omni.plan.implement
 
-## Execution Constraint
-
-Do NOT use the Task tool to delegate work to subagents. Execute all steps sequentially in the main agent context. Subagents default to a lesser model (Composer 2) that degrades quality for judgment-intensive work.
-
 ## Step 1: Find and Read the Plan
 
 Locate the `.plan.md` file to execute:

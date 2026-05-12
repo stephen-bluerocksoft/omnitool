@@ -8,10 +8,6 @@ disable-model-invocation: true
 
 This command ALWAYS creates a new spec. Even if an existing spec directory seems related, create a new spec -- do NOT modify or extend existing specs.
 
-## Execution Constraint
-
-Do NOT use the Task tool to delegate work to subagents. Execute all steps sequentially in the main agent context. Subagents default to a lesser model (Composer 2) that degrades quality for judgment-intensive work.
-
 ## Step 1: Verify Speckit Initialization
 
 **Dotfile directory warning**: Both `.specify/` and `.cursor/` are dotfile directories. Glob's `**/` recursion silently skips dotfile directories, which causes false negatives. Use `ls` via the Shell tool to check for these directories -- never rely on Glob alone.

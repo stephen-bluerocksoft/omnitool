@@ -6,10 +6,6 @@ disable-model-invocation: true
 
 # omni.spec.implement
 
-## Execution Constraint
-
-Do NOT use the Task tool to delegate work to subagents. Execute all steps sequentially in the main agent context. Subagents default to a lesser model (Composer 2) that degrades quality for judgment-intensive work.
-
 ## Step 1: Verify Prerequisites
 
 **Dotfile directory warning**: `.specify/` and `.cursor/` are dotfile directories. Glob's `**/` recursion silently skips them. Use `ls` via the Shell tool -- never rely on Glob alone.

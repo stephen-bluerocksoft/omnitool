@@ -6,10 +6,6 @@ disable-model-invocation: true
 
 # omni.spec.align
 
-## Execution Constraint
-
-Do NOT use the Task tool to delegate work to subagents. Execute all steps sequentially in the main agent context. Subagents default to a lesser model (Composer 2) that degrades quality for judgment-intensive work.
-
 ## Overview
 
 Audit alignment between specification artifacts and the actual implementation. When code has evolved past the spec during implementation, this command updates the spec to match reality -- the implementation is the source of truth at this point.

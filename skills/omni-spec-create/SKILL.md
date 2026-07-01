@@ -112,6 +112,7 @@ Review tasks.md and verify every user story has at least one corresponding test 
 
 1. Run `git branch --show-current` to confirm you are on the feature branch matching the spec folder name
 2. **OUTPUT a summary and END your turn. Do NOT call any more tools.**
+   - **Lead with a "Core design" paragraph (REQUIRED).** Before any tables or lists, write 2-5 sentences of plain prose that describe the central approach the spec commits to -- the mechanism a reader needs to picture what is about to be implemented. Name the key moving parts, the primary flow, what is reused vs. built new, and any deliberate non-goals (e.g. "zero changes to X", "least-privilege Y"). This is a narrative overview, not a bullet list, and it must always appear even when the spec is simple. Derive it from plan.md (Technical Context, architecture) and research.md (design decisions) -- do not fabricate.
    - Present what was created: spec.md, plan.md, tasks.md, and any contracts or data models
    - Include a table of analysis findings that were addressed and how each was resolved
    - List any LOW findings accepted with rationale

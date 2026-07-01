@@ -4,7 +4,7 @@ This file guides AI coding agents working on the Omnitool repository. For human-
 
 ## Project Overview
 
-Omnitool is a personal collection of AI coding tools, skills, agents, and workflows. It installs skills and agents to Cursor for use across all projects.
+Omnitool is a personal collection of AI coding tools, skills, agents, and workflows. It is Claude-first (Claude Code) with Cursor supported as a secondary target, and installs skills and agents to both for use across all projects.
 
 This is a **content-only repository** -- it contains Markdown files, shell scripts, and a Makefile. There is no application code, no package manager, and no test suite.
 
@@ -20,9 +20,9 @@ Skills follow the open [Agent Skills](https://agentskills.io/) standard. This re
 
 ```text
 omnitool/
-  agents/     # Subagent definitions (installed to ~/.cursor/agents/)
-  skills/     # Skill directories ({name}/SKILL.md, installed globally)
-  rules/      # User rules (paste into Cursor Settings > General > Rules for AI)
+  agents/     # Subagent definitions (installed to ~/.claude/agents/ and ~/.cursor/agents/)
+  skills/     # Skill directories ({name}/SKILL.md, installed to ~/.claude/skills/ and ~/.cursor/skills/)
+  rules/      # Global rules (Claude: ~/.claude/CLAUDE.md; Cursor: Settings > Rules for AI)
   scripts/    # Installation scripts
   templates/  # Template for new agents (repo-only; not installed by install.sh)
 ```
@@ -46,8 +46,8 @@ omnitool/
 ## Creating New Skills
 
 1. Create `skills/{name}/SKILL.md`
-2. Include YAML frontmatter with `name`, `description`, and `disable-model-invocation: true`
-3. Add skill instructions
+2. Include YAML frontmatter with `name` and a trigger-rich `description`. Add `disable-model-invocation: true` only for heavy, side-effecting workflows that should stay slash-command-only; omit it for reference/lightweight skills so the model auto-invokes them by `description`
+3. Add skill instructions. Skills run in both Claude Code (primary) and Cursor -- where a step depends on tool-specific paths or commands (e.g. Speckit exposes `/speckit.*` slash commands in Claude Code but skills under `.cursor/skills/` in Cursor), cover both in the body
 4. Update `README.md` to list the new skill
 5. Run `make install` to deploy
 
@@ -71,11 +71,11 @@ omnitool/
 | `readonly` | boolean | `false` | Restricts write permissions (no file edits, no state-changing shell) |
 | `is_background` | boolean | `false` | Runs in background without blocking the parent agent |
 
-Cursor honors `readonly` in subagent frontmatter. If you later reuse the same Markdown in another product, check that product's subagent docs for equivalent controls.
+Both Claude Code and Cursor honor `readonly` in subagent frontmatter. If you later reuse the same Markdown in another product, check that product's subagent docs for equivalent controls.
 
 ## Installation
 
-Skills are copied to `~/.cursor/skills/` and agents to `~/.cursor/agents/` by `scripts/install.sh`. The install is idempotent and safe to run alongside the BRS Codex installer.
+`scripts/install.sh` copies skills to `~/.claude/skills/` and `~/.cursor/skills/`, and agents to `~/.claude/agents/` and `~/.cursor/agents/`. The install is idempotent and safe to run alongside the BRS Codex installer.
 
 ## Key concepts
 

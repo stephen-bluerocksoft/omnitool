@@ -1,6 +1,6 @@
 #!/bin/bash
 # Omnitool - Installation Script
-# Copies personal skills and agents to Cursor and Claude global directories
+# Copies personal skills and agents to Claude Code (primary) and Cursor global directories
 
 set -e
 set -o pipefail
@@ -112,12 +112,12 @@ cleanup_deprecated "$CLAUDE_COMMANDS_DIR" "${DEPRECATED_COMMANDS[@]}"
 cleanup_deprecated "$CLAUDE_AGENTS_DIR" "${DEPRECATED_AGENTS[@]}"
 
 echo "Installing skills..."
-install_skills "$SKILLS_DIR" "$CURSOR_SKILLS_DIR" "Cursor (~/.cursor/skills)"
 install_skills "$SKILLS_DIR" "$CLAUDE_SKILLS_DIR" "Claude (~/.claude/skills)"
+install_skills "$SKILLS_DIR" "$CURSOR_SKILLS_DIR" "Cursor (~/.cursor/skills)"
 
 echo "Installing agents..."
-install_files "$AGENTS_DIR" "$CURSOR_AGENTS_DIR" "Cursor (~/.cursor/agents)"
 install_files "$AGENTS_DIR" "$CLAUDE_AGENTS_DIR" "Claude (~/.claude/agents)"
+install_files "$AGENTS_DIR" "$CURSOR_AGENTS_DIR" "Cursor (~/.cursor/agents)"
 
 echo ""
 echo "Installation complete!"

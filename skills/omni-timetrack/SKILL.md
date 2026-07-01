@@ -134,7 +134,7 @@ The user pastes the timetrack into a system that **does not support markdown**. 
    - Mention PR numbers where relevant, with correct attribution
    - Do NOT fabricate work -- only describe what is in the actual commit history and PR metadata
 
-11. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Cursor renders bare `-` lines as markdown bullets, which strips the dash on copy-paste. A code block preserves the characters exactly and provides a one-click copy button.
+11. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Markdown renderers (Claude Code, Cursor) turn bare `-` lines into bullets, which strips the dash on copy-paste; a code block preserves the characters exactly and provides a one-click copy button.
 
 12. **If no commits exist** for the date range (local or cross-repo), report that clearly and suggest checking a different date.
 

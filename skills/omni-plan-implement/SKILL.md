@@ -1,6 +1,6 @@
 ---
 name: omni-plan-implement
-description: Execute a Cursor Plan Mode plan with post-implementation verification and proactive test creation. Use when ready to implement from a .plan.md file.
+description: Execute an approved implementation plan document with post-implementation verification and proactive test creation. Use when ready to implement from a saved plan file (e.g. a .plan.md produced by plan mode).
 disable-model-invocation: true
 ---
 
@@ -8,13 +8,13 @@ disable-model-invocation: true
 
 ## Step 1: Find and Read the Plan
 
-Locate the `.plan.md` file to execute:
+Locate the plan document to execute. Plan mode in Claude Code produces an approved plan; in Cursor it is saved as a `.plan.md` file. Either way this skill executes a saved plan file.
 
-1. **If the user's message contains a file path** (ends in `.plan.md` or contains `/`): read that file directly.
+1. **If the user's message contains a file path** (ends in `.plan.md`/`.md` or contains `/`): read that file directly.
 
-2. **Otherwise, auto-detect**:
-   a. Search the workspace for `*.plan.md` files using `ls *.plan.md .cursor/plans/*.plan.md 2>/dev/null`
-   b. If no workspace plans found, search `~/.cursor/plans/` using `ls -t ~/.cursor/plans/*.plan.md 2>/dev/null | head -20`
+2. **Otherwise, auto-detect** (any of these may hold plan files):
+   a. Search the workspace using `ls *.plan.md plans/*.md .cursor/plans/*.plan.md 2>/dev/null`
+   b. If no workspace plans found, search the user-level Cursor plans dir with `ls -t ~/.cursor/plans/*.plan.md 2>/dev/null | head -20`
    c. If the user provided input, filter candidates by matching it against filenames (case-insensitive partial match)
    d. If multiple candidates remain, pick the most recently modified file. If the top candidates were modified within 60 seconds of each other, list them and ask the user which one to use.
 
@@ -133,7 +133,7 @@ Only run layers that actually exist. If a layer's detection files are absent, sk
 
 ### 6b: Run Tests
 
-Run all detected test layers. Independent layers (backend, frontend, E2E) can be launched in parallel using separate Shell calls with `block_until_ms: 0` to background them, then monitor each for completion.
+Run all detected test layers. Independent layers (backend, frontend, E2E) can be launched in parallel as background shell commands, then monitor each for completion.
 
 For each layer:
 

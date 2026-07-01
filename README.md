@@ -1,6 +1,6 @@
 # Omnitool
 
-Personal AI coding toolkit -- skills, workflows, and tools that augment agentic development in Cursor.
+Personal AI coding toolkit -- skills, workflows, and tools that augment agentic development. Built Claude-first (Claude Code), with Cursor supported as a secondary target.
 
 Named after the [omni-tool](https://masseffect.fandom.com/wiki/Omni-tool) from Mass Effect: a universal device that does everything.
 
@@ -10,7 +10,7 @@ Named after the [omni-tool](https://masseffect.fandom.com/wiki/Omni-tool) from M
 make install
 ```
 
-This copies skills to `~/.cursor/skills/` and agents to `~/.cursor/agents/` so they are available globally in Cursor.
+This copies skills and agents to both `~/.claude/` (Claude Code) and `~/.cursor/` (Cursor) so they are available globally in each. Skills follow the open [Agent Skills](https://agentskills.io/) standard and run in both tools; where a step depends on tool-specific paths or commands, the skill body handles both.
 
 ## Skills
 
@@ -32,7 +32,10 @@ No agents currently shipped -- `repo-test-auditor` was consolidated into the BRS
 
 ## User Rules
 
-Cursor user rules that apply globally across all projects. Each file in `rules/` is one rule -- paste its contents into **Cursor Settings > General > Rules for AI** as a separate entry.
+Global rules that apply across all projects. Each file in `rules/` is one rule. These are not copied by `make install` -- install them into each tool's always-on layer by hand:
+
+- **Claude Code**: append the rule text to `~/.claude/CLAUDE.md` (or import it), which loads every session.
+- **Cursor**: paste the rule contents into **Cursor Settings > General > Rules for AI** as a separate entry.
 
 | Rule | Purpose |
 | ---- | ------- |
@@ -53,10 +56,11 @@ make update
 
 ## Adding a New Skill
 
-1. Create `skills/{name}/SKILL.md` with `name`, `description`, and `disable-model-invocation: true` in YAML frontmatter
-2. Add skill instructions
-3. Add it to the table above
-4. Run `make install`
+1. Create `skills/{name}/SKILL.md` with `name` and a trigger-rich `description` in YAML frontmatter
+2. Decide invocation: omit `disable-model-invocation` for reference/lightweight skills so the model auto-invokes them by `description`; add `disable-model-invocation: true` for heavy, side-effecting workflows (branch creation, PR posting, multi-file scaffolds) that should stay slash-command-only
+3. Add skill instructions; where a step is tool-specific, cover both Claude Code and Cursor in the body
+4. Add it to the table above
+5. Run `make install`
 
 ## Adding a New Agent
 

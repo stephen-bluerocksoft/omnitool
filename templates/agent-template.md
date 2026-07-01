@@ -1,6 +1,6 @@
 # Agent Template
 
-Use this template when creating new Omnitool agents (installed to `~/.cursor/agents/`).
+Use this template when creating new Omnitool agents (installed to `~/.claude/agents/` and `~/.cursor/agents/`).
 
 ---
 

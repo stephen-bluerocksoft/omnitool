@@ -6,11 +6,15 @@ disable-model-invocation: true
 
 # omni.spec.implement
 
+## Runtime note
+
+This skill runs in both Claude Code (primary) and Cursor. Speckit's implement phase is exposed as `/speckit.implement` in Claude Code (command file at `.claude/commands/speckit.implement.md`) and as a skill under `.cursor/skills/speckit-implement/` in Cursor.
+
 ## Step 1: Verify Prerequisites
 
-**Dotfile directory warning**: `.specify/` and `.cursor/` are dotfile directories. Glob's `**/` recursion silently skips them. Use `ls` via the Shell tool -- never rely on Glob alone.
+**Dotfile directory caution**: `.specify/`, `.claude/`, and `.cursor/` are dotfile directories. Recursive glob patterns (`**/`) silently skip them. List them with an `ls` shell command -- never rely on glob alone.
 
-1. Run `ls -d .specify/ .cursor/skills/speckit-implement/ 2>/dev/null` to confirm speckit is initialized
+1. Run `ls -d .specify/ .claude/commands/speckit.implement.md 2>/dev/null` (Claude Code) or `ls -d .specify/ .cursor/skills/speckit-implement/ 2>/dev/null` (Cursor) to confirm speckit is initialized
 2. Run `git branch --show-current` to get the current branch
 3. Verify the branch matches a `specs/` directory (e.g., branch `005-my-feature` matches `specs/005-my-feature/`). If not on a feature branch, check user input for a spec reference and `git checkout` the matching branch.
 4. Verify these files exist in the spec directory:
@@ -24,7 +28,10 @@ If any prerequisite fails, tell the user what is missing and suggest running `/o
 
 ## Step 2: Implement
 
-Read the speckit-implement skill at `<project-root>/.cursor/skills/speckit-implement/SKILL.md` and follow its instructions to execute tasks from `tasks.md`.
+Run the Speckit implement phase to execute tasks from `tasks.md`:
+
+- **Claude Code**: invoke `/speckit.implement`.
+- **Cursor**: read `<project-root>/.cursor/skills/speckit-implement/SKILL.md` and follow its instructions.
 
 ## Step 3: Post-Implementation Verification
 
@@ -175,7 +182,7 @@ Only run layers that actually exist. If a layer's detection files are absent, sk
 
 ### 6b: Run Tests
 
-Run all detected test layers. Independent layers (backend, frontend, E2E) can be launched in parallel using separate Shell calls with `block_until_ms: 0` to background them, then monitor each for completion.
+Run all detected test layers. Independent layers (backend, frontend, E2E) can be launched in parallel as background shell commands, then monitor each for completion.
 
 For each layer:
 

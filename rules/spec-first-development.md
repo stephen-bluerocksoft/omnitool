@@ -13,9 +13,16 @@ These documents are the project's source of truth. Read them before writing code
 
 ## Workflows
 
-- **New features**: Use `/omni.spec.create` to generate spec artifacts, then `/omni.spec.implement` to execute tasks.
-- **Changes to existing features**: Read the current spec in `specs/{nnn}-{name}/`, update spec artifacts as needed, checkout the spec branch, THEN make code changes.
-- **Bug fixes**: If the bug deviates from spec, fix code to match spec. If the spec was wrong, update spec first, then fix code. Document in the spec's edge cases section.
+Drive spec work through the omnitool skills -- never hand-code a speckit-style flow yourself:
+
+- **New features**: Use `/omni-spec-create` to generate spec artifacts, then `/omni-spec-implement` to execute tasks.
+- **Changes to existing features**: Use `/omni-spec-modify` to change the spec first (it cascades the edit through plan, tasks, and analysis), then `/omni-spec-implement`.
+- **Bug fixes**: If the bug deviates from spec, fix code to match spec. If the spec was wrong, update the spec first (via `/omni-spec-modify` for a requirement change), then fix code. Document in the spec's edge cases section.
+- **Spec drifted from code**: Use `/omni-spec-align` to update the spec artifacts to match what was actually built.
+
+These skills wrap Speckit's `/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, `/speckit.analyze`, and `/speckit.implement` commands. If the `omni-spec-*` skills are not installed, fall back to invoking those `/speckit.*` commands directly.
+
+**Backstop**: When you are about to implement in a Speckit repo, do NOT improvise. `/omni-spec-implement` is model-invocable -- run it (it confirms before doing side-effecting work). If the feature's `spec.md`/`plan.md`/`tasks.md` do not exist yet, run `/omni-spec-create` first. If you cannot invoke the skill, STOP and tell the user to run `/omni-spec-implement`.
 
 ## Before Making Code Changes
 
@@ -39,6 +46,7 @@ These documents are the project's source of truth. Read them before writing code
 
 | Situation | Action |
 | --------- | ------ |
+| About to hand-code an implementation in a speckit repo | STOP. Run `/omni-spec-implement` (it confirms first) or hand off to the user |
 | On main/master and about to implement | STOP. Create/checkout spec branch |
 | Branch name doesn't match spec folder | STOP. Checkout correct branch |
 | Not sure what the spec wants | Use `/speckit.clarify` |

@@ -1,6 +1,6 @@
 ---
 name: omni-spec-create
-description: Create a brand-new feature specification using the spec-first (Speckit) workflow. Use when the user wants to spec, scope, or plan a NEW feature -- phrases like "write a spec for", "start a new feature", "scope out", or "let's plan X". Produces spec.md, plan.md, tasks.md, and any contracts/data models. Do NOT use to modify an existing spec (use omni-spec-align for that).
+description: Create a brand-new feature specification using the spec-first (Speckit) workflow. Use when the user wants to spec, scope, or plan a NEW feature -- phrases like "write a spec for", "start a new feature", "scope out", or "let's plan X". Produces spec.md, plan.md, tasks.md, and any contracts/data models. Do NOT use to modify an existing spec (use omni-spec-modify for that).
 ---
 
 # omni.spec.create
@@ -11,42 +11,38 @@ This command ALWAYS creates a new spec. Even if an existing spec directory seems
 
 ## Runtime note
 
-This skill runs in both Claude Code (primary) and Cursor. Speckit exposes the same phases in each:
-
-- **Claude Code**: Speckit installs slash commands. Invoke them directly -- `/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, `/speckit.checklist`, `/speckit.analyze`. Their command files live in `.claude/commands/speckit.*.md`.
-- **Cursor**: Speckit installs skills under `.cursor/skills/speckit-*/`. Read the matching `SKILL.md` and follow it.
+Speckit installs slash commands in Claude Code. Invoke them directly -- `/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, `/speckit.checklist`, `/speckit.analyze`. Their command files live in `.claude/commands/speckit.*.md`.
 
 When BRS Codex subagents are installed (`spec-creator`, `spec-planner`, `spec-validator`), you MAY delegate the heavy phases to them to keep the main context clean; they wrap the same Speckit commands. Delegation is optional -- invoking the Speckit commands directly is equally valid.
 
 ## Step 1: Verify Speckit Initialization
 
-**Dotfile directory caution**: `.specify/`, `.claude/`, and `.cursor/` are dotfile directories. Recursive glob patterns (`**/`) silently skip dotfile directories, causing false negatives. List these directories with an `ls` shell command -- never rely on glob alone.
+**Dotfile directory caution**: `.specify/` and `.claude/` are dotfile directories. Recursive glob patterns (`**/`) silently skip dotfile directories, causing false negatives. List these directories with an `ls` shell command -- never rely on glob alone.
 
 Run these checks from the project root:
 
-1. `ls -d .specify/ .claude/commands/speckit.specify.md 2>/dev/null` (Claude Code) or `ls -d .specify/ .cursor/skills/speckit-specify/ 2>/dev/null` (Cursor) to detect the Speckit data directory and command/skill files
-2. Do NOT check `~/.claude/skills/` or `~/.cursor/skills/` -- those are the user-level directories where this command lives, not the project directory
+1. `ls -d .specify/ .claude/commands/speckit.specify.md 2>/dev/null` to detect the Speckit data directory and command files
+2. Do NOT check `~/.claude/skills/` -- that is the user-level directory where this command lives, not the project directory
 
 If Speckit is already initialized (the command/skill file above exists), continue to Step 2.
 
 If it is NOT initialized, initialize Speckit:
 
-1. `cp .specify/memory/constitution.md /tmp/constitution-backup.md` (skip if `.specify/` does not exist yet)
-2. `specify init --here --ai claude --force` (use `--ai cursor-agent` when running in Cursor)
-3. `cp /tmp/constitution-backup.md .specify/memory/constitution.md` (skip if no backup was made)
+1. `cp .specify/memory/constitution.md "/tmp/omni-spec-create-constitution-$(basename "$PWD").md"` (skip if `.specify/` does not exist yet) -- the per-project filename avoids clobbering another repo's backup
+2. `specify init --here --ai claude --force`
+3. `cp "/tmp/omni-spec-create-constitution-$(basename "$PWD").md" .specify/memory/constitution.md` (skip if no backup was made)
 
 ## Step 2: Create Feature Spec
 
 Run the Speckit specify phase to create the feature spec, handling any clarifying questions it surfaces:
 
-- **Claude Code**: invoke `/speckit.specify` with the feature description.
-- **Cursor**: read `<project-root>/.cursor/skills/speckit-specify/SKILL.md` and follow its instructions.
+Invoke `/speckit.specify` with the feature description.
 
 Record the **branch name** and **spec directory path** from the phase output for subsequent steps.
 
 ## Step 3: Plan, Tasks, and Analysis
 
-Execute these phases in order using the spec directory from Step 2. In Claude Code invoke the `/speckit.*` command named below; in Cursor read the matching `.cursor/skills/speckit-*/SKILL.md`.
+Execute these phases in order using the spec directory from Step 2. Invoke the `/speckit.*` command named in each phase below.
 
 ### 3a: Plan
 

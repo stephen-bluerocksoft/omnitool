@@ -1,7 +1,6 @@
 ---
 name: omni-spec-align
-description: Audit alignment between spec artifacts and actual implementation, updating specs to match reality. Use when implementation has evolved past the spec.
-disable-model-invocation: true
+description: Audit alignment between spec artifacts and the actual implementation, updating specs to match reality (implementation is the source of truth). Use when a feature's specs/<NNN>-<name>/ artifacts exist and the code has diverged from them -- e.g. after implementing. Also runs as the alignment sub-step of omni-spec-implement.
 ---
 
 # omni.spec.align
@@ -11,6 +10,10 @@ disable-model-invocation: true
 Audit alignment between specification artifacts and the actual implementation. When code has evolved past the spec during implementation, this command updates the spec to match reality -- the implementation is the source of truth at this point.
 
 This is NOT a code review or bug hunt. This command asks: **"Does the spec accurately describe what was built?"**
+
+**Confirm before updating specs.** This flow rewrites the spec artifacts (spec.md, plan.md, tasks.md, contracts/, data-model.md, ...) to match the implementation. Before Phase 1, state which feature spec you will align and confirm the user wants the spec files updated now. Skip this confirmation when the user explicitly invoked `/omni-spec-align`, or when this skill runs as a sub-step of `/omni-spec-implement` (that flow's confirmation already covers it).
+
+**Base branch**: below, `<base>` means the repository's main integration branch. Detect it once: try `git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p'`, and if empty fall back to whichever of `main` or `master` exists (`git rev-parse --verify main` / `git rev-parse --verify master`).
 
 ## Instructions
 
@@ -39,8 +42,8 @@ Record the last FR ID (e.g., FR-011) and last task ID (e.g., T018) so new IDs co
 2. **Find files not in the plan**. Check for implementation files that were added or modified but are not listed in the project structure:
 
    ```bash
-   git diff main --name-only
-   git diff main --stat
+   git diff <base> --name-only
+   git diff <base> --stat
    ```
 
    Read any unlisted files that are part of the implementation (not IDE config, lockfiles, etc.).

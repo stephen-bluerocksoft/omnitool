@@ -8,13 +8,13 @@ disable-model-invocation: true
 
 ## Step 1: Find and Read the Plan
 
-Locate the plan document to execute. Plan mode in Claude Code produces an approved plan; in Cursor it is saved as a `.plan.md` file. Either way this skill executes a saved plan file.
+Locate the plan document to execute. Claude Code plan mode produces an approved plan saved as a plan file. This skill executes that saved plan file.
 
 1. **If the user's message contains a file path** (ends in `.plan.md`/`.md` or contains `/`): read that file directly.
 
 2. **Otherwise, auto-detect** (any of these may hold plan files):
-   a. Search the workspace using `ls *.plan.md plans/*.md .cursor/plans/*.plan.md 2>/dev/null`
-   b. If no workspace plans found, search the user-level Cursor plans dir with `ls -t ~/.cursor/plans/*.plan.md 2>/dev/null | head -20`
+   a. Search the workspace using `ls *.plan.md plans/*.md .claude/plans/*.md 2>/dev/null`
+   b. If no workspace plans found, search the user-level Claude plans dir with `ls -t ~/.claude/plans/*.md 2>/dev/null | head -20`
    c. If the user provided input, filter candidates by matching it against filenames (case-insensitive partial match)
    d. If multiple candidates remain, pick the most recently modified file. If the top candidates were modified within 60 seconds of each other, list them and ask the user which one to use.
 

@@ -6,7 +6,7 @@ help:
 	@echo ""
 	@echo "Usage: make <target>"
 	@echo ""
-	@echo "  install    Install skills and agents to ~/.claude/ and ~/.cursor/"
+	@echo "  install    Install skills and agents to ~/.claude/ and inject rules into ~/.claude/CLAUDE.md"
 	@echo "  update     Pull latest changes and run install"
 
 install:

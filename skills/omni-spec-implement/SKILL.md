@@ -1,20 +1,23 @@
 ---
 name: omni-spec-implement
-description: Implement a feature from its spec artifacts with post-implementation verification. Use when ready to implement tasks from a spec.
-disable-model-invocation: true
+description: Implement a feature from its spec artifacts, then verify, align the spec, and green the test suite. Use ONLY when the current feature branch already has spec.md, plan.md, and tasks.md with incomplete tasks -- never to scaffold a new spec (use omni-spec-create) and never on a vague "build X".
 ---
 
 # omni.spec.implement
 
+**Confirm before implementing.** This flow writes code across many files, rewrites the spec artifacts to match what was built, and runs the full test suite -- fixing pre-existing failures too (Step 6). Before running Step 1, state which spec/branch you will implement and how many incomplete tasks remain, then confirm the user wants to proceed now. Skip this confirmation only when the user explicitly invoked `/omni-spec-implement`.
+
 ## Runtime note
 
-This skill runs in both Claude Code (primary) and Cursor. Speckit's implement phase is exposed as `/speckit.implement` in Claude Code (command file at `.claude/commands/speckit.implement.md`) and as a skill under `.cursor/skills/speckit-implement/` in Cursor.
+Speckit's implement phase is exposed as `/speckit.implement` in Claude Code (command file at `.claude/commands/speckit.implement.md`).
+
+**Base branch**: throughout this skill, `<base>` means the repository's main integration branch. Detect it once and reuse it in every `git diff` below: try `git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p'`, and if that is empty fall back to whichever of `main` or `master` exists (`git rev-parse --verify main` / `git rev-parse --verify master`).
 
 ## Step 1: Verify Prerequisites
 
-**Dotfile directory caution**: `.specify/`, `.claude/`, and `.cursor/` are dotfile directories. Recursive glob patterns (`**/`) silently skip them. List them with an `ls` shell command -- never rely on glob alone.
+**Dotfile directory caution**: `.specify/` and `.claude/` are dotfile directories. Recursive glob patterns (`**/`) silently skip them. List them with an `ls` shell command -- never rely on glob alone.
 
-1. Run `ls -d .specify/ .claude/commands/speckit.implement.md 2>/dev/null` (Claude Code) or `ls -d .specify/ .cursor/skills/speckit-implement/ 2>/dev/null` (Cursor) to confirm speckit is initialized
+1. Run `ls -d .specify/ .claude/commands/speckit.implement.md 2>/dev/null` to confirm speckit is initialized
 2. Run `git branch --show-current` to get the current branch
 3. Verify the branch matches a `specs/` directory (e.g., branch `005-my-feature` matches `specs/005-my-feature/`). If not on a feature branch, check user input for a spec reference and `git checkout` the matching branch.
 4. Verify these files exist in the spec directory:
@@ -28,10 +31,7 @@ If any prerequisite fails, tell the user what is missing and suggest running `/o
 
 ## Step 2: Implement
 
-Run the Speckit implement phase to execute tasks from `tasks.md`:
-
-- **Claude Code**: invoke `/speckit.implement`.
-- **Cursor**: read `<project-root>/.cursor/skills/speckit-implement/SKILL.md` and follow its instructions.
+Run the Speckit implement phase to execute tasks from `tasks.md`: invoke `/speckit.implement`.
 
 ## Step 3: Post-Implementation Verification
 
@@ -65,7 +65,7 @@ Audit test coverage and pattern consistency for changed code:
 
 1. **Discover test setup** -- find test directories and identify the test framework from config files (`pytest.ini`, `jest.config.*`, `vitest.config.*`, etc.). Read 3-5 existing test files and extract naming patterns, directory structure, fixture/import patterns, assertion style, and mocking approach.
 
-2. **Identify changed code** -- run `git diff main --name-only --diff-filter=AM`, filter to source files only, and determine each file's expected test location based on discovered conventions.
+2. **Identify changed code** -- run `git diff <base> --name-only --diff-filter=AM`, filter to source files only, and determine each file's expected test location based on discovered conventions.
 
 3. **Audit tests** -- for each changed source file, check:
    - Does the expected test file exist?
@@ -95,74 +95,13 @@ Review the results from both verification passes (Step 3a and 3b).
 
 **Cap at 2 remediation cycles.** If issues persist after 2 cycles, include them in the summary as unresolved items rather than looping indefinitely.
 
-## Step 5: Align Spec
+## Step 5: Align the Spec
 
-Update spec artifacts so they accurately describe what was built. The implementation is the source of truth.
+Bring the spec artifacts back in line with what was actually built -- the implementation is the source of truth at this point.
 
-### 5a: Read All Spec Artifacts
+Do NOT re-derive the alignment procedure here. Run the **omni-spec-align** skill, which is the single source of truth for spec alignment: pass it the spec directory for the current branch. Because the implement confirmation at the top of this skill already covers this work, omni-spec-align runs as a **sub-step of omni-spec-implement** and skips its own confirmation gate.
 
-Read every file in the spec directory and extract:
-
-| Artifact | What to extract |
-| -------- | --------------- |
-| `spec.md` | Requirements (FR-NNN), user stories, acceptance scenarios, edge cases, assumptions |
-| `plan.md` | Key technical decisions, project structure listing, architecture |
-| `contracts/` | API contracts -- request/response schemas, status codes, event types |
-| `data-model.md` | Entities, fields, relationships, constraints |
-| `research.md` | Decisions, rationale, resolved/unresolved open items |
-| `tasks.md` | Task breakdown, completion status, dependency graph |
-| `quickstart.md` | Setup steps, validation scenarios |
-
-Record the last FR ID and last task ID so new IDs continue sequentially.
-
-### 5b: Read the Actual Implementation
-
-1. Read the project structure from `plan.md` and read every file listed there in full
-2. Find files not in the plan using `git diff main --name-only` and `git diff main --stat`. Read any unlisted implementation files (not IDE config, lockfiles, etc.)
-3. For each endpoint, function, or module described in the spec, read the implementation and note what it actually does
-
-### 5c: Identify Deviations
-
-Compare spec claims against implementation reality. For each deviation, record the category, spec claim, and implementation reality:
-
-| Category | What to look for |
-| -------- | ---------------- |
-| Behavior changes | Endpoint/function does more or less than spec says |
-| New features | Implemented functionality not mentioned in any spec artifact |
-| Modified signatures | Function parameters, return types, API contracts changed from spec |
-| New files | Scripts, tooling, config files added but not in project structure |
-| Removed features | Spec describes functionality that was not implemented or was removed |
-| Edge cases | New edge cases discovered and handled during implementation |
-| Assumptions invalidated | Spec assumptions that turned out wrong during implementation |
-| Data model changes | Fields added/removed, types changed, new relationships |
-
-Do NOT flag trivial differences (variable naming, internal refactoring that preserves behavior). Focus on deviations that would mislead someone reading the spec.
-
-### 5d: Update Spec Artifacts
-
-For **each** deviation, update the spec to match what was built:
-
-| Artifact | What to update |
-| -------- | -------------- |
-| `spec.md` | Add/update functional requirements (FR-NNN), acceptance scenarios, edge cases, assumptions |
-| `contracts/` | Update request/response schemas, status codes, handled event types. Add new contract files if new APIs were introduced |
-| `plan.md` | Update key technical decisions, project structure listing. Add new files. Remove files that were not created |
-| `research.md` | Add new decisions with rationale. Remove or update invalidated decisions |
-| `tasks.md` | Mark completed tasks as `[X]`. Add new tasks for work done outside the original plan |
-| `quickstart.md` | Add validation scenarios for new behavior. Update setup steps if they changed |
-| `data-model.md` | Update entities, fields, relationships, constraints to match actual schema |
-
-Rules: new FRs get sequential IDs, new tasks get sequential IDs, cross-reference new FRs in the tasks that implement them, preserve existing content that is still accurate, match the style of existing content.
-
-### 5e: Self-Verification
-
-1. Confirm every deviation has a corresponding spec update
-2. Verify new FR and task IDs are sequential with no gaps or duplicates
-3. Verify new tasks reference the FRs they implement and vice versa
-4. Confirm every spec update reflects actual implemented behavior, not aspirational work
-5. Confirm artifacts do not contradict each other after all updates
-
-Record: deviations found by category, artifacts updated, and remaining gaps.
+When it returns, carry its "Artifacts Updated" and "Remaining Gaps" results into the Step 7 summary.
 
 ## Step 6: Run Full Test Suite
 

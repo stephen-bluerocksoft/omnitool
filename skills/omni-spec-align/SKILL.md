@@ -67,6 +67,8 @@ Compare spec claims against implementation reality. For each deviation, record t
 
 Do NOT flag trivial differences (variable naming, internal refactoring that preserves behavior). Focus on deviations that would mislead someone reading the spec.
 
+**Open convergence gaps are NOT deviations.** If `tasks.md` contains a `## Phase N: Convergence` section with unchecked `[ ]` tasks, those are known, tracked gaps that `speckit-converge` recorded -- work the spec demanded and nobody has built yet. A requirement is only a "removed feature" when the team decided not to build it, never merely because the code does not implement it yet. Before classifying anything as a removed feature, check whether an open Convergence task traces to it (via its `source-ref`, e.g. `FR-003`, `US1/AC2`, `Constitution II`). If one does, exclude it from Phase 3 entirely and carry it into Remaining Gaps instead.
+
 ### Phase 4: Update Spec Artifacts
 
 For **each** deviation identified in Phase 3, update the spec to match what was built. The implementation is the source of truth.
@@ -89,6 +91,7 @@ For **each** deviation identified in Phase 3, update the spec to match what was 
 - Cross-reference new FRs in the tasks that implement them.
 - Preserve existing content that is still accurate -- do not rewrite sections unnecessarily.
 - Match the style and formatting of existing content in each artifact.
+- **Never weaken or delete a requirement that an open Convergence task traces to**, and never rewrite, renumber, or reorder an existing `## Phase N: Convergence` section. Deleting an unmet requirement makes the next converge run report `converged` against a spec that no longer asks for the missing work -- the gap disappears silently instead of being built.
 
 ### Phase 5: Self-Verification
 
@@ -100,7 +103,7 @@ Before producing output, verify completeness:
 
 3. **Cross-reference integrity**: Verify new tasks reference the FRs they implement and vice versa.
 
-4. **No spec-only fabrication**: Confirm every spec update reflects actual implemented behavior, not aspirational or planned work.
+4. **No spec-only fabrication**: Confirm every spec update reflects actual implemented behavior, not aspirational or planned work. This governs what you *add* -- never invent a requirement for work that does not exist. It is not licence to *delete* an unmet requirement the spec legitimately demands: if an open Convergence task traces to it, it stays.
 
 5. **Artifact consistency**: After all updates, confirm artifacts do not contradict each other (e.g., `data-model.md` matches `contracts/`, `tasks.md` aligns with `plan.md`).
 
@@ -150,4 +153,4 @@ Checklist of which artifacts were modified:
 
 ### Remaining Gaps
 
-List any issues that cannot be resolved by updating the spec alone (e.g., unimplemented requirements, features that need discussion). If none, write "No remaining gaps."
+List any issues that cannot be resolved by updating the spec alone (e.g., unimplemented requirements, features that need discussion). List every open `## Phase N: Convergence` task here, with its `source-ref` and severity -- these are the spec's unmet demands, and they must surface as gaps rather than be aligned away. If none, write "No remaining gaps."

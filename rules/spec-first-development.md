@@ -20,7 +20,11 @@ Drive spec work through the omnitool skills -- never hand-code a speckit-style f
 - **Bug fixes**: If the bug deviates from spec, fix code to match spec. If the spec was wrong, update the spec first (via `/omni-spec-modify` for a requirement change), then fix code. Document in the spec's edge cases section.
 - **Spec drifted from code**: Use `/omni-spec-align` to update the spec artifacts to match what was actually built.
 
-These skills wrap Speckit's `/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, `/speckit.analyze`, and `/speckit.implement` commands. If the `omni-spec-*` skills are not installed, fall back to invoking those `/speckit.*` commands directly.
+These skills wrap Speckit's `speckit-specify`, `speckit-plan`, `speckit-tasks`, `speckit-analyze`, `speckit-implement`, and `speckit-converge` skills, which Speckit installs at `.claude/skills/speckit-*/SKILL.md`. If the `omni-spec-*` skills are not installed, fall back to invoking those `speckit-*` skills directly.
+
+**Verify with converge, don't hand-roll it.** After implementing, `speckit-converge` assesses the code against every requirement, acceptance criterion, plan decision, and constitution MUST principle, then appends the remaining work to `tasks.md` as traceable tasks. Never write a bespoke task-verification pass in its place -- run converge, implement what it appends, and repeat until it reports `converged`.
+
+**Speckit must be on the skills layout.** Older Speckit versions installed slash commands at `.claude/commands/speckit.*.md`. That layout is not supported: if a project has `.claude/commands/speckit.*.md` but no `.claude/skills/speckit-*/`, STOP and tell the user to upgrade (`specify self upgrade`, then `specify init --here --integration claude --force`, preserving `.specify/memory/constitution.md`). Never fall back to the legacy command files.
 
 **Backstop**: When you are about to implement in a Speckit repo, do NOT improvise. `/omni-spec-implement` is model-invocable -- run it (it confirms before doing side-effecting work). If the feature's `spec.md`/`plan.md`/`tasks.md` do not exist yet, run `/omni-spec-create` first. If you cannot invoke the skill, STOP and tell the user to run `/omni-spec-implement`.
 
@@ -49,7 +53,8 @@ These skills wrap Speckit's `/speckit.specify`, `/speckit.plan`, `/speckit.tasks
 | About to hand-code an implementation in a speckit repo | STOP. Run `/omni-spec-implement` (it confirms first) or hand off to the user |
 | On main/master and about to implement | STOP. Create/checkout spec branch |
 | Branch name doesn't match spec folder | STOP. Checkout correct branch |
-| Not sure what the spec wants | Use `/speckit.clarify` |
+| Not sure what the spec wants | Use the `speckit-clarify` skill |
+| Repo has `.claude/commands/speckit.*.md` but no `.claude/skills/speckit-*/` | STOP. Outdated Speckit -- tell the user to upgrade; do not use the legacy command files |
 | Change isn't in the spec | Update the spec first |
 | Spec says X but code does Y | Fix code OR update spec with justification |
 | Task isn't in tasks.md | Add it first |

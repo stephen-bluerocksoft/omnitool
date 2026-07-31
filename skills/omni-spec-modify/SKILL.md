@@ -11,16 +11,37 @@ Change an existing feature's specification *before* implementing it. This edits 
 
 ## Runtime note
 
-Speckit installs slash commands in Claude Code. This skill invokes `/speckit.analyze` (and, if the change is ambiguous, `/speckit.clarify`); their command files live in `.claude/commands/speckit.*.md`.
+Speckit installs its phases as **Claude Code skills** at `.claude/skills/speckit-<phase>/SKILL.md`. This skill invokes `speckit-analyze` (and, if the change is ambiguous, `speckit-clarify`) through the Skill tool. Names are hyphenated, not dotted.
+
+Older Speckit versions installed slash-command files at `.claude/commands/speckit.*.md` instead. That layout is **not supported** by this skill -- see Step 1.
 
 ## Step 1: Identify the Spec and Branch
 
 **Dotfile directory caution**: `.specify/` and `.claude/` are dotfile directories. Recursive glob patterns (`**/`) silently skip them. List them with an `ls` shell command -- never rely on glob alone.
 
-1. Run `ls -d .specify/ .claude/commands/speckit.analyze.md 2>/dev/null` to confirm Speckit is initialized. If not, tell the user this feature has no spec yet and suggest `/omni-spec-create`.
+1. Run `ls -d .specify/ .claude/skills/speckit-analyze/ .claude/commands/speckit.analyze.md 2>/dev/null` to confirm Speckit is initialized and on the skills layout:
+   - `.specify/` and `.claude/skills/speckit-analyze/` both present -- continue
+   - `.claude/commands/speckit.analyze.md` present but `.claude/skills/speckit-analyze/` absent -- **STOP**, outdated Speckit (see below)
+   - `.specify/` absent -- this feature has no spec yet; suggest `/omni-spec-create` and stop
 2. Run `git branch --show-current`. Identify the feature's spec directory from the branch name, user input, or by checking `specs/`. The branch should match a `specs/<NNN>-<name>/` directory (e.g. branch `005-my-feature` matches `specs/005-my-feature/`).
 3. If you are on `main`/`master`, or the branch does not match the target spec, `git checkout` the feature branch first -- spec edits belong on the feature branch, never on main.
 4. Verify `spec.md`, `plan.md`, and `tasks.md` exist in the spec directory. If any is missing, the feature was never fully specified -- suggest `/omni-spec-create` and stop.
+
+### Outdated Speckit (legacy commands layout)
+
+The project was scaffolded by a Speckit version that installs slash commands. This workflow requires the skills layout. **Do NOT fall back to the `.claude/commands/speckit.*.md` files and do NOT proceed** -- report the following to the user and END your turn:
+
+> This project uses an outdated Speckit layout (`.claude/commands/speckit.*.md`). The omni spec workflow requires the skills layout (`.claude/skills/speckit-*/`). To upgrade:
+>
+> ```sh
+> cp .specify/memory/constitution.md "/tmp/speckit-constitution-$(basename "$PWD").md"
+> specify self upgrade
+> specify init --here --integration claude --force
+> cp "/tmp/speckit-constitution-$(basename "$PWD").md" .specify/memory/constitution.md
+> rm -f .claude/commands/speckit.*.md
+> ```
+>
+> Re-run `/omni-spec-modify` once the upgrade is done.
 
 ## Step 2: Read the Current Spec
 
@@ -36,7 +57,7 @@ Read every file in the spec directory and understand the current state before ch
 | `tasks.md` | Task breakdown, completion status (`[ ]`/`[X]`), dependency graph |
 | `quickstart.md` | Setup steps, validation scenarios |
 
-Record the last FR ID (e.g. FR-011) and last task ID (e.g. T018) so new IDs continue sequentially. Restate the requested change concretely. If it is ambiguous, ask the user or run `/speckit.clarify` before editing.
+Record the last FR ID (e.g. FR-011) and last task ID (e.g. T018) so new IDs continue sequentially. Include any `## Phase N: Convergence` section when computing the maximum -- its tasks are real task IDs, and new tasks must continue past them rather than collide. Do not renumber or reorder that section. Restate the requested change concretely. If it is ambiguous, ask the user or run the `speckit-clarify` skill before editing.
 
 ## Step 3: Apply the Change Top-Down
 
@@ -57,7 +78,7 @@ For the requested change:
 
 ## Step 4: Analyze and Remediate
 
-1. Run the Speckit analyze phase (`/speckit.analyze`).
+1. Run the Speckit analyze phase (the `speckit-analyze` skill).
 2. Remediate ALL findings using the same CRITICAL/HIGH/MEDIUM/LOW severity rules as `omni-spec-create` Step 3d (Analyze and Remediate) -- update the relevant artifact, reconcile inconsistencies, resolve ambiguities with concrete decisions, and accept LOW findings only with a documented rationale.
 3. Re-run the analysis until zero CRITICAL, HIGH, and MEDIUM findings remain. If new findings emerge from edits, repeat the cycle.
 

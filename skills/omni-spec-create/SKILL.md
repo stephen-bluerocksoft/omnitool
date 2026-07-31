@@ -11,57 +11,85 @@ This command ALWAYS creates a new spec. Even if an existing spec directory seems
 
 ## Runtime note
 
-Speckit installs slash commands in Claude Code. Invoke them directly -- `/speckit.specify`, `/speckit.plan`, `/speckit.tasks`, `/speckit.checklist`, `/speckit.analyze`. Their command files live in `.claude/commands/speckit.*.md`.
+Speckit installs its phases as **Claude Code skills** at `.claude/skills/speckit-<phase>/SKILL.md`. Invoke them through the Skill tool by name -- `speckit-specify`, `speckit-plan`, `speckit-tasks`, `speckit-checklist`, `speckit-analyze`. Names are hyphenated, not dotted.
 
-When BRS Codex subagents are installed (`spec-creator`, `spec-planner`, `spec-validator`), you MAY delegate the heavy phases to them to keep the main context clean; they wrap the same Speckit commands. Delegation is optional -- invoking the Speckit commands directly is equally valid.
+Older Speckit versions installed slash-command files at `.claude/commands/speckit.*.md` instead. That layout is **not supported** by this skill -- see Step 1.
+
+When BRS Codex subagents are installed (`spec-creator`, `spec-planner`, `spec-validator`), you MAY delegate the heavy phases to them to keep the main context clean; they wrap the same Speckit skills. Delegation is optional -- invoking the Speckit skills directly is equally valid.
 
 ## Step 1: Verify Speckit Initialization
 
 **Dotfile directory caution**: `.specify/` and `.claude/` are dotfile directories. Recursive glob patterns (`**/`) silently skip dotfile directories, causing false negatives. List these directories with an `ls` shell command -- never rely on glob alone.
 
-Run these checks from the project root:
+Run this check from the project root:
 
-1. `ls -d .specify/ .claude/commands/speckit.specify.md 2>/dev/null` to detect the Speckit data directory and command files
-2. Do NOT check `~/.claude/skills/` -- that is the user-level directory where this command lives, not the project directory
+```sh
+ls -d .specify/ .claude/skills/speckit-specify/ .claude/commands/speckit.specify.md 2>/dev/null
+```
 
-If Speckit is already initialized (the command/skill file above exists), continue to Step 2.
+Do NOT check `~/.claude/skills/` -- that is the user-level directory where this skill lives, not the project directory.
 
-If it is NOT initialized, initialize Speckit:
+Interpret the result:
+
+| Result | Action |
+| ------ | ------ |
+| `.specify/` and `.claude/skills/speckit-specify/` both present | Speckit is current. Continue to Step 2. |
+| `.claude/commands/speckit.specify.md` present, `.claude/skills/speckit-specify/` absent | **STOP.** Outdated Speckit -- see below. |
+| `.specify/` absent | Not initialized -- see below. |
+
+### Outdated Speckit (legacy commands layout)
+
+The project was scaffolded by a Speckit version that installs slash commands. This workflow requires the skills layout. **Do NOT fall back to the `.claude/commands/speckit.*.md` files and do NOT proceed** -- report the following to the user and END your turn:
+
+> This project uses an outdated Speckit layout (`.claude/commands/speckit.*.md`). The omni spec workflow requires the skills layout (`.claude/skills/speckit-*/`). To upgrade:
+>
+> ```sh
+> cp .specify/memory/constitution.md "/tmp/speckit-constitution-$(basename "$PWD").md"
+> specify self upgrade
+> specify init --here --integration claude --force
+> cp "/tmp/speckit-constitution-$(basename "$PWD").md" .specify/memory/constitution.md
+> rm -f .claude/commands/speckit.*.md
+> ```
+>
+> Re-run `/omni-spec-create` once the upgrade is done.
+
+### Not initialized
 
 1. `cp .specify/memory/constitution.md "/tmp/omni-spec-create-constitution-$(basename "$PWD").md"` (skip if `.specify/` does not exist yet) -- the per-project filename avoids clobbering another repo's backup
-2. `specify init --here --ai claude --force`
+2. `specify init --here --integration claude --force`
 3. `cp "/tmp/omni-spec-create-constitution-$(basename "$PWD").md" .specify/memory/constitution.md` (skip if no backup was made)
+4. Confirm `.claude/skills/speckit-specify/` now exists. If it does not, the installed `specify` CLI is too old -- tell the user to run `specify self upgrade` and stop.
 
 ## Step 2: Create Feature Spec
 
 Run the Speckit specify phase to create the feature spec, handling any clarifying questions it surfaces:
 
-Invoke `/speckit.specify` with the feature description.
+Invoke the `speckit-specify` skill with the feature description.
 
 Record the **branch name** and **spec directory path** from the phase output for subsequent steps.
 
 ## Step 3: Plan, Tasks, and Analysis
 
-Execute these phases in order using the spec directory from Step 2. Invoke the `/speckit.*` command named in each phase below.
+Execute these phases in order using the spec directory from Step 2. Invoke the `speckit-*` skill named in each phase below.
 
 ### 3a: Plan
 
 1. Run `git checkout <branch>` to ensure you are on the feature branch
-2. Run the Speckit plan phase (`/speckit.plan`)
+2. Run the Speckit plan phase (`speckit-plan`)
 3. This fills: plan.md, research.md, data-model.md, contracts/, quickstart.md
 
 ### 3b: Tasks
 
-1. Run the Speckit tasks phase (`/speckit.tasks`)
+1. Run the Speckit tasks phase (`speckit-tasks`)
 2. This generates tasks.md from the plan
 
 ### 3c: Checklist
 
-1. Run the Speckit checklist phase (`/speckit.checklist`)
+1. Run the Speckit checklist phase (`speckit-checklist`)
 
 ### 3d: Analyze and Remediate
 
-1. Run the Speckit analyze phase (`/speckit.analyze`)
+1. Run the Speckit analyze phase (`speckit-analyze`)
 2. Remediate ALL findings from the analysis report using these severity rules:
 
 **CRITICAL/HIGH** -- Blockers. For each finding:

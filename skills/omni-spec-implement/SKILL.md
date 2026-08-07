@@ -35,7 +35,7 @@ Older Speckit versions installed a slash-command file at `.claude/commands/speck
    - `spec.md` (required)
    - `plan.md` (required)
    - `tasks.md` (required)
-5. Read `tasks.md` and count incomplete tasks (lines with `[ ]`). If zero incomplete tasks remain, do NOT stop -- every task being checked off is a claim, not proof. Tell the user the task list is already complete and that you are running a convergence check to confirm the code actually satisfies the spec, then **skip Step 2 and start at Step 3a**. Converge will either report `converged` or append the work that is genuinely still missing.
+5. Read `tasks.md` and count incomplete tasks (lines with `[ ]`). If zero incomplete tasks remain, do NOT stop -- every task being checked off is a claim, not proof. Tell the user the task list is already complete and that you are running a convergence check to confirm the code actually satisfies the spec, then **skip Step 2 and start at Step 3a** -- but still run Step 1b first, since converge can append tasks that send you back through `speckit-implement` and its checklist gate. Converge will either report `converged` or append the work that is genuinely still missing.
 6. If the user specified a subset of tasks, note which tasks to implement. Otherwise, implement all incomplete tasks.
 
 If any prerequisite fails, tell the user what is missing and suggest running `/omni-spec-create` first.
@@ -55,6 +55,18 @@ Either the project uses the legacy slash-command layout, or it predates `speckit
 > ```
 >
 > Re-run `/omni-spec-implement` once the upgrade is done.
+
+## Step 1b: Walk the Checklists
+
+`speckit-implement` gates on `checklists/`: when any item is unchecked it STOPs and asks whether to implement anyway. Pre-empt that gate here -- **never put that question to the user.** Walking the checklist is the answer, every time.
+
+Speckit checklists validate **spec quality**, not code. Every item is a question about the spec artifacts, and every one is answerable by reading them.
+
+1. Run `ls specs/<feature>/checklists/ 2>/dev/null`. If the directory is absent, or every item across every file is already `[X]`, skip to Step 2.
+2. For each checklist file, evaluate every unchecked item against `spec.md`, `plan.md`, `tasks.md`, `data-model.md`, and `contracts/`. Cite the artifact section that satisfies it.
+3. Mark an item `[X]` only when the artifacts genuinely satisfy it. Never mark an item to clear the gate -- a checklist walked dishonestly is worse than one left unchecked.
+4. Items that remain `[ ]` are genuine spec gaps. **STOP** and report each one with its checklist name, the item text, and what the artifacts are missing. Recommend `/omni-spec-modify` for a requirement change or `/omni-spec-create` for a missing artifact, then END your turn. Do not implement against a spec with open gaps, and do not offer to proceed anyway.
+5. If every item now passes, continue to Step 2. Speckit's checklist gate will compute PASS and proceed without prompting.
 
 ## Step 2: Implement
 

@@ -34,12 +34,13 @@ The project was scaffolded by a Speckit version that installs slash commands. Th
 > This project uses an outdated Speckit layout (`.claude/commands/speckit.*.md`). The omni spec workflow requires the skills layout (`.claude/skills/speckit-*/`). To upgrade:
 >
 > ```sh
-> cp .specify/memory/constitution.md "/tmp/speckit-constitution-$(basename "$PWD").md"
 > specify self upgrade
-> specify init --here --integration claude --force
-> cp "/tmp/speckit-constitution-$(basename "$PWD").md" .specify/memory/constitution.md
+> specify integration upgrade claude
+> specify extension update
 > rm -f .claude/commands/speckit.*.md
 > ```
+>
+> `integration upgrade` is diff-aware: it compares manifest hashes and refuses to run when Speckit files have local edits, so pass `--force` only when you mean to discard them. A project on the legacy commands layout predates those manifests, so if the upgrade reports nothing to compare against, use `specify init --here --integration claude --force` instead -- it preserves `specs/` and an existing `.specify/memory/constitution.md`. Back the constitution up first if it carries edits you cannot lose.
 >
 > Re-run `/omni-spec-modify` once the upgrade is done.
 

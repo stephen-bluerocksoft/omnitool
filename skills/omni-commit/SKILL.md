@@ -62,7 +62,7 @@ Follow the same Phase 1 and Phase 2 as the standard flow, with these differences
   EOF
   ```
 
-  Do **not** use `git commit -m "$(cat <<'EOF' ... EOF)"`. macOS ships bash 3.2, which mis-parses a heredoc nested inside command substitution: it ignores the quoted delimiter and re-parses the body, so any unpaired quote character aborts the command with ``unexpected EOF while looking for matching `'``. An apostrophe in a word like "don't" is the usual trigger. Piping the heredoc straight to `-F -` has no command substitution, needs no temp file, and passes apostrophes, double quotes, backticks, and `$VAR` through literally.
+  Do **not** use `git commit -m "$(cat <<'EOF' ... EOF)"`. macOS ships bash 3.2, which mis-parses a heredoc nested inside command substitution: it ignores the quoted delimiter and re-parses the body, so any unpaired quote character aborts the command with ``unexpected EOF while looking for matching `'``. An apostrophe in a word like "don't" is the usual trigger. Piping the heredoc straight to `-F -` has no command substitution, needs no temp file, and passes apostrophes, double quotes, backticks, and `$VAR` through literally. Pick a delimiter the body cannot contain: `EOF` is a poor choice for any message or body that discusses shell scripting, because a literal `EOF` line inside the content terminates the heredoc early -- the command receives a silently truncated body and the remainder is parsed as shell. Use something like `MSG` or `PRBODY_9F2A` instead.
 
 After all commits, show the standard Phase 5 summary, then stop.
 

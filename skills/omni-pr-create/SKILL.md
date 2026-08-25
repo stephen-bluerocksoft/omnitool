@@ -150,7 +150,7 @@ All git and gh commands that modify state (push, pr create) require write permis
     git push -u origin "$BR"
     ```
 
-    b. Create the PR with the body on stdin (`gh` reads `-` from standard input). Never use `--body "$(cat <<'EOF' ... EOF)"` -- bash 3.2 on macOS mis-parses a heredoc inside command substitution and breaks on any unpaired quote, such as an apostrophe:
+    b. Create the PR with the body on stdin (`gh` reads `-` from standard input). Never use `--body "$(cat <<'EOF' ... EOF)"` -- bash 3.2 on macOS mis-parses a heredoc inside command substitution and breaks on any unpaired quote, such as an apostrophe: Pick a delimiter the body cannot contain: `EOF` is a poor choice for any message or body that discusses shell scripting, because a literal `EOF` line inside the content terminates the heredoc early -- the command receives a silently truncated body and the remainder is parsed as shell. Use something like `MSG` or `PRBODY_9F2A` instead.
     ```sh
     gh pr create --base <base-branch> --title "<title>" --body-file - <<'EOF'
     <pr-body>

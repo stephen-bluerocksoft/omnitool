@@ -101,9 +101,9 @@ All git commands that modify repository state (reset, add, commit, branch) requi
      # Stage exactly the files the linters rewrote -- never `git add -A`,
      # which would sweep in unrelated work sitting in the tree.
      git diff --name-only -z | xargs -0 git add --
-     git commit -F - <<'EOF'
+     git commit -F - <<'MSG'
      style: apply linter auto-fixes
-     EOF
+     MSG
      ```
 
      Report to the user: "Linter auto-fixes applied and committed. These changes will be folded into the appropriate logical groups during compaction."
@@ -270,12 +270,12 @@ All git commands that modify repository state (reset, add, commit, branch) requi
     d. **Commit** with the message on stdin (not `-m "$(cat <<'EOF' ...)"` -- bash 3.2 breaks on apostrophes there):
 
     ```sh
-    git commit -F - <<'EOF'
+    git commit -F - <<'MSG'
     <type>(<scope>): <description>
 
     - First change bullet
     - Second change bullet
-    EOF
+    MSG
     ```
 
     e. **Verify** the commit succeeded:

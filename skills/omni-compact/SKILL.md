@@ -98,7 +98,9 @@ All git commands that modify repository state (reset, add, commit, branch) requi
    - If there are changes, stage and commit them:
 
      ```sh
-     git add -A
+     # Stage exactly the files the linters rewrote -- never `git add -A`,
+     # which would sweep in unrelated work sitting in the tree.
+     git diff --name-only -z | xargs -0 git add --
      git commit -F - <<'EOF'
      style: apply linter auto-fixes
      EOF

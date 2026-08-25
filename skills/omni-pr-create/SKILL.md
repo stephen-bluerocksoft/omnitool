@@ -143,17 +143,18 @@ All git and gh commands that modify state (push, pr create) require write permis
 
 12. **Execute**. Run sequentially:
 
-    a. Push the branch if needed:
+    a. Push the branch if needed. Name the branch explicitly and confirm it first -- `HEAD` resolves to whatever branch is currently checked out, so if the branch changed underneath you (an IDE, a hook, another session), `push HEAD` silently pushes to that branch instead, `main` included:
     ```sh
-    git push -u origin HEAD
+    BR=$(git branch --show-current)
+    [ "$BR" = "<expected-branch>" ] || { echo "ABORT: on $BR, not <expected-branch>"; exit 1; }
+    git push -u origin "$BR"
     ```
 
-    b. Create the PR using a HEREDOC for the body:
+    b. Create the PR with the body on stdin (`gh` reads `-` from standard input). Never use `--body "$(cat <<'EOF' ... EOF)"` -- bash 3.2 on macOS mis-parses a heredoc inside command substitution and breaks on any unpaired quote, such as an apostrophe: Pick a delimiter the body cannot contain: `EOF` is a poor choice for any message or body that discusses shell scripting, because a literal `EOF` line inside the content terminates the heredoc early -- the command receives a silently truncated body and the remainder is parsed as shell. Use something like `MSG` or `PRBODY_9F2A` instead.
     ```sh
-    gh pr create --base <base-branch> --title "<title>" --body "$(cat <<'EOF'
+    gh pr create --base <base-branch> --title "<title>" --body-file - <<'EOF'
     <pr-body>
     EOF
-    )"
     ```
 
     c. If the user specified reviewers in the user's message, add them:

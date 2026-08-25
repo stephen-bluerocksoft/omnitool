@@ -99,10 +99,9 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
      ```sh
      git add -A
-     git commit -m "$(cat <<'EOF'
+     git commit -F - <<'EOF'
      style: apply linter auto-fixes
      EOF
-     )"
      ```
 
      Report to the user: "Linter auto-fixes applied and committed. These changes will be folded into the appropriate logical groups during compaction."
@@ -266,16 +265,15 @@ All git commands that modify repository state (reset, add, commit, branch) requi
     git diff --cached --stat
     ```
 
-    d. **Commit** using a HEREDOC:
+    d. **Commit** with the message on stdin (not `-m "$(cat <<'EOF' ...)"` -- bash 3.2 breaks on apostrophes there):
 
     ```sh
-    git commit -m "$(cat <<'EOF'
+    git commit -F - <<'EOF'
     <type>(<scope>): <description>
 
     - First change bullet
     - Second change bullet
     EOF
-    )"
     ```
 
     e. **Verify** the commit succeeded:

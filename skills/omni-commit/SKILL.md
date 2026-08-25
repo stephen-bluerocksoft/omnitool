@@ -49,10 +49,10 @@ Follow the same Phase 1 and Phase 2 as the standard flow, with these differences
 
   Ask: "Proceed with these N commit(s)? (yes/no/edit)"
 
-- **Phase 4**: Commit using a HEREDOC to include the body:
+- **Phase 4**: Commit with the message on stdin:
 
   ```sh
-  git commit -m "$(cat <<'EOF'
+  git commit -F - <<'EOF'
   <type>(<scope>): <description>
 
   - First change bullet
@@ -60,8 +60,9 @@ Follow the same Phase 1 and Phase 2 as the standard flow, with these differences
 
   <footers if any>
   EOF
-  )"
   ```
+
+  Do **not** use `git commit -m "$(cat <<'EOF' ... EOF)"`. macOS ships bash 3.2, which mis-parses a heredoc nested inside command substitution: it ignores the quoted delimiter and re-parses the body, so any unpaired quote character aborts the command with ``unexpected EOF while looking for matching `'``. An apostrophe in a word like "don't" is the usual trigger. Piping the heredoc straight to `-F -` has no command substitution, needs no temp file, and passes apostrophes, double quotes, backticks, and `$VAR` through literally.
 
 After all commits, show the standard Phase 5 summary, then stop.
 

@@ -24,7 +24,7 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-commit` | Checkpoint changes as logically grouped conventional commits (compact-before-PR workflow) |
 | `omni-compact` | Compact a feature branch's noisy commit history into clean, logical commits |
 | `omni-pr-create` | Create a pull request from the current branch using gh CLI |
-
+| `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |
 | `omni-timetrack` | Generate a timetrack entry summarizing work for management |
 
 ## Agents

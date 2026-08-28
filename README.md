@@ -38,6 +38,7 @@ Global rules that apply across all projects. Each file in `rules/` is one rule. 
 | Rule | Purpose |
 | ---- | ------- |
 | `global-defaults` | Conventional commits, Python venv, temp files |
+| `commit-proposals` | How to present a commit for approval: grouping, files, what was left out |
 | `spec-first-development` | Speckit workflow, constitution compliance, branch naming |
 | `task-management` | Task splitting, completion verification, sub-agent verification |
 | `documentation-standards` | Source documentation from code, never fabricate |

@@ -146,7 +146,13 @@ What does not matter: detailed body text, footers, or multi-paragraph explanatio
    - If the user says "no", stop
    - If the user says "yes" or "proceed", continue to Phase 4
 
-   **If 1 or 2 commits**, auto-proceed to Phase 4 without asking. Just briefly state what you are committing (e.g., "Committing: `feat(auth): add login endpoint` -- 3 files").
+   **If 1 or 2 commits**, auto-proceed to Phase 4 without asking. Still state the subject, the files by explicit path, and anything you are leaving out -- a file count is not reviewable:
+
+   ```text
+   Committing feat(auth): add login endpoint
+     Files: src/auth/login.ts, src/auth/login.test.ts
+     Not included: notes.md -- scratch notes, left in the working tree
+   ```
 
 ### Phase 4: Execute Commits
 

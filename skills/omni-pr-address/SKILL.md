@@ -61,7 +61,7 @@ Exactly five classifications. Four are verdicts assigned in Phase 3; `DISCARD` i
 - `STALE` -- the cited code changed since the feedback was written. Forces a re-read at HEAD before any verdict.
 - `OVERRIDE` -- the verdict was set by the user at the triage gate. Recorded in terminal output only, never in public text: a reply states the disposition, never who chose it.
 
-**Do not invent a severity scale.** Carry the source's own label verbatim in a `Raised as` column (`cursor[bot] High`, `brs-pr-review Major`, `GitGuardian`) and use it for exactly one thing: implementation order within `ACCEPT`. Two fixed vocabularies in one file is where substitution errors start.
+**Do not invent a severity scale.** Carry the source's own label verbatim (`cursor[bot] High`, `brs-pr-review Major`, `GitGuardian`) and use it for exactly one thing: implementation order within `ACCEPT`. Two fixed vocabularies in one file is where substitution errors start. Where the label is *displayed* is Phase 4's call -- a `Raised as` column when sources differ, a hoisted line when they do not.
 
 ## Evidence
 
@@ -203,19 +203,35 @@ Assign every candidate a verdict, backed by evidence at or above the minimum in 
 
 **This is a decision-review gate, not an edit-permission gate.** Invoking `/omni-pr-address` already authorizes the file edits. What needs review is the judgment: the skill is about to tell a reviewer publicly that they were wrong, or that something is out of scope. Those are the user's calls, and this table is the only place they are reviewable before they become public.
 
-Print one row per finding, each carrying its evidence:
+Print **two rendered markdown tables** -- verdicts, then evidence keyed by the same `#`. Do NOT wrap either in a fenced block and do NOT hand-pad columns: the terminal renders GFM, so a fence turns the table into preformatted text and forces manual alignment that breaks on the first long path.
 
-```text
-  #   Verdict   Raised as         Location                          Finding
-  F1  ACCEPT    cursor[bot] High  backend/tests/infra/test_x.py:211 yq not installed in the CI job
-        evidence: read .github/workflows/test.yml -- no yq install step; run `yq --version` -- not found
-  F2  REJECT    GitGuardian       frontend/src/pages/Profile.tsx:81 Hardcoded generic password
-        evidence: read at flagged sha -- line is `resolver: zodResolver(schema)`; false positive
-  F3  DEFER     cursor[bot] Med   k8s/values.production.yaml:54     Stripe webhook secret not a chart key
-        evidence: spec 036 REQ-001..005 do not cover Stripe -- tracked in #162
-```
+Hoist the source into a line above the table when every finding came from one reviewer. `Raised as` earns a column only when sources genuinely differ (a bot, a scanner, and a human on one PR).
 
-Then print the counts (`N evaluated: A accept, R reject, D defer, X decline, S discarded`) and ask for a go-ahead.
+> Raised by **cursor[bot]** -- F1 as High, F3 as Medium.
+
+| # | Verdict | Finding | Location |
+| --- | --- | --- | --- |
+| F1 | `ACCEPT` | `yq` not installed in the CI job | `test_x.py:211` |
+| F2 | `REJECT` | Hardcoded generic password | `Profile.tsx:81` |
+| F3 | `DEFER` | Stripe webhook secret not a chart key | `values.production.yaml:54` |
+
+Evidence belongs in the second table, never inline in the first -- multi-line prose inside an aligned grid is what makes a gate unreadable. Bold the load-bearing conclusion so the verdict's basis survives skimming.
+
+| # | Kind | What it showed |
+| --- | --- | --- |
+| F1 | `read` + `run` | `.github/workflows/test.yml` has no `yq` install step; `yq --version` -- not found. **Claim holds.** |
+| F2 | `read` | At the flagged sha the line is `resolver: zodResolver(schema)`. **False positive.** |
+| F3 | `spec` | Spec 036 `REQ-001..005` do not cover Stripe. Tracked in #162. |
+
+Code-style every path, symbol, and verdict. That styling is the whole readability gain over a fenced block -- it is what makes `client.py:61` and `_apply_auth` land as identifiers rather than prose.
+
+Then print the counts -- `N findings -- A accept, R reject, D defer, X decline` -- and ask for a go-ahead.
+
+**`DISCARD` is not counted.** It is assigned in Phase 2 and never reaches evaluation, so listing it in a tally that sums to `N` inflates the work and reports boilerplate-skipping as judgment. Its granularity is arbitrary anyway -- a bot's four summary sections are either one discard or four, and nothing decides which. Print the discards below the tables as unnumbered prose, because that list is the anti-cherry-picking check and that is what makes it worth printing at all:
+
+> Not treated as findings: the bot's summary and compliance blocks (praise and restatement), and its two self-disclaimed "Observations (non-blocking)".
+
+A thread-anchored question is the exception. It is a `DISCARD` that still produces public text in Phase 8, so it goes in the verdict table marked `QUESTION` -- never buried in that footnote.
 
 **Override grammar**: `F3 -> accept`, `F5 -> reject`, `F2 -> defer #178`. The user's call sits at the top of the BRS precedence order -- apply it verbatim and mark the finding `OVERRIDE`. A finding flipped away from `ACCEPT` drops out of Phase 5.
 
@@ -342,6 +358,8 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
 
 **Tone**: Direct and terse. State what's wrong, where, and what to do. No preamble, no filler, no praise. This governs the summary comment and the inline replies as much as the terminal output.
 
+**The terminal renders GitHub-flavored markdown.** Tables, code spans, and bold all work there. Reach for a fenced block only when the content is genuinely preformatted -- a command, a diff, a template body destined for GitHub. Structured output that a table would carry MUST be a table: a fence around it produces hand-aligned columns that break on the first long path, and it strips the code styling that makes identifiers scannable.
+
 ### Summary comment
 
 ```text
@@ -366,14 +384,16 @@ R rejected, D deferred, X declined.>
 
 ### Terminal output
 
-```text
-PR:       <owner/repo>#<number> -- <title>
-Findings: <N> evaluated -- <A> accepted, <R> rejected, <D> deferred, <X> declined, <S> discarded
-Landed:   <sha> on <branch> (confirmed on remote)
-Posted:   <N> inline replies, <M> threads resolved, 1 summary comment
-Not run:  <what was not verified, and who covers it>
-Link:     <PR URL>
-```
+Unfenced, so it renders. Paths, shas, and branches are code-styled:
+
+- **PR** -- `<owner/repo>#<number>`: `<title>`
+- **Findings** -- `<N>`: `<A>` accepted, `<R>` rejected, `<D>` deferred, `<X>` declined
+- **Landed** -- `<sha>` on `<branch>` (confirmed on remote)
+- **Posted** -- `<N>` inline replies, `<M>` threads resolved, 1 summary comment
+- **Not run** -- `<what was not verified, and who covers it>`
+- **Link** -- `<PR URL>`
+
+The `DISCARD` rule from Phase 4 holds here: no count, and the tally lists verdicts only.
 
 Follow it with any `BLOCKED` findings, any `OVERRIDE` the user made, and any observation noticed but deliberately left out of the diff. Omit empty sections.
 

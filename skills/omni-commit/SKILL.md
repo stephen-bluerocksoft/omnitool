@@ -62,7 +62,7 @@ Follow the same Phase 1 and Phase 2 as the standard flow, with these differences
   MSG
   ```
 
-  Do **not** use `git commit -m "$(cat <<'EOF' ... EOF)"`. macOS ships bash 3.2, which mis-parses a heredoc nested inside command substitution: it ignores the quoted delimiter and re-parses the body, so any unpaired quote character aborts the command with ``unexpected EOF while looking for matching `'``. An apostrophe in a word like "don't" is the usual trigger. Piping the heredoc straight to `-F -` has no command substitution, needs no temp file, and passes apostrophes, double quotes, backticks, and `$VAR` through literally. Pick a delimiter the body cannot contain: `EOF` is a poor choice for any message or body that discusses shell scripting, because a literal `EOF` line inside the content terminates the heredoc early -- the command receives a silently truncated body and the remainder is parsed as shell. Use something like `MSG` or `PRBODY_9F2A` instead.
+  Do **not** use `git commit -m "$(cat <<'EOF' ... EOF)"` -- bash 3.2 mis-parses a heredoc inside command substitution and breaks on apostrophes. See [references/commit-message-heredoc.md](references/commit-message-heredoc.md) for the full rationale and for choosing a delimiter.
 
 After all commits, show the standard Phase 5 summary, then stop.
 
@@ -146,7 +146,13 @@ What does not matter: detailed body text, footers, or multi-paragraph explanatio
    - If the user says "no", stop
    - If the user says "yes" or "proceed", continue to Phase 4
 
-   **If 1 or 2 commits**, auto-proceed to Phase 4 without asking. Just briefly state what you are committing (e.g., "Committing: `feat(auth): add login endpoint` -- 3 files").
+   **If 1 or 2 commits**, auto-proceed to Phase 4 without asking. Still state the subject, the files by explicit path, and anything you are leaving out -- a file count is not reviewable:
+
+   ```text
+   Committing feat(auth): add login endpoint
+     Files: src/auth/login.ts, src/auth/login.test.ts
+     Not included: notes.md -- scratch notes, left in the working tree
+   ```
 
 ### Phase 4: Execute Commits
 
@@ -188,26 +194,9 @@ What does not matter: detailed body text, footers, or multi-paragraph explanatio
     Branch: <branch-name>
     ```
 
-## Conventional Commits Quick Reference
+## Commit Message Format
 
-| Type | When to Use |
-| ---- | ----------- |
-| `feat` | Adds a new feature |
-| `fix` | Fixes a bug |
-| `docs` | Documentation only changes |
-| `style` | Formatting, missing semicolons, etc. (no code change) |
-| `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `perf` | Performance improvement |
-| `test` | Adding or correcting tests |
-| `build` | Changes to build system or dependencies |
-| `ci` | Changes to CI configuration |
-| `chore` | Other changes that don't modify src or test files |
-| `revert` | Reverts a previous commit |
-
-**Formatting rules**:
-
-- First line (type + scope + description) MUST be 50 characters or less
-- Use imperative mood ("add" not "added")
+Types, the 50-character subject limit, imperative mood, and breaking-change syntax are defined once in the Conventional Commits section of the global defaults rule, which is always loaded. Do not restate them here -- a second copy is what let `build` and `ci` go missing from one list and not the other.
 
 ## Important Rules
 

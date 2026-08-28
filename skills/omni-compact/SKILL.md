@@ -267,7 +267,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
     git diff --cached --stat
     ```
 
-    d. **Commit** with the message on stdin (not `-m "$(cat <<'EOF' ...)"` -- bash 3.2 breaks on apostrophes there):
+    d. **Commit** with the message on stdin (not `-m "$(cat <<'EOF' ...)"` -- bash 3.2 breaks on apostrophes there; see `omni-commit/references/commit-message-heredoc.md`):
 
     ```sh
     git commit -F - <<'MSG'
@@ -340,28 +340,14 @@ All git commands that modify repository state (reset, add, commit, branch) requi
       git push --force-with-lease origin <current-branch>
     ```
 
-## Conventional Commits Quick Reference
+## Commit Message Format
 
-| Type | When to Use |
-| ---- | ----------- |
-| `feat` | Adds a new feature |
-| `fix` | Fixes a bug (rarely used in compacted output -- fold into `feat`) |
-| `docs` | Documentation only changes |
-| `style` | Formatting, missing semicolons, etc. (no code change) |
-| `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `perf` | Performance improvement |
-| `test` | Adding or correcting tests |
-| `build` | Changes to build system or dependencies |
-| `ci` | Changes to CI configuration |
-| `chore` | Other changes that don't modify src or test files |
+Types, the 50-character subject limit, imperative mood, body wrapping, and breaking-change syntax are defined once in the Conventional Commits section of the global defaults rule, which is always loaded. Do not restate them here.
 
-**Formatting rules**:
+Two things are specific to compaction and are not in that rule:
 
-- First line (type + scope + description) MUST be 50 characters or less
-- Use imperative mood ("add" not "added")
-- Body lines wrap at 72 characters
-- Breaking changes: `!` before colon OR `BREAKING CHANGE:` in footer
-- Footer tokens use `-` in place of spaces (e.g., `Reviewed-by`)
+- `fix` is rarely right in compacted output. A bug fixed on the same branch that introduced the feature was never a bug in the base history -- fold it into the `feat` commit.
+- Footer tokens use `-` in place of spaces (e.g., `Reviewed-by`).
 
 ## Important Rules
 

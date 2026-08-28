@@ -181,12 +181,14 @@ Present the combined results from all steps:
 ### Verification Results
 
 **Todo Verification**:
+
 - Verified: N todos
 - Phantom completions found and fixed: N
 - Broken implementations found and fixed: N
 - Unresolved issues: N (list if any)
 
 **Test Audit**:
+
 - Framework detected: [name]
 - Tests present: N of N changed source files
 - Missing tests found and added: N

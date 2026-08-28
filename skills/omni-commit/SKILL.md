@@ -19,13 +19,13 @@ When the user invokes `/omni-commit full` (with optional additional hints after 
 Follow the same Phase 1 and Phase 2 as the standard flow, with these differences:
 
 - **Phase 2 step 6**: For each logical group, also determine:
-  - **Body** (optional): Bulleted list of changes using `- ` prefix. Each bullet explains one change (what and why). Wrap lines at 72 characters.
+  - **Body** (optional): Bulleted list of changes, each line starting with `-` and a space. Each bullet explains one change (what and why). Wrap lines at 72 characters.
   - **Breaking change**: Add `!` before colon or `BREAKING CHANGE:` footer if applicable
   - **Footers** (optional): `Refs:`, `Fixes:`, etc. if relevant
 
 - **Phase 3**: **Always** show the full commit plan and ask for confirmation, regardless of how many commits:
 
-  ```
+  ```text
   Commit Plan
   ===========
 
@@ -133,7 +133,7 @@ What does not matter: detailed body text, footers, or multi-paragraph explanatio
 
 7. **If 3 or more commits**, show a lightweight plan and ask for confirmation:
 
-   ```
+   ```text
    Commit Plan (N commits)
      1. <type>(<scope>): <description>  [file1, file2]
      2. <type>(<scope>): <description>  [file3]
@@ -180,7 +180,7 @@ What does not matter: detailed body text, footers, or multi-paragraph explanatio
 
 10. **Show final summary** after all commits:
 
-    ```
+    ```text
     N commit(s) created:
       <hash> <type>(<scope>): <description>
       <hash> <type>(<scope>): <description>
@@ -205,6 +205,7 @@ What does not matter: detailed body text, footers, or multi-paragraph explanatio
 | `revert` | Reverts a previous commit |
 
 **Formatting rules**:
+
 - First line (type + scope + description) MUST be 50 characters or less
 - Use imperative mood ("add" not "added")
 

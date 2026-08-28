@@ -192,7 +192,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
 18. **Show the compaction plan** to the user before executing:
 
-    ```
+    ```text
     Compaction Plan
     ===============
 
@@ -311,7 +311,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
 25. **Show final summary**:
 
-    ```
+    ```text
     Compaction Summary
     ==================
 
@@ -335,7 +335,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
     If the branch was previously pushed to the remote, remind the user:
 
-    ```
+    ```text
     This branch was previously pushed. To update the remote:
       git push --force-with-lease origin <current-branch>
     ```
@@ -356,6 +356,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 | `chore` | Other changes that don't modify src or test files |
 
 **Formatting rules**:
+
 - First line (type + scope + description) MUST be 50 characters or less
 - Use imperative mood ("add" not "added")
 - Body lines wrap at 72 characters

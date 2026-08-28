@@ -99,40 +99,40 @@ The user pastes the timetrack into a system that **does not support markdown**. 
 
 10. **Write the timetrack entry** using this structure:
 
-   - First line: `YYYY-MM-DD (Day of Week)` (using the shell-verified day name from step 9)
-   - Blank line, then a repo or project name as a single line (ALL CAPS or Title Case is fine).
-   - Blank line, then each **theme** as a short title line (plain text only).
-   - Under each theme, one or more lines starting with `-` and a space (1-2 sentences each).
-   - Repeat for other repos. For multiple days in range, repeat the date line and sections per day.
+    - First line: `YYYY-MM-DD (Day of Week)` (using the shell-verified day name from step 9)
+    - Blank line, then a repo or project name as a single line (ALL CAPS or Title Case is fine).
+    - Blank line, then each **theme** as a short title line (plain text only).
+    - Under each theme, one or more lines starting with `-` and a space (1-2 sentences each).
+    - Repeat for other repos. For multiple days in range, repeat the date line and sections per day.
 
-   Example shape (illustrative; the real output must match this plain-text style):
+    Example shape (illustrative; the real output must match this plain-text style):
 
-   ```text
-   2026-04-06 (Monday)
+    ```text
+    2026-04-06 (Monday)
 
-   my-org/current-repo
+    my-org/current-repo
 
-   Customer reporting improvements
-   - Shipped clearer export flow so ops can close month without manual spreadsheets.
+    Customer reporting improvements
+    - Shipped clearer export flow so ops can close month without manual spreadsheets.
 
-   Bug fixes
-   - Resolved timeout errors affecting morning batch runs.
+    Bug fixes
+    - Resolved timeout errors affecting morning batch runs.
 
-   other-org/other-repo
+    other-org/other-repo
 
-   Documentation
-   - Updated runbooks for the handoff to the support team.
-   ```
+    Documentation
+    - Updated runbooks for the handoff to the support team.
+    ```
 
-   Guidelines:
+    Guidelines:
 
-   - **Audience is upper management** -- focus on outcomes and business value, not implementation details
-   - Group related commits into a single bullet rather than listing each commit
-   - Use plain language; avoid jargon (no "enum", "migration", "dependency injection")
-   - Lead with the *what* and *why*, not the *how*
-   - When referencing a PR, **match language to role** (see step 4b): reviewed vs authored vs merged-by-you. Never describe reviewed-only PRs as your own merge or implementation.
-   - Mention PR numbers where relevant, with correct attribution
-   - Do NOT fabricate work -- only describe what is in the actual commit history and PR metadata
+    - **Audience is upper management** -- focus on outcomes and business value, not implementation details
+    - Group related commits into a single bullet rather than listing each commit
+    - Use plain language; avoid jargon (no "enum", "migration", "dependency injection")
+    - Lead with the *what* and *why*, not the *how*
+    - When referencing a PR, **match language to role** (see step 4b): reviewed vs authored vs merged-by-you. Never describe reviewed-only PRs as your own merge or implementation.
+    - Mention PR numbers where relevant, with correct attribution
+    - Do NOT fabricate work -- only describe what is in the actual commit history and PR metadata
 
 11. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Markdown renderers turn bare `-` lines into bullets, which strips the dash on copy-paste; a code block preserves the characters exactly and provides a one-click copy button.
 

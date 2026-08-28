@@ -15,9 +15,11 @@ Format: `<type>[optional scope]: <description>` (first line 50 chars max, body w
 | `docs` | Documentation only |
 | `refactor` | Code change that is neither fix nor feature |
 | `test` | Adding or correcting tests |
-| `chore` | Other changes (build, CI, tooling) |
 | `perf` | Performance improvement |
 | `style` | Formatting, no logic change |
+| `build` | Build system or dependency changes |
+| `ci` | CI configuration changes |
+| `chore` | Anything else that touches neither src nor tests |
 | `revert` | Reverts a previous commit |
 
 Use imperative mood ("add" not "added"). Breaking changes: add `!` before colon or `BREAKING CHANGE:` footer.

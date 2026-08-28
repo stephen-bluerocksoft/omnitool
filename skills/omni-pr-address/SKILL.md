@@ -247,9 +247,19 @@ Implement `ACCEPT` findings only, in source-severity order, one finding at a tim
 
 **Fix nothing that is not an accepted finding.** Improvements noticed along the way are unrequested code; report them as observations in the terminal output, and keep them out of the diff.
 
+The one that gets through is the small, obviously-correct cleanup in a file you already have open -- an emoji the project's `AGENTS.md` forbids, a lint nit, a name inconsistent with its neighbour. Being right is not the test. It was not raised, not evaluated, and not approved at the gate, so it does not enter the diff. A standards violation is a finding like any other; noticing it yourself moves it past nothing. Take it to the gate as a new finding, or leave it and report it as an observation.
+
 ### Phase 6: Verify
 
-Two layers, both recorded.
+**Scope check first.** Every path in the diff MUST trace to an accepted finding:
+
+```bash
+git diff --name-only
+```
+
+A path no accepted finding touched is unrequested code that reached the working tree. Back it out before running anything else -- `git checkout -- <path>` when the whole file is yours, a reversed hunk when it is not. Do NOT carry it forward to disclose later: a disclosed unrequested change is still an unrequested change, and the user approved a verdict table, not a diff.
+
+Then two layers, both recorded.
 
 1. **Per-finding proof.** For each implemented finding, name the specific check that establishes the fix. For a behavior defect, that check is a test **confirmed to fail against the pre-fix code** -- run it against the unfixed state before you call it passing. For a docs or config defect, it is the render, parse, or lint that would have caught the error.
 
@@ -369,15 +379,19 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
 R rejected, D deferred, X declined.>
 
 - **[<area>] <finding headline>** -- <what changed, concretely>. `<path>`, `<path>`
-- **[<area>] <finding headline>** -- Not changed: <one-line reason>.
-- **[<area>] <finding headline>** -- Deferred: <where it is tracked>.
+- **[<area>] <finding headline>** -- Rejected: <the premise that does not hold>. Evidence: <what showed it>.
+- **[<area>] <finding headline>** -- Deferred to <issue | follow-up | spec NNN>: <why it is not this PR's work>.
+- **[<area>] <finding headline>** -- Declined: <the deliberate choice, and why>.
 
 **Verification:** <what was actually run, with results>. <What was NOT run, and who covers it.>
 
 <sub>Not treated as findings: <one clause per DISCARD, with why>.</sub>
 ```
 
-- Not-changed findings get bullets too. A summary listing only the wins reads like verification and does not get reviewed.
+- **Every finding that was not accepted gets its own bullet, naming the verdict verbatim and the reason.** `Rejected`, `Deferred`, `Declined`, `Blocked` -- the same word the gate assigned. A summary listing only the wins reads like verification and does not get reviewed.
+- A bare "Not changed" is not a disposition. It reads as either `REJECT` or `DECLINE`, and the difference is whether the reviewer erred -- the one thing they will look for. Name the verdict.
+- A `Rejected` bullet carries the evidence, not just the conclusion; a `Deferred` bullet carries the destination the verdict named. Neither reason may be new -- both restate what was on the Phase 4 table.
+- **No "also cleaned up" bullet.** Every bullet maps to a finding the gate approved. A change with no finding behind it should not have survived Phase 6's scope check, and disclosing it here launders it into the record instead of removing it.
 - The trailing not-run sentence in **Verification** is mandatory.
 - When zero findings were accepted there is no commit: title the comment `### Review findings evaluated -- no code changes`.
 - If the run produced more than one commit, the title carries HEAD and each bullet carries its own sha.
@@ -395,7 +409,7 @@ Unfenced, so it renders. Paths, shas, and branches are code-styled:
 
 The `DISCARD` rule from Phase 4 holds here: no count, and the tally lists verdicts only.
 
-Follow it with any `BLOCKED` findings, any `OVERRIDE` the user made, and any observation noticed but deliberately left out of the diff. Omit empty sections.
+Follow it with the one-line disposition for every finding not accepted -- verdict word plus reason, the same pair the summary comment carries -- then any `BLOCKED` findings, any `OVERRIDE` the user made, and any observation noticed but deliberately left out of the diff. Omit empty sections.
 
 ## Important Rules
 
@@ -405,9 +419,10 @@ Follow it with any `BLOCKED` findings, any `OVERRIDE` the user made, and any obs
 - **NEVER** resolve a thread that is not backed by a commit confirmed on the remote, or one you have not replied to.
 - **NEVER** assign `REJECT` on reasoning alone -- name the command or the read, or take it to the gate.
 - **NEVER** treat advisory prose, a reviewer's self-report, or vendor boilerplate as a work item.
-- **NEVER** fix anything outside the accepted findings.
+- **NEVER** fix anything outside the accepted findings -- including a standards violation you spotted yourself in a file you were already editing.
 - **NEVER** delete the PR branch.
 - **NEVER** ingest this skill's own prior comments as feedback.
 - **ALWAYS** re-read the code at HEAD before judging feedback written against an older commit.
 - **ALWAYS** state what was not run -- in the terminal output and in the summary comment.
+- **ALWAYS** name the verdict and the reason for every finding not accepted -- in the terminal output and in the summary comment.
 - **ALWAYS** reply to every thread you evaluated, whatever the verdict.

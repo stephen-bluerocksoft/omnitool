@@ -21,7 +21,7 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-spec-implement` | Implement a feature from its spec with post-implementation verification |
 | `omni-plan-implement` | Execute an approved plan-mode plan with verification and proactive test creation |
 | `omni-spec-align` | Audit and sync spec artifacts with the actual implementation |
-| `omni-commit` | Checkpoint changes as logically grouped conventional commits (compact-before-PR workflow) |
+| `omni-commit` | Group changes into conventional commits, propose them for approval, and commit what is approved |
 | `omni-compact` | Compact a feature branch's noisy commit history into clean, logical commits |
 | `omni-pr-create` | Create a pull request from the current branch using gh CLI |
 | `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |

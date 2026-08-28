@@ -1,0 +1,25 @@
+---
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  markdown:
+    name: Markdown
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      # actions/checkout v4.2.2, pinned by SHA per BRS infrastructure standards
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      # Pinned to an exact version so a new upstream release cannot turn a green
+      # branch red without a commit here. Rules live in .markdownlint.jsonc.
+      - name: markdownlint
+        run: npx --yes markdownlint-cli@0.48.0 --ignore temp '**/*.md'

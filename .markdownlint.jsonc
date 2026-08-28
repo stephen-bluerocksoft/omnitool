@@ -1,0 +1,28 @@
+// omnitool markdownlint configuration.
+//
+// The core standards require markdown to "follow markdownlint standards".
+// This file is what that sentence means: without it the rule is unenforceable
+// prose, and the repo is judged against defaults it never adopted.
+//
+// Three default rules are off because they contradict deliberate repo
+// conventions, not because the findings were inconvenient. Everything else is
+// on, including the structural rules that catch real rendering bugs.
+{
+  "default": true,
+
+  // Skill and rules files are authored as long prose lines and are read by
+  // agents, not diffed by column. Hard-wrapping them at 80 would rewrap every
+  // paragraph in the repo and make every future edit a whole-paragraph diff.
+  "MD013": false,
+
+  // Skill files open with YAML frontmatter followed by prose; the Agent Skills
+  // standard defines that shape, so there is no leading H1.
+  "MD041": false,
+
+  // Skill procedures are long numbered lists interrupted by code fences, which
+  // markdownlint reads as a new list restarting mid-document. The numbers are
+  // load-bearing: the prose cross-references them ("see step 4b", "from step
+  // 9") across eight files, so renumbering to satisfy the rule would silently
+  // break those references.
+  "MD029": false
+}

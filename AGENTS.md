@@ -12,6 +12,7 @@ Skills follow the open [Agent Skills](https://agentskills.io/) standard. This re
 
 ## Setup Commands
 
+- Lint every Markdown file: `make lint`
 - Install globally: `make install`
 - Pull latest and reinstall: `make update`
 - View all targets: `make help`
@@ -32,7 +33,7 @@ omnitool/
 - All content files are Markdown (`.md`)
 - Shell scripts use `bash` with `set -e` and `set -o pipefail`
 - No emojis in any Markdown file
-- Follow markdownlint standards
+- Follow markdownlint standards -- `make lint` enforces them, and the rules the repo turns off are documented with their reasons in `.markdownlint.jsonc`
 - Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`
 - Commit subject line must be 50 characters or less, body wraps at 72
 

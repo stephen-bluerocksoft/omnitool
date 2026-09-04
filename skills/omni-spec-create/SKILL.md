@@ -69,6 +69,23 @@ Invoke the `speckit-specify` skill with the feature description.
 
 Record the **branch name** and **spec directory path** from the phase output for subsequent steps.
 
+## Step 2a: Clarify
+
+Run the Speckit clarify phase (`speckit-clarify`) before planning.
+
+This step exists here, in the main session, because it is the one phase that **must** talk to the user:
+it asks up to five targeted questions about underspecified areas and writes the answers back into
+`spec.md`. A spec subagent cannot run it -- `spec-creator` and `spec-planner` have no channel to the
+user, and silence is not consent. Upstream sequences it `specify -> clarify -> plan` for the same
+reason: the plan should be built on answers, not on guesses.
+
+- **Skip it only when the user says to**, or when the spec genuinely has no underspecified areas -- and
+  say which, rather than skipping silently
+- Do not answer its questions on the user's behalf. An unanswered question is not approval
+- Where the session is non-interactive and nobody can answer, **stop before Step 3** and report the
+  open questions. Planning past them writes guesses into the artifacts that everything downstream
+  treats as requirements
+
 ## Step 3: Plan, Tasks, and Analysis
 
 Execute these phases in order using the spec directory from Step 2. Invoke the `speckit-*` skill named in each phase below.
@@ -79,14 +96,17 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 2. Run the Speckit plan phase (`speckit-plan`)
 3. This fills: plan.md, research.md, data-model.md, contracts/, quickstart.md
 
-### 3b: Tasks
+### 3b: Checklist
+
+1. Run the Speckit checklist phase (`speckit-checklist`)
+2. Checklist runs **before** tasks: upstream orders the workflow `plan -> checklist -> tasks ->
+   analyze`, the checklist's prerequisite is the plan, and `speckit-implement` treats the resulting
+   checklist as a gate. Generating it after tasks produces a gate nothing was written against
+
+### 3c: Tasks
 
 1. Run the Speckit tasks phase (`speckit-tasks`)
 2. This generates tasks.md from the plan
-
-### 3c: Checklist
-
-1. Run the Speckit checklist phase (`speckit-checklist`)
 
 ### 3d: Analyze and Remediate
 
@@ -98,14 +118,14 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 - Update the relevant spec artifact (spec.md, plan.md, tasks.md, contracts/, data-model.md)
 - Coverage gaps: add or update tasks in tasks.md
 - Inconsistencies: reconcile conflicting artifacts
-- Ambiguities: choose concrete behavior, document in spec.md edge cases, update tasks
+- Ambiguities: **ask the user** -- you are in the main session and they are reachable. Resolve it yourself only where the spec, plan, constitution, or code settles it, and cite that evidence. Never invent a behavior and write it into spec.md: it stops reading as a guess and becomes a requirement
 
 **MEDIUM** -- Must be resolved. For each finding:
 
 - Coverage gap: add explicit mention in task descriptions in tasks.md
-- Underspecification: add concrete decision to spec.md and ensure tasks.md reflects it
+- Underspecification: add the concrete decision to spec.md and ensure tasks.md reflects it when the spec or code determines it; otherwise put the question to the user
 - Inconsistency: update lower-authority artifact to match higher-authority one
-- Ambiguity: resolve with concrete statement in spec.md, propagate to dependent artifacts
+- Ambiguity: same test as CRITICAL/HIGH -- derivable means resolve it with the evidence cited; anything that is a design decision goes to the user
 
 **LOW** -- For each finding, choose one:
 

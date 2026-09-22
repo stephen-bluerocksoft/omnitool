@@ -1,6 +1,6 @@
 ---
 name: omni-epic-review
-description: Review the code a devbot epic run produced, one workplan unit at a time. Slices the epic branch back into its units (from manifest.yaml and the specs/<slug>/ paths each commit touches), dispatches one full brs-review per slice in a worktree at that slice's own commit, re-verifies every finding against the branch head, adds one bounded cross-cutting pass, and prints a single report with a per-unit sizing table. Use on an epic branch before opening its pull request, or on any branch too large for one review -- phrases like "review this epic", "review the epic branch unit by unit", "this PR is too big to review". Text only; never posts to GitHub. Not the pre-launch plan audit (that is /devbot-review) and not a single-change review (use brs-review).
+description: Review the code a devbot epic run produced, one workplan unit at a time. Slices the epic branch back into its units (from manifest.yaml and the specs/<slug>/ paths each commit touches), dispatches one full brs-review per slice in a worktree at that slice's own commit, re-verifies every finding against the branch head, adds one bounded cross-cutting pass, and prints a single report -- every surviving finding listed, with a per-unit sizing table and severity tally -- saved to temp/ as well. Use on an epic branch before opening its pull request, or on any branch too large for one review -- phrases like "review this epic", "review the epic branch unit by unit", "this PR is too big to review". Text only; never posts to GitHub. Not the pre-launch plan audit (that is /devbot-review) and not a single-change review (use brs-review).
 compatibility: Requires brs-review (BRS Codex) installed at ~/.claude/skills/brs-review, and git 2.17+ (worktree add/remove)
 ---
 
@@ -10,7 +10,7 @@ A devbot epic runs on one branch and lands as one pull request, and an epic-size
 
 **Confirm before dispatching.** The slice plan is the cost: one full `brs-review` per slice plus one cross-cutting pass, each its own subagent. Print the plan (Step 2) and confirm the user wants to spend that now. Skip this confirmation only when the user explicitly invoked `/omni-epic-review`.
 
-**Text only.** The report in the terminal is the entire deliverable. This skill never posts to GitHub, never runs `gh`, never commits, and never changes a tracked file. The worktrees it creates under `temp/` are removed before it ends.
+**Text only.** The deliverable is the report, printed in the terminal and saved to one gitignored file, `temp/epic-review-<head-short>.md`, so it survives scrollback, context compaction, and a fix session started fresh. This skill never posts to GitHub, never runs `gh`, never commits, and never changes a tracked file. The worktrees it creates under `temp/` are removed before it ends.
 
 **Once.** `brs-review` documents that repeated runs sample different judgment-based findings rather than converging, and every slice here inherits that. Run this skill once, fix the Must Fix findings, and stop.
 
@@ -33,7 +33,7 @@ Not `/devbot-review`: that audits the plan before launch. This reviews the code 
 This skill is model-invocable. A session is **non-interactive** whenever nobody is there to answer a question -- an unattended runner, a scheduled job, a cloud trigger.
 
 - **Never commit, push, tag, or run `gh`.** Every subagent dispatch restates this.
-- **The plan confirmation is the only question**, and it is governed by the gate above: an explicit `/omni-epic-review` invocation is the answer. Every other choice has a non-interactive branch named in the step that makes it (manifest ambiguity falls back to per-commit slicing and says so in the report; a dirty tree is a precondition failure, not a question).
+- **The plan confirmation is the only routine question**, and it is governed by the gate above: an explicit `/omni-epic-review` invocation is the answer. Every other choice has a non-interactive branch named in the step that makes it (manifest ambiguity falls back to per-commit slicing and says so in the report; a dirty tree is a precondition failure, not a question; an existing report for the same head stops the run).
 - **Worktrees are removed on every exit path** -- after the report, after a precondition failure in Step 3 or later, and after a subagent failure. Step 1 also prunes leftovers from an earlier run that did not get that far.
 - **Nothing leaves the machine.**
 
@@ -44,7 +44,7 @@ This skill is model-invocable. A session is **non-interactive** whenever nobody 
 3. `ls ~/.claude/skills/brs-review/SKILL.md ~/.claude/skills/brs-review/references/cross-cutting.md`. Either missing: **STOP** and tell the user to install BRS Codex (`make install` in its repo). Do not substitute a hand-rolled review.
 4. Detect `<base>` (Runtime note). Record `<head>` as `git rev-parse HEAD` and `<merge-base>` as `git merge-base <base> HEAD`. If `git rev-list --count <merge-base>..HEAD` is 0, there is nothing to review; say so and stop.
 5. Prune leftovers: `git worktree prune`, then if `temp/epic-review/` exists, `git worktree remove --force` each subdirectory that is still a worktree and delete the rest.
-6. `git check-ignore -q temp || echo "temp/ is not gitignored"`. Continue either way; the report notes it if not ignored.
+6. `git check-ignore -q temp || echo "temp/ is not gitignored"`. Continue either way; if it is not ignored, Step 7 skips the report file and the report says so. Then `ls temp/epic-review-<head-short>.md`: if a report for this exact head already exists, this branch state was already reviewed (see **Once**) -- say so and point at the file. Interactively, ask whether to review again anyway; non-interactively, stop.
 7. Locate the epic manifest, in this order, and stop at the first hit:
    - The invocation names a manifest path or an epic slug -- use that path, or `<docs-root>/<slug>/manifest.yaml`.
    - `grep -n "devbot program conventions" CLAUDE.md AGENTS.md 2>/dev/null` names the epic docs root; list `<docs-root>/*/manifest.yaml`.
@@ -97,6 +97,8 @@ For a cross-cutting or docs-only slice, replace the unit sentence with: "This ra
 
 Collect every slice's output. A subagent that fails or returns nothing is recorded as an unreviewed slice in the report -- never re-dispatched silently, never filled in by the orchestrator reviewing that slice itself.
 
+**Wait for everything before reporting.** Do not write the Step 7 report until every subagent from Steps 3 and 5 has returned and every background command you started (a test run you kicked off to settle a caveat, for example) has exited. A report written while work is still in flight is buried by the completion notices that arrive after it, and anything it lists as "not run" may be stale by the time it is read.
+
 ## Step 4: Verify every finding against HEAD
 
 A slice was reviewed at its own commit, so a reviewer of an early unit cannot see the fix a later unit or the preflight pass already landed. Every finding must be re-established against the real branch head before it is reported. The orchestrator does this; when a slice returned more than about fifteen findings, dispatch one verify subagent for that slice with the same instructions (read-only, no questions).
@@ -133,6 +135,8 @@ This runs before the report is written, and on any exit after Step 3 began.
 
 **Tone**: direct and terse, as `brs-review` specifies. State what is wrong, where, and what to do. No praise, no description of what was checked; silence on a topic means it passed. Every location is `path:line` **at HEAD**, so the reader can open it on the checked-out branch.
 
+**Every surviving finding is listed.** Terse applies to each entry, never to the list. Every finding that survived Step 4 and the dedupe -- from every slice and from the cross-cutting pass -- appears as its own entry under its slice, Minor included. Do not filter, sample, regroup by theme, or collapse findings into a count; a recommendation of which to fix first is never a substitute for the list. Before printing, count the entries: the number must equal the Summary's K and the Tally's total. If they differ, the report is wrong -- fix it before printing.
+
 ```text
 Epic review: <epic> on <branch> (base <base>, <head-short>)
 
@@ -146,15 +150,27 @@ Sizing
   7  U6             U6          1     67    7493          54         5864  OVER BUDGET -- split next time
   8  cross-cutting  --         15    128    3605          50         2094
 
+Tally
+  Slice          Blocker  Critical  Major  Minor
+  U1                   0         1      3      2
+  U6                   0         0      4      1
+  Cross-cutting        0         0      1      4
+  Total                0         1      8      7
+
 Findings by slice
   ## U1 -- 025-intake-foundation
-  <brs-review's Must Fix / Recommended sections for this slice, HEAD-relative>
+  [Critical] path/to/file.py:164 (9/10) -- <issue>. Fix: <proposed fix>
+  [Major] path/to/other.py:397 (8/10) -- <issue>. Fix: <proposed fix>
+  ...
 
   ## U6 -- 030-intake-ui
   ...
 
-Cross-cutting
-  <Step 5 findings>
+  ## Cross-cutting
+  <Step 5 findings, same entry format>
+
+Suggested order
+  <optional: which entries to fix first and why, citing them by path:line>
 
 Not reviewed
   <slices whose subagent failed, or "none">
@@ -164,9 +180,13 @@ Resolved in-branch: <count> findings dropped because a later slice fixed them.
 Verdict: CHANGES NEEDED | PASS
 ```
 
-Omit any section that would be empty except Sizing and Verdict. The verdict follows `brs-review`'s rule -- **CHANGES NEEDED** when any Blocker or Critical finding survived Step 4, otherwise **PASS** -- and is advice to the author, never a GitHub review state.
+Within a slice, order entries Blocker, Critical, Major, Minor. An entry may run past one line when the failure scenario needs it, but each finding is exactly one entry. Omit any section that would be empty except Sizing, Tally, and Verdict. The verdict follows `brs-review`'s rule -- **CHANGES NEEDED** when any Blocker or Critical finding survived Step 4, otherwise **PASS** -- and is advice to the author, never a GitHub review state.
 
-Close with two lines: fix the Must Fix findings, then `/omni-pr-create`; and, when any slice was over budget, that the sizing table is input for the next `/devbot-review` -- a unit that produced an over-budget slice should be two units.
+Close with three lines: fix the Must Fix findings, then `/omni-pr-create`; where the report was saved; and, when any slice was over budget, that the sizing table is input for the next `/devbot-review` -- a unit that produced an over-budget slice should be two units.
+
+**Save the report.** Write the exact report you printed to `temp/epic-review-<head-short>.md`. It sits directly in `temp/`, not under `temp/epic-review/`, which Step 6 removes. If Step 1 found `temp/` not gitignored, skip the file and say in the closing lines that the report was not saved and why -- an unignored report is one `git add` away from a commit. Never delete an earlier run's report; the head in each filename marks which branch state it describes.
+
+**After the report.** The report is the last substantial message. If a notification arrives afterward (a subagent follow-up, a late message), answer it in one line -- whether it changes any finding, and if so, which -- and point back at the saved report. Do not re-summarize the review in chat; a restatement pushes the report out of view and drifts from the file.
 
 ## Do not
 
@@ -174,5 +194,7 @@ Close with two lines: fix the Must Fix findings, then `/omni-pr-create`; and, wh
 - Do not split an oversized slice. Flag it.
 - Do not re-dispatch a failed slice silently, and do not review it in the orchestrator's own context. Report it as not reviewed.
 - Do not report a finding you could not re-establish at HEAD.
+- Do not report findings by count or theme in place of listing them. A number in the Summary with fewer entries under it is an incomplete report.
+- Do not write the report while a subagent or background command is still running.
 - Do not run this skill twice on the same branch state.
 - Do not post, comment, commit, push, or run `gh`.

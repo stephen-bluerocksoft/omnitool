@@ -21,7 +21,6 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-spec-implement` | Implement a feature from its spec with post-implementation verification |
 | `omni-plan-implement` | Execute an approved plan-mode plan with verification and proactive test creation |
 | `omni-epic-seed` | Synthesize a devbot-plan-ready epic seed document from a PRD |
-| `omni-epic-review` | Review a built epic branch one workplan unit at a time -- a brs-review per unit in its own worktree, findings re-verified against HEAD, plus a cross-cutting pass |
 | `omni-spec-align` | Audit and sync spec artifacts with the actual implementation |
 | `omni-commit` | Group changes into conventional commits, propose them for approval, and commit what is approved |
 | `omni-compact` | Compact a feature branch's noisy commit history into clean, logical commits |

@@ -49,6 +49,12 @@ DEPRECATED_AGENTS=(
     "repo-test-auditor.md"   # consolidated into BRS test-auditor
 )
 
+# Skills install as directories, so a retired one needs directory removal;
+# cleanup_deprecated only removes files and would silently match nothing.
+DEPRECATED_SKILLS=(
+    "omni-epic-review"       # promoted to BRS brs-review sliced mode
+)
+
 echo "Omnitool Installer"
 echo "=================="
 echo ""
@@ -103,6 +109,17 @@ install_skills() {
     done
 
     echo "  Installed $count skills to $label"
+}
+
+cleanup_deprecated_skills() {
+    local target_dir="$1"
+    shift
+    for old_skill in "$@"; do
+        if [ -d "$target_dir/$old_skill" ]; then
+            rm -rf "${target_dir:?}/${old_skill:?}"
+            echo "  Removed deprecated skill: $old_skill"
+        fi
+    done
 }
 
 cleanup_deprecated() {
@@ -175,6 +192,7 @@ install_claude_md() {
 echo "Cleaning up deprecated files..."
 cleanup_deprecated "$CLAUDE_COMMANDS_DIR" "${DEPRECATED_COMMANDS[@]}"
 cleanup_deprecated "$CLAUDE_AGENTS_DIR" "${DEPRECATED_AGENTS[@]}"
+cleanup_deprecated_skills "$CLAUDE_SKILLS_DIR" "${DEPRECATED_SKILLS[@]}"
 
 echo "Installing skills..."
 install_skills "$SKILLS_DIR" "$CLAUDE_SKILLS_DIR" "Claude (~/.claude/skills)"

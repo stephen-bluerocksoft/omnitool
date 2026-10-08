@@ -53,6 +53,7 @@ DEPRECATED_AGENTS=(
 # cleanup_deprecated only removes files and would silently match nothing.
 DEPRECATED_SKILLS=(
     "omni-epic-review"       # promoted to BRS brs-review sliced mode
+    "omni-epic-seed"         # renamed to omni-prd-program
 )
 
 echo "Omnitool Installer"

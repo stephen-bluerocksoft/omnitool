@@ -184,8 +184,8 @@ Follow `references/architecture-review.md`. In short:
 1. **Write the synthesis down** for the critic: the verified Phase 5 picture plus the intent map's deliberate decisions (rulings, research choices, the plan's own deviation and complexity notes), plus the trust boundaries drawn from the architecture diagram, in the scratchpad as `architect-brief.txt` with the reference's constraints, fourteen lenses, and return shape.
 2. **Run the critic.** Fanned-out run: one read-only `Explore` subagent reads the brief and returns candidates. Single-pass run: work through the lenses inline.
 3. **Vet every candidate** -- re-establish its evidence at `HEAD` and re-count any "N copies"; check whether the spec chose it on purpose and argue with that reason rather than ignoring it; read the PR's existing reviews and inline comments and drop or extend anything already raised; check the next spec's branch and sibling folders before claiming a trend; drop anything that ends in "no change needed".
-4. **Size the survivors** -- priority, spec change, cheapest moment, blocking or non-blocking -- and state unknowns with the measurement that would settle them. Each keeps its quality attribute, scenario, and "keep it fixed" check.
-5. **Tier, theme, and budget them** (reference, "Tiers, themes, and the budget"): at most four **Fix before merge** with full detail, the rest **Improve later** as one-liners, at most eight in total whatever the PR's size; group them into two or three risk themes; list what was checked and found sound. Survivors past the cap get one line in the coverage notes.
+4. **Size the survivors** -- priority, spec change, blocking or non-blocking -- and state unknowns with the measurement that would settle them. Each keeps its quality attribute, scenario, and "keep it fixed" check.
+5. **Place, theme, and budget them** (reference, "Placement, themes, and the budget"): **Address in this PR** by default; **For the author to file** only when the change belongs to another repository, depends on unmerged sibling work, needs evidence first, or is outside the feature's scope -- each with its reason, target, and a draft issue title. At most eight entries across both lists whatever the PR's size; group them into two or three risk themes; list what was checked and found sound. Survivors past the cap get one line in the coverage notes.
 6. **Write the questions for the author**: three to six, each about intent the code cannot reveal.
 
 Recommendations are design advice, not defect reports. If a candidate turns out to be a bug, leave it out and mention `brs-pr-review` in the terminal summary.
@@ -207,17 +207,18 @@ Recommendations are design advice, not defect reports. If a candidate turns out 
    Size: <files> files, +<additions>; production code <code files> files, +<code lines>
    Analysis: <single pass | M area analysts>; <K> claims dropped or marked unverified
    Spec drift: <N> not found, <N> beyond spec, <N> plan departures | no governing spec
-   Architecture review: <T> risk themes; <B> fix before merge, <L> improve later (<K> blocking); <Q> questions for the author; <D> candidates dropped in vetting
+   Architecture review: <T> risk themes; <P> to address in this PR, <F> for the author to file (<K> blocking); <Q> questions for the author; <D> candidates dropped in vetting
    Page: <artifact link | local file path, not published>
    ```
 
-   Then state the risk themes and the fix-before-merge items in a sentence or two, offer to draft any of them as PR comments, and END the turn.
+   Then state the risk themes and the most important in-PR items in a sentence or two, offer to draft the review as one PR comment addressed to the author -- follow-ups included, for the author to file -- and END the turn.
 
 ## Important Rules
 
 **NEVER:**
 
 - Post to GitHub, comment, review, or label during the run; afterwards, only on the user's request and after they approve the exact text
+- File issues -- follow-ups are for the PR author to file
 - Check out the PR branch, create a worktree, or modify tracked files
 - Report defects, style issues, or quality grades -- that is `brs-pr-review`
 - Present a deliberate, documented design decision as an oversight

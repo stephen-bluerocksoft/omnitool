@@ -75,20 +75,20 @@ In order:
 
 1. **Bottom line** -- one bordered box, the only thing a busy reader needs:
    - the two or three **risk themes**, each a short name on its own line followed by one sentence and the numbers of the recommendations it covers;
-   - one count line: how many to fix before merge, how many to improve later, and how many are blocking (usually none). Do not list the items again -- the tier headings directly below already name them, and repeating them in the box is noise.
-2. **Fix before merge** -- one short line under the heading saying why these are cheapest before merge, then at most four full blocks, the first open, the rest collapsed.
-3. **Improve later** -- one collapsed row per recommendation. The row itself shows the number, title, priority, and a single line: the finding, why it matters, and the cheapest moment. Expanding it reveals the same full block as the first tier.
+   - one count line: how many to address in this PR, how many for the author to file, and how many are blocking (usually none). Do not list the items again -- the list headings directly below already name them, and repeating them in the box is noise.
+2. **Address in this PR** -- one short line under the heading noting which items need a spec change or touch an unmerged migration, then one full block per item in priority order, numbered 1, 2, 3; the first open, the rest collapsed.
+3. **For the author to file** -- one line under the heading saying these cannot be done in this PR and the author files them. Then one collapsed row per follow-up, lettered A, B, C. The row shows the title, the priority, the repositories involved, what it depends on, an ordered **Issues to file** list (each issue tagged with its repository, its draft title, and what blocks it -- including the issue in this repository that adopts a dependency's change), and -- when waiting leaves an exposure -- the interim decision for the author, linked to the matching question. When the follow-up is part of an in-PR recommendation, link the two both ways; when it stands alone, expanding the row reveals its full block.
 4. **Checked and sound** -- a short list of decisions examined and found safe.
 5. **Questions for the author** -- three to six, each about intent the code cannot reveal. A question answerable by reading more code does not belong here.
 
 **Full block layout.** Lay each block out as structure, never as bold run-in labels inside paragraphs, which read as a wall of text:
 
 - the header shows the number in a small badge, the title in the display face, the priority tag, and a blocking or non-blocking tag;
-- a row of small labelled tiles holds the lens, the quality attribute, spec change, and cheapest moment;
+- a row of small labelled tiles holds the lens, the quality attribute, spec change, and where it goes (this PR, or the follow-up it depends on);
 - the scenario is a tinted panel of three labelled rows -- When, Today, Should -- as a definition list;
 - every other field is a two-column definition list: a narrow column of small uppercase muted labels on the left, the content on the right, with lists for multi-part fields such as Where and Recommendation. Below about 640px it stacks to one column.
 
-The fields, in order: **Where** (paths, tables, routes, with counts when the point is "N copies"); **Why it matters** (the concrete cost and when it lands); **Design today** (when the spec, a ruling, or research chose it on purpose, that reason and what the alternative still satisfies; name any PR finding it extends, for example "extends R15"); **Recommendation** (specific enough to size); **Cost and timing** (spec change and which requirements, cheapest moment); **Keep it fixed** (the automated check that stops it coming back, when practical); **Unknowns** (what the code cannot settle and the measurement that would).
+The fields, in order: **Where** (paths, tables, routes, with counts when the point is "N copies"); **Why it matters** (the concrete cost and when it lands); **Design today** (when the spec, a ruling, or research chose it on purpose, that reason and what the alternative still satisfies; name any PR finding it extends, for example "extends R15"); **Recommendation** (specific enough to size); **Cost** (spec change and which requirements, migration impact); **Keep it fixed** (the automated check that stops it coming back, when practical); **Unknowns** (what the code cannot settle and the measurement that would).
 
 Never put a defect, a style remark, or a "this is fine" confirmation among the recommendations -- confirmations belong in Checked and sound. When vetting leaves nothing standing, say so in the bottom line and keep the other parts.
 

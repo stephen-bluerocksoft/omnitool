@@ -80,24 +80,34 @@ The critic is adversarial by instruction, so its output over-reaches. The orches
 3. **Check the PR's existing reviews.** Read the review bodies and inline comments (`gh api repos/<owner>/<repo>/pulls/<n>/reviews` and `/pulls/<n>/comments`, both `--paginate`). If a reviewer already raised it, either drop the candidate or present it as an extension of their finding and name it.
 4. **Check the neighbours.** When the candidate is about extension (lens 8) or layout (lens 7), look at the next spec's branch and the sibling folders before claiming a trend.
 5. **Drop what needs no action.** "This is fine" is not a recommendation. A candidate that ends in "no change needed" or only confirms the design is omitted -- at most one line in the coverage notes.
-6. **Size it.** Give each surviving recommendation (the tiers and themes below build on this):
+6. **Size it.** Give each surviving recommendation (the placement and themes below build on this):
    - **Priority** -- High (data integrity, security, privacy, or a choice that gets much harder after merge), Medium (recurring cost, drift risk, or an operability gap on a critical path), Low (organisation and polish).
    - **Spec change** -- yes or no; if yes, which requirements, rulings, or contracts change.
-   - **Cheapest moment** -- before merge, next spec, or any time.
    - **Merge-blocking** -- almost always no; this is design advice, not a defect gate. Say yes only when the design will corrupt, lose, or expose data.
 7. **Name the unknowns.** Anything the code cannot settle -- how long a run takes, which of two timeouts wins in an external system, how much traffic a trigger sees -- is stated as unknown with the measurement that would settle it. Never estimate it.
 
-## Tiers, themes, and the budget
+## Placement, themes, and the budget
 
-A reader's attention does not grow with the PR. A larger PR yields more candidates, but the page must not get longer: filter harder and group more. These rules hold for every PR size.
+The reviewer reports; the PR author acts. Every surviving recommendation is something that should be addressed, and an agent can usually make the change now, so recommendations are not split by when to do them. They are split by **whether the change belongs in this PR**.
 
-1. **Tier every survivor.**
-   - **Fix before merge** -- High priority, or a change whose cost rises sharply once the PR merges (an unmerged migration, a contract no client uses yet). At most **four**. These get the full detail block.
-   - **Improve later** -- everything else that survived. These get one line each (the finding, why it matters, the cheapest moment), with the full detail block available on expand.
-   - At most **eight** across both tiers, highest priority first. Fewer strong ones beat a long list. The cap limits recommendations, not lenses: survivors that miss it get one line each in the coverage notes, so nothing is silently discarded. Never drop a medium finding to look decisive -- compress it into the second tier instead.
-2. **Mark each one blocking or non-blocking**, in the style of Conventional Comments, so the merge question is explicit. Blocking is rare: only a design that will corrupt, lose, or expose data.
-3. **Find the risk themes.** Group the survivors into two or three themes, ATAM's systemic weaknesses: what the individual findings have in common and which business goal they threaten. Each theme is one sentence naming the recommendations it covers. Themes are the headline of the section; the recommendations are the evidence.
-4. **List what was checked and found sound** -- ATAM's non-risks -- as a short list of decisions the critic examined and found safe, so the reader knows what the review covered and does not assume silence means unexamined.
+1. **Place every survivor.**
+   - **Address in this PR** -- the default. Spec changes are not a reason to defer: in a spec-first repo the change runs through spec-modify inside the PR.
+   - **For the author to file** -- only when the change cannot be made in this PR, for one of these reasons, which the entry must name:
+     - it belongs to **another repository or team** (for example a platform the PR depends on);
+     - it depends on **unmerged sibling work** (another spec's branch owns the table or module it needs);
+     - it needs **evidence first** -- a measurement that decides whether or how to fix it;
+     - it is **outside the feature's scope** and would grow the PR into unrelated work.
+
+     A decision that only a person can make is not a follow-up; it is a question for the author.
+   - A recommendation can split: the part this repo can do goes in the PR, the part another repo owns becomes a follow-up, and each names the other. A split recommendation counts once against the budget below.
+   - **No temporary workarounds for another repository's job.** When a recommendation's real fix lives in another repository or an unmerged sibling, it is a follow-up marked "depends on `<repository>`: `<change>`". Do not invent throwaway work in this PR -- wrappers, shims, or guards built only to be deleted when the dependency lands. The PR keeps only the parts that are permanent and valuable on their own, with no dependency on the follow-up (for example, a uniqueness constraint in this repo's own table).
+   - **Name the exposure while waiting.** When a deferred fix leaves a security, privacy, or data-integrity exposure in place until the dependency lands, the follow-up says so plainly, and a question for the author asks them to contain it (for example, ship the feature switched off) or accept it knowingly. The review never makes that call for them.
+   - **Check the platform before promising an in-PR change.** Confirm against the dependency's code at the pinned version that the PR can actually do what an in-PR recommendation says (how the platform grants tools, which fields its API returns). If it cannot, the recommendation is a follow-up. A capability you could not verify goes under Unknowns.
+2. **Write follow-ups for the author to file.** Each follow-up gives what it depends on, every issue the author must file -- one per repository, in the order they must land, each with its repository, a draft title, and what blocks it -- and, when waiting leaves an exposure, the interim decision the author must make. A dependency's change usually needs a second issue in this repository to adopt it (and often a spec change here): list it, blocked by the first. When nothing is needed here afterwards, say so. The skill never files issues, and neither does the reviewer: when the review is posted, the follow-ups go to the author in that comment, and the author files them -- in a Speckit repo through `speckit-taskstoissues` when they come from spec tasks, otherwise through `brs-file-issue`.
+3. **Order by priority within each list**, highest first, and keep at most **eight** entries across both lists so the page stays readable whatever the PR's size. A larger PR gets stricter filtering and more grouping, never a longer report. The cap limits the page, not the work: survivors past it get one line each in the coverage notes, so nothing is silently discarded.
+4. **Mark each one blocking or non-blocking**, in the style of Conventional Comments, so the merge question is explicit. Blocking is rare: only a design that will corrupt, lose, or expose data.
+5. **Find the risk themes.** Group the survivors into two or three themes, ATAM's systemic weaknesses: what the individual findings have in common and which business goal they threaten. Each theme is one sentence naming the recommendations it covers. Themes are the headline of the section; the recommendations are the evidence.
+6. **List what was checked and found sound** -- ATAM's non-risks -- as a short list of decisions the critic examined and found safe, so the reader knows what the review covered and does not assume silence means unexamined.
 
 ## Questions for the author
 
@@ -105,7 +115,7 @@ Separate from recommendations: three to six questions whose answer is intent the
 
 ## Turning recommendations into PR comments
 
-The skill never posts. When the user asks to put recommendations on the PR afterwards, draft each as a comment in the page's Where / Why it matters / Fix shape, group related ones, leave out any the user marks as no-action, show the exact text, and post only after an explicit yes for that text. Post as a plain comment (`gh pr comment <n> --body-file`), never as a review, so no existing verdict changes.
+The skill never posts and never files. When the user asks to put the review on the PR afterwards, draft one comment addressed to the PR author: the risk themes, then the in-PR recommendations in the page's Where / Why it matters / Fix shape, then the follow-ups for the author to file, each with its reason, target repository, and draft issue title. Leave out any the user marks as no-action, show the exact text, and post only after an explicit yes for that text. Post as a plain comment (`gh pr comment <n> --body-file`), never as a review, so no existing verdict changes.
 
 ## Sources
 

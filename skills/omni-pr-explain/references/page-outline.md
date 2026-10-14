@@ -69,28 +69,28 @@ When no spec governs the PR, replace the section with one line saying so and nam
 
 ### 10. Architecture review
 
-The advisory half of the page, built in Phase 6 under `references/architecture-review.md`. Open with one sentence that sets the stance: "A skeptical architect's read of this design: where it will hurt and what to change while it is cheap. Design advice, not a defect review."
+The advisory half of the page, built in Phase 6 under `references/architecture-review.md`. It follows progressive disclosure: the reader who stops after the first box knows what to do; everything else is detail on demand. Open with one sentence that sets the stance: "A skeptical architect's read of this design: where it will hurt and what to change while it is cheap. Design advice, not a defect review."
 
-- **Summary table** first: one row per recommendation, highest priority first -- the recommendation in a few words, the lens it came from, priority (High, Medium, Low as a tag), spec change (yes or no), cheapest moment (before merge, next spec, any time). A reader who stops here knows what to do.
-- **One block per recommendation**, numbered in the table's order, each collapsible with the first open. Lay each block out as structure, never as bold run-in labels inside paragraphs, which read as a wall of text:
-  - the header shows the number in a small badge, the title in the display face, and the priority tag;
-  - a row of small labelled tiles holds the lens, the quality attribute, spec change, and cheapest moment;
-  - the scenario is a tinted panel of three labelled rows -- When, Today, Should -- as a definition list;
-  - every other field is a two-column definition list: a narrow column of small uppercase muted labels on the left, the content on the right, with lists for multi-part fields such as Where and Recommendation. Below about 640px it stacks to one column.
+In order:
 
-  The fields, in order:
-  - **Quality attribute and scenario** -- the attribute at risk (for example "Reliability: fault tolerance") and the concrete scenario: when this happens, the system does that, and it should do this instead.
-  - **Where** -- paths, tables, routes, with counts when the point is "N copies".
-  - **Why it matters** -- the concrete cost: what drifts, breaks, or gets harder, and when.
-  - **The design today and why** -- when the spec, a ruling, or research chose it on purpose, quote that reason and say what the alternative still satisfies.
-  - **Recommendation** -- the change, specific enough to size.
-  - **Cost and timing** -- spec change and which requirements, cheapest moment, merge-blocking (almost always no).
-  - **Keep it fixed** -- the automated check (test, constraint, lint rule, CI step) that stops the problem coming back, when one is practical.
-  - **Unknowns** -- what the code cannot settle and the measurement that would.
-  - When it extends a finding already on the PR, name that finding (for example "extends R15").
-- **Questions for the author** -- three to six, each about intent the code cannot reveal. A question answerable by reading more code does not belong here.
+1. **Bottom line** -- one bordered box, the only thing a busy reader needs:
+   - the two or three **risk themes**, each a short name on its own line followed by one sentence and the numbers of the recommendations it covers;
+   - one count line: how many to fix before merge, how many to improve later, and how many are blocking (usually none). Do not list the items again -- the tier headings directly below already name them, and repeating them in the box is noise.
+2. **Fix before merge** -- one short line under the heading saying why these are cheapest before merge, then at most four full blocks, the first open, the rest collapsed.
+3. **Improve later** -- one collapsed row per recommendation. The row itself shows the number, title, priority, and a single line: the finding, why it matters, and the cheapest moment. Expanding it reveals the same full block as the first tier.
+4. **Checked and sound** -- a short list of decisions examined and found safe.
+5. **Questions for the author** -- three to six, each about intent the code cannot reveal. A question answerable by reading more code does not belong here.
 
-Never put a defect, a style remark, or a "this is fine" confirmation in this section. Omit the recommendations part, keeping the questions, only when vetting left nothing standing -- and then say so in one sentence.
+**Full block layout.** Lay each block out as structure, never as bold run-in labels inside paragraphs, which read as a wall of text:
+
+- the header shows the number in a small badge, the title in the display face, the priority tag, and a blocking or non-blocking tag;
+- a row of small labelled tiles holds the lens, the quality attribute, spec change, and cheapest moment;
+- the scenario is a tinted panel of three labelled rows -- When, Today, Should -- as a definition list;
+- every other field is a two-column definition list: a narrow column of small uppercase muted labels on the left, the content on the right, with lists for multi-part fields such as Where and Recommendation. Below about 640px it stacks to one column.
+
+The fields, in order: **Where** (paths, tables, routes, with counts when the point is "N copies"); **Why it matters** (the concrete cost and when it lands); **Design today** (when the spec, a ruling, or research chose it on purpose, that reason and what the alternative still satisfies; name any PR finding it extends, for example "extends R15"); **Recommendation** (specific enough to size); **Cost and timing** (spec change and which requirements, cheapest moment); **Keep it fixed** (the automated check that stops it coming back, when practical); **Unknowns** (what the code cannot settle and the measurement that would).
+
+Never put a defect, a style remark, or a "this is fine" confirmation among the recommendations -- confirmations belong in Checked and sound. When vetting leaves nothing standing, say so in the bottom line and keep the other parts.
 
 ### 11. Coverage notes
 

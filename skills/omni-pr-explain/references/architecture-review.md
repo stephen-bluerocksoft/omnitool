@@ -80,14 +80,24 @@ The critic is adversarial by instruction, so its output over-reaches. The orches
 3. **Check the PR's existing reviews.** Read the review bodies and inline comments (`gh api repos/<owner>/<repo>/pulls/<n>/reviews` and `/pulls/<n>/comments`, both `--paginate`). If a reviewer already raised it, either drop the candidate or present it as an extension of their finding and name it.
 4. **Check the neighbours.** When the candidate is about extension (lens 8) or layout (lens 7), look at the next spec's branch and the sibling folders before claiming a trend.
 5. **Drop what needs no action.** "This is fine" is not a recommendation. A candidate that ends in "no change needed" or only confirms the design is omitted -- at most one line in the coverage notes.
-6. **Size it.** Give each surviving recommendation:
+6. **Size it.** Give each surviving recommendation (the tiers and themes below build on this):
    - **Priority** -- High (data integrity, security, privacy, or a choice that gets much harder after merge), Medium (recurring cost, drift risk, or an operability gap on a critical path), Low (organisation and polish).
    - **Spec change** -- yes or no; if yes, which requirements, rulings, or contracts change.
    - **Cheapest moment** -- before merge, next spec, or any time.
    - **Merge-blocking** -- almost always no; this is design advice, not a defect gate. Say yes only when the design will corrupt, lose, or expose data.
 7. **Name the unknowns.** Anything the code cannot settle -- how long a run takes, which of two timeouts wins in an external system, how much traffic a trigger sees -- is stated as unknown with the measurement that would settle it. Never estimate it.
 
-Keep at most **eight** recommendations, highest priority first. Fewer strong ones beat a long list. The cap limits recommendations, not lenses: candidates that survive vetting but miss the cut get one line each in the coverage notes, so nothing is silently discarded.
+## Tiers, themes, and the budget
+
+A reader's attention does not grow with the PR. A larger PR yields more candidates, but the page must not get longer: filter harder and group more. These rules hold for every PR size.
+
+1. **Tier every survivor.**
+   - **Fix before merge** -- High priority, or a change whose cost rises sharply once the PR merges (an unmerged migration, a contract no client uses yet). At most **four**. These get the full detail block.
+   - **Improve later** -- everything else that survived. These get one line each (the finding, why it matters, the cheapest moment), with the full detail block available on expand.
+   - At most **eight** across both tiers, highest priority first. Fewer strong ones beat a long list. The cap limits recommendations, not lenses: survivors that miss it get one line each in the coverage notes, so nothing is silently discarded. Never drop a medium finding to look decisive -- compress it into the second tier instead.
+2. **Mark each one blocking or non-blocking**, in the style of Conventional Comments, so the merge question is explicit. Blocking is rare: only a design that will corrupt, lose, or expose data.
+3. **Find the risk themes.** Group the survivors into two or three themes, ATAM's systemic weaknesses: what the individual findings have in common and which business goal they threaten. Each theme is one sentence naming the recommendations it covers. Themes are the headline of the section; the recommendations are the evidence.
+4. **List what was checked and found sound** -- ATAM's non-risks -- as a short list of decisions the critic examined and found safe, so the reader knows what the review covered and does not assume silence means unexamined.
 
 ## Questions for the author
 

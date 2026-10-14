@@ -30,6 +30,7 @@ Two failure modes sit on either side of this workflow, and most rules below exis
 | ------ | ----- |
 | Review feedback on a pull request you own | `omni-pr-address` (this skill) |
 | Reviewing someone else's pull request | `brs-pr-review` -- posts inline comments and a verdict |
+| Understanding what a pull request implements | `omni-pr-explain` -- architecture page, never posts |
 | A local branch, commit, or working tree with no PR | `brs-review` -- text output only, never posts |
 | Opening the pull request in the first place | `omni-pr-create` |
 | An accepted finding that contradicts the spec | `/omni-spec-modify`, then `/omni-spec-implement` |

@@ -60,7 +60,8 @@ New or changed env keys (names only), containers or services, CI changes, extern
 Only when a spec governs the PR. Open with: "A high-level comparison of the code with `specs/<slug>`, not a converge pass."
 
 - **Requirement map**: each user story with its requirements, the area or areas implementing them, and a status (implemented, partial, not found).
-- **Not found**: each requirement with no implementing evidence, with the search that was run.
+- **Not found**: each requirement with no implementing evidence, with the search that was run. When there are none, say so in one sentence and stop -- do not discuss individual requirements under this heading.
+- **Checked and resolved**: requirements that first looked missing but turned out to be satisfied, each with the mechanism that satisfies it. Omit the heading when there are none. Keeping these apart from Not found means that heading only ever lists real gaps.
 - **Beyond spec**: capabilities with no requirement.
 - **Plan departures**: plan decisions the code does differently, with both sides stated.
 

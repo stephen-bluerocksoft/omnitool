@@ -172,7 +172,7 @@ resolve + fetch -> inventory + classify -> gather intent (PR text, spec)
    - **Config, infrastructure, integrations**: new env keys (names only), services, containers, external APIs, feature flags.
 
 3. **Drift check against the intent map** (only when a spec governs the PR). This is a high-level note, not a converge pass -- say so on the page.
-   - **Not found**: a requirement with no implementing evidence in any analyst return. Before listing it, read the requirement's full text, then search for it yourself (`git grep` for the requirement's key terms at `HEAD`) and record the search you ran. Some requirements need no code of their own -- "the ladder stops through the state change" is satisfied by a rule that only applies in certain states. When an existing mechanism satisfies the requirement, cite that mechanism and report it as implemented, not missing.
+   - **Not found**: a requirement with no implementing evidence in any analyst return. Before listing it, read the requirement's full text, then search for it yourself (`git grep` for the requirement's key terms at `HEAD`) and record the search you ran. Some requirements need no code of their own -- "the ladder stops through the state change" is satisfied by a rule that only applies in certain states. When an existing mechanism satisfies the requirement, report it as implemented and list it under **Checked and resolved** with that mechanism, never under Not found.
    - **Beyond spec**: a capability an analyst reported that maps to no requirement.
    - **Plan departures**: a plan decision the code visibly does differently.
 

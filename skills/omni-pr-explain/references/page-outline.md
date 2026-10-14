@@ -67,18 +67,39 @@ Only when a spec governs the PR. Open with: "A high-level comparison of the code
 
 When no spec governs the PR, replace the section with one line saying so and naming what intent was drawn from (PR body, linked issues).
 
-### 10. Questions for the author
+### 10. Architecture review
 
-Architecture-level questions only: boundaries, coupling, ownership, sequencing, design trade-offs. Three to eight items. Never defects -- those belong to `brs-pr-review`.
+The advisory half of the page, built in Phase 6 under `references/architecture-review.md`. Open with one sentence that sets the stance: "A skeptical architect's read of this design: where it will hurt and what to change while it is cheap. Design advice, not a defect review."
+
+- **Summary table** first: one row per recommendation, highest priority first -- the recommendation in a few words, the lens it came from, priority (High, Medium, Low as a tag), spec change (yes or no), cheapest moment (before merge, next spec, any time). A reader who stops here knows what to do.
+- **One block per recommendation**, numbered in the table's order, each collapsible with the first open. Lay each block out as structure, never as bold run-in labels inside paragraphs, which read as a wall of text:
+  - the header shows the number in a small badge, the title in the display face, and the priority tag;
+  - a row of small labelled tiles holds the lens, the quality attribute, spec change, and cheapest moment;
+  - the scenario is a tinted panel of three labelled rows -- When, Today, Should -- as a definition list;
+  - every other field is a two-column definition list: a narrow column of small uppercase muted labels on the left, the content on the right, with lists for multi-part fields such as Where and Recommendation. Below about 640px it stacks to one column.
+
+  The fields, in order:
+  - **Quality attribute and scenario** -- the attribute at risk (for example "Reliability: fault tolerance") and the concrete scenario: when this happens, the system does that, and it should do this instead.
+  - **Where** -- paths, tables, routes, with counts when the point is "N copies".
+  - **Why it matters** -- the concrete cost: what drifts, breaks, or gets harder, and when.
+  - **The design today and why** -- when the spec, a ruling, or research chose it on purpose, quote that reason and say what the alternative still satisfies.
+  - **Recommendation** -- the change, specific enough to size.
+  - **Cost and timing** -- spec change and which requirements, cheapest moment, merge-blocking (almost always no).
+  - **Keep it fixed** -- the automated check (test, constraint, lint rule, CI step) that stops the problem coming back, when one is practical.
+  - **Unknowns** -- what the code cannot settle and the measurement that would.
+  - When it extends a finding already on the PR, name that finding (for example "extends R15").
+- **Questions for the author** -- three to six, each about intent the code cannot reveal. A question answerable by reading more code does not belong here.
+
+Never put a defect, a style remark, or a "this is fine" confirmation in this section. Omit the recommendations part, keeping the questions, only when vetting left nothing standing -- and then say so in one sentence.
 
 ### 11. Coverage notes
 
-Collapsed by default. How the analysis ran (single pass, or M area analysts with the area plan table), what each analyst skimmed or could not read, claims dropped or marked unverified, and what was sampled from the tests, seeds, and generated buckets (one line per bucket, describing coverage and entities, never values).
+Collapsed by default. How the analysis ran (single pass, or M area analysts with the area plan table, plus the architecture critic: which lenses produced candidates, how many were dropped in vetting and why, and any that survived vetting but missed the eight-recommendation cap, in one line each), what each analyst skimmed or could not read, claims dropped or marked unverified, and what was sampled from the tests, seeds, and generated buckets (one line per bucket, describing coverage and entities, never values).
 
 ## Diagram guidance
 
 - **Choose the medium by diagram type.** Artifacts render Mermaid natively from `<pre class="mermaid">` blocks, with no library to load. Use Mermaid for the entity-relationship, sequence, and state diagrams, whose layout it handles well, and leave theming to the renderer -- no `classDef` colors, which ignore dark mode. Hand-draw the architecture diagram and the size chart as inline SVG, colored through the page's theme tokens and `currentColor`, because they need the new/modified/existing encoding and an exact scale.
-- **Make every diagram enlargeable.** Wrap each diagram -- each hand-drawn SVG container and each `<pre class="mermaid">` -- in an element with class `zoomable`, `tabindex="0"`, `role="button"` and `aria-label="Enlarge diagram"`, and give it a small "Enlarge" badge on its top edge. Wrap the Mermaid block rather than tagging the `<pre>`, because the renderer may replace the `<pre>` with its SVG. One page-level script opens a full-screen viewer when a `zoomable` is clicked or activated with Enter or Space. The viewer clones the diagram's `<svg>` (sized from its `viewBox`) into a stage with zoom by wheel, pinch, double-click and +/− buttons, drag to pan, a Fit button, a zoom percentage, and Escape to close and return focus. Use event delegation on `document`, since Mermaid renders after the page loads. Large sequence and architecture diagrams are unreadable at column width without it.
+- **Make every diagram enlargeable.** Wrap each diagram -- each hand-drawn SVG container and each `<pre class="mermaid">` -- in an element with class `zoomable`, `tabindex="0"`, `role="button"` and `aria-label="Enlarge diagram"`, and give it a small "Enlarge" badge on its top edge. Wrap the Mermaid block rather than tagging the `<pre>`, because the renderer may replace the `<pre>` with its SVG. One page-level script opens a full-screen viewer when a `zoomable` is clicked or activated with Enter or Space. The viewer clones the diagram's `<svg>` (sized from its `viewBox`) into a stage with zoom by wheel, pinch, double-click and +/− buttons, drag to pan, a Fit button, a zoom percentage, and Escape to close and return focus. Use event delegation on `document`, since Mermaid renders after the page loads. Hide the viewer with the `hidden` attribute and put `[hidden] { display: none !important; }` in the page's own CSS, so a closed viewer can never cover the page when it is rendered outside the Artifact skeleton. Large sequence and architecture diagrams are unreadable at column width without it.
 - **Keep Mermaid syntax plain.** Write path parameters as `:id` rather than `{id}` in sequence messages, give multi-word states an alias (`state "Follow-Up Sent" as FUS`), and keep `;` and `#` out of labels.
 - Diagrams show the mechanism, not decoration. Every box is a real component, entity, or external system named in the code at head.
 - Keep each diagram readable at phone width: at most about 15 nodes. Split a larger picture by area rather than shrinking it.

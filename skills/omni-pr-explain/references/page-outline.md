@@ -67,34 +67,13 @@ Only when a spec governs the PR. Open with: "A high-level comparison of the code
 
 When no spec governs the PR, replace the section with one line saying so and naming what intent was drawn from (PR body, linked issues).
 
-### 10. Architecture review
+### 10. Questions for the author
 
-The advisory half of the page, built in Phase 6 under `references/architecture-review.md`. It follows progressive disclosure: the reader who stops after the first box knows what to do; everything else is detail on demand. Open with one sentence that sets the stance: "A skeptical architect's read of this design: where it will hurt and what to change while it is cheap. Design advice, not a defect review."
-
-In order:
-
-1. **Bottom line** -- one bordered box, the only thing a busy reader needs:
-   - the two or three **risk themes**, each a short name on its own line followed by one sentence and the numbers of the recommendations it covers;
-   - one count line: how many to address in this PR, how many for the author to file, and how many are blocking (usually none). Do not list the items again -- the list headings directly below already name them, and repeating them in the box is noise.
-2. **Address in this PR** -- one short line under the heading noting which items need a spec change or touch an unmerged migration, then one full block per item in priority order, numbered 1, 2, 3; the first open, the rest collapsed.
-3. **For the author to file** -- one line under the heading saying these cannot be done in this PR and the author files them. Then one collapsed row per follow-up, lettered A, B, C. The row shows the title, the priority, the repositories involved, what it depends on, an ordered **Issues to file** list (each issue tagged with its repository, its draft title, and what blocks it -- including the issue in this repository that adopts a dependency's change), and -- when waiting leaves an exposure -- the interim decision for the author, linked to the matching question. When the follow-up is part of an in-PR recommendation, link the two both ways; when it stands alone, expanding the row reveals its full block.
-4. **Checked and sound** -- a short list of decisions examined and found safe.
-5. **Questions for the author** -- three to six, each about intent the code cannot reveal. A question answerable by reading more code does not belong here.
-
-**Full block layout.** Lay each block out as structure, never as bold run-in labels inside paragraphs, which read as a wall of text:
-
-- the header shows the number in a small badge, the title in the display face, the priority tag, and a blocking or non-blocking tag;
-- a row of small labelled tiles holds the lens, the quality attribute, spec change, and where it goes (this PR, or the follow-up it depends on);
-- the scenario is a tinted panel of three labelled rows -- When, Today, Should -- as a definition list;
-- every other field is a two-column definition list: a narrow column of small uppercase muted labels on the left, the content on the right, with lists for multi-part fields such as Where and Recommendation. Below about 640px it stacks to one column.
-
-The fields, in order: **Where** (paths, tables, routes, with counts when the point is "N copies"); **Why it matters** (the concrete cost and when it lands); **Design today** (when the spec, a ruling, or research chose it on purpose, that reason and what the alternative still satisfies; name any PR finding it extends, for example "extends R15"); **Recommendation** (specific enough to size); **Cost** (spec change and which requirements, migration impact); **Keep it fixed** (the automated check that stops it coming back, when practical); **Unknowns** (what the code cannot settle and the measurement that would).
-
-Never put a defect, a style remark, or a "this is fine" confirmation among the recommendations -- confirmations belong in Checked and sound. When vetting leaves nothing standing, say so in the bottom line and keep the other parts.
+Three to six questions the explanation raised, each about intent the code cannot reveal: a spec ambiguity, a design choice nothing explains, behaviour the code leaves undefined. Questions only -- no recommendations, priorities, or follow-ups; design advice comes from `brs-pr-review`'s architecture pass. Omit the section when the explanation raised none.
 
 ### 11. Coverage notes
 
-Collapsed by default. How the analysis ran (single pass, or M area analysts with the area plan table, plus the architecture critic: which lenses produced candidates, how many were dropped in vetting and why, and any that survived vetting but missed the eight-recommendation cap, in one line each), what each analyst skimmed or could not read, claims dropped or marked unverified, and what was sampled from the tests, seeds, and generated buckets (one line per bucket, describing coverage and entities, never values).
+Collapsed by default. How the analysis ran (single pass, or M area analysts with the area plan table), what each analyst skimmed or could not read, claims dropped or marked unverified, and what was sampled from the tests, seeds, and generated buckets (one line per bucket, describing coverage and entities, never values).
 
 ## Diagram guidance
 

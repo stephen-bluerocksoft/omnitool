@@ -26,7 +26,7 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-compact` | Compact a feature branch's noisy commit history into clean, logical commits |
 | `omni-pr-create` | Create a pull request from the current branch using gh CLI |
 | `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |
-| `omni-pr-explain` | Explain what a pull request implements as a system-architecture page with diagrams, then review that architecture through fourteen standards-based lenses and recommend improvements; published as a private Artifact |
+| `omni-pr-explain` | Explain what a pull request implements as a system-architecture page with diagrams, published as a private Artifact (design review lives in brs-pr-review) |
 | `omni-timetrack` | Generate a timetrack entry summarizing work for management |
 
 ## Agents

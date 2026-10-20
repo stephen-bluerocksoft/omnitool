@@ -1,13 +1,15 @@
 ---
 name: omni-spec-create
-description: Create a brand-new feature specification using the spec-first (Speckit) workflow. Use when the user wants to spec, scope, or plan a NEW feature -- phrases like "write a spec for", "start a new feature", "scope out", or "let's plan X". Also use when changing a feature whose spec has merged to the default branch -- under Flow-Forward that change is a new spec that supersedes it. Produces spec.md, plan.md, tasks.md, and any contracts/data models. Do NOT use to modify an in-flight spec on its own branch (use omni-spec-modify for that).
+description: Create a brand-new feature specification using the spec-first (Speckit) workflow. Use when the user wants to spec, scope, or plan a NEW feature -- phrases like "write a spec for", "start a new feature", "scope out", or "let's plan X". Also use when changing a feature whose spec has merged to the default branch -- under Flow-Forward, the default, that change is a new spec that supersedes it (a project whose constitution records Living Spec uses omni-spec-modify instead). Produces spec.md, plan.md, tasks.md, and any contracts/data models. Do NOT use to modify an in-flight spec on its own branch (use omni-spec-modify for that).
 ---
 
 # omni.spec.create
 
 This command ALWAYS creates a new spec. Even if an existing spec directory seems related, create a new spec -- do NOT modify or extend existing specs.
 
-**Superseding a merged feature.** BRS projects follow Speckit's Flow-Forward model: a feature directory that has merged to the default branch is an immutable record. When the new feature changes one, read the predecessor's `spec.md` and, after Step 2, add a `## Supersedes` section to the new `spec.md` listing each predecessor directory with the requirement IDs (FR-NNN, SC-NNN, user stories) this spec replaces or removes, one line each. A requirement it does not list stays governed by the predecessor. Never edit the predecessor directory -- not even to add a back-pointer.
+**Superseding a merged feature.** BRS projects follow Speckit's Flow-Forward model by default: a feature directory that has merged to the default branch is an immutable record. When the new feature changes one, read the predecessor's `spec.md` and, after Step 2, add a `## Supersedes` section to the new `spec.md` listing each predecessor directory with the requirement IDs (FR-NNN, SC-NNN, user stories) this spec replaces or removes, one line each. A requirement it does not list stays governed by the predecessor. Never edit the predecessor directory -- not even to add a back-pointer.
+
+This applies under Flow-Forward, the BRS default. When `.specify/memory/constitution.md` records a model that edits merged features in place, such as Living Spec, a change to a merged feature is not a new spec: tell the user it belongs in `/omni-spec-modify` on the existing feature and END your turn.
 
 **Confirm before scaffolding.** This flow creates a new git branch and scaffolds many files. Before running Step 1, state the feature you understood -- and the merged feature it supersedes, if any -- then ask with the Guided decisions rule in the core standards. Selecting the first option is the go-ahead for this flow on the feature as stated, and nothing else:
 

@@ -1,6 +1,6 @@
 ---
 name: omni-spec-align
-description: Audit alignment between an in-flight feature's spec artifacts and the implementation on its branch, updating the spec to match reality (implementation is the source of truth). Use when the feature's specs/<NNN>-<name>/ artifacts have not yet merged to the default branch and the code has diverged from them -- e.g. after implementing. Never aligns a merged feature, which is immutable under Flow-Forward. Also runs as the alignment sub-step of omni-spec-implement.
+description: Audit alignment between an in-flight feature's spec artifacts and the implementation on its branch, updating the spec to match reality (implementation is the source of truth). Use when the feature's specs/<NNN>-<name>/ artifacts have not yet merged to the default branch and the code has diverged from them -- e.g. after implementing. Under Flow-Forward, the default, it never aligns a merged feature; a project whose constitution records Living Spec aligns merged features too. Also runs as the alignment sub-step of omni-spec-implement.
 ---
 
 # omni.spec.align
@@ -20,7 +20,7 @@ Skip this question when the user explicitly invoked `/omni-spec-align`, or when 
 
 **Base branch**: below, `<base>` means the repository's main integration branch. Detect it once: try `git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p'`, and if empty fall back to whichever of `main` or `master` exists (`git rev-parse --verify main` / `git rev-parse --verify master`).
 
-**In-flight features only.** BRS projects follow Speckit's Flow-Forward model: a feature directory that has merged to the default branch is an immutable record. Before Phase 1, run `git cat-file -e <base>:specs/<NNN>-<name>/spec.md`. If it succeeds, **STOP** without editing anything: drift from a merged spec is either a bug to fix in code or a requirement change that needs a new spec through `/omni-spec-create`, whose `## Supersedes` section names the merged directory. Show that the spec has merged and what the request says about the drift, then ask with the Guided decisions rule in the core standards:
+**In-flight features only, under Flow-Forward.** BRS projects follow Speckit's Flow-Forward model by default: a feature directory that has merged to the default branch is an immutable record. Before Phase 1, read the spec persistence model in `.specify/memory/constitution.md`. If it records one that edits merged features in place, such as Living Spec, skip this check and go to Phase 1. Otherwise run `git cat-file -e <base>:specs/<NNN>-<name>/spec.md`. If it succeeds, **STOP** without editing anything: drift from a merged spec is either a bug to fix in code or a requirement change that needs a new spec through `/omni-spec-create`, whose `## Supersedes` section names the merged directory. Show that the spec has merged and what the request says about the drift, then ask with the Guided decisions rule in the core standards:
 
 - **Fix the code to match the merged spec** -- the spec stays the governing record; recommend it when the code broke a requirement nobody chose to change
 - **Open a superseding spec with `/omni-spec-create`** -- the selection is that skill's go-ahead; recommend it when the drift is behavior the user wants to keep

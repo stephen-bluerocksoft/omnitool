@@ -21,7 +21,7 @@ Drive spec work through the omnitool skills -- never hand-code a speckit-style f
 - **Bug fixes**: If the bug deviates from spec, fix code to match spec. If the spec was wrong, change the spec first -- `/omni-spec-modify` when the feature is in flight, a new superseding spec via `/omni-spec-create` when it has merged -- then fix code.
 - **Spec drifted from code during implementation**: Use `/omni-spec-align` on the in-flight feature to update its spec to match what was built. Drift from a merged spec is a bug fix or a new superseding spec, never an alignment.
 
-**Flow-Forward specs.** BRS projects follow Speckit's Flow-Forward model: a feature directory is editable only while it is in flight on its own branch, and becomes an immutable record once it merges to the default branch (`git cat-file -e <default>:specs/<NNN-name>/spec.md` succeeds). Where two features disagree, the later one whose `## Supersedes` section claims the requirement governs.
+**Flow-Forward specs.** BRS projects follow Speckit's Flow-Forward model by default: a feature directory is editable only while it is in flight on its own branch, and becomes an immutable record once it merges to the default branch (`git cat-file -e <default>:specs/<NNN-name>/spec.md` succeeds). Where two features disagree, the later one whose `## Supersedes` section claims the requirement governs. A project whose `.specify/memory/constitution.md` records a different model follows that model instead -- for example Living Spec, where every change above that would open a superseding spec goes through `/omni-spec-modify` on the existing feature, merged or not, and `/omni-spec-align` works on merged features too. The constitution outranks this rule, and the merged-feature checks in the omni-spec skills yield to it.
 
 These skills wrap Speckit's `speckit-specify`, `speckit-plan`, `speckit-tasks`, `speckit-analyze`, `speckit-implement`, and `speckit-converge` skills, which Speckit installs at `.claude/skills/speckit-*/SKILL.md`. If the `omni-spec-*` skills are not installed, fall back to invoking those `speckit-*` skills directly.
 
@@ -60,7 +60,7 @@ These skills wrap Speckit's `speckit-specify`, `speckit-plan`, `speckit-tasks`, 
 | Repo has `.claude/commands/speckit.*.md` but no `.claude/skills/speckit-*/` | STOP. Outdated Speckit -- tell the user to upgrade; do not use the legacy command files |
 | Change isn't in the spec | Update the spec first -- in flight via `/omni-spec-modify`, merged via a new superseding spec |
 | Spec says X but code does Y | Fix code OR change the spec with justification (same routing) |
-| About to edit a spec directory that is on the default branch | STOP. It is immutable -- open a new superseding spec with `/omni-spec-create` |
+| About to edit a spec directory that is on the default branch | Under Flow-Forward, STOP. It is immutable -- open a new superseding spec with `/omni-spec-create`. Under a constitution that records Living Spec, edit it with `/omni-spec-modify` |
 | Task isn't in tasks.md | Add it first |
 | API doesn't match contract | Update contract OR fix API |
 | Unresolved open item in research.md | Resolve before implementing |

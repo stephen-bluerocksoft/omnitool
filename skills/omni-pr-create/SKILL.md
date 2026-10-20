@@ -21,7 +21,10 @@ All git and gh commands that modify state (push, pr create) require write permis
    ```
 
    - If on `main` or `master`, **STOP** and warn the user. PRs should be created from feature branches.
-   - If there are uncommitted changes, warn the user and ask whether to proceed or commit first.
+   - If there are uncommitted changes, list them, then ask with the Guided decisions rule in the core standards:
+     - **Commit first** -- stop so the user can run `/omni-commit`; recommend it when the uncommitted files belong to the work on this branch, since the PR would otherwise miss them
+     - **Proceed without them** -- the PR covers committed work only and the changes stay in the tree; recommend it when they are unrelated to the branch
+     - **Stop** -- end the run with nothing pushed
 
 2. **Determine base branch**. The base branch is resolved in this order:
    - Explicitly provided by the user in the user's message (e.g., "into dev", "base: main")
@@ -52,7 +55,9 @@ All git and gh commands that modify state (push, pr create) require write permis
    gh pr list --head <current-branch> --state open --json number,title,url
    ```
 
-   - If a PR already exists for this branch, show the URL and ask the user if they want to update it or abort.
+   - If a PR already exists for this branch, show the URL, then ask with the Guided decisions rule in the core standards:
+     - **Update it (Recommended)** -- continue, redrafting that PR's title and body from the whole branch; the step 10 plan shows the result and step 11 approves it
+     - **Abort** -- leave the existing PR as it is and stop
 
 ### Phase 2: Draft the PR
 
@@ -133,13 +138,19 @@ All git and gh commands that modify state (push, pr create) require write permis
 
     Body:
     <full PR body preview>
+
+    Flags:
+      - <base is main/master, or possible secrets in the diff -- omit this section when there are none>
     ```
 
-11. **Ask the user to confirm**:
-    - "Create this PR? (yes/no/edit)"
-    - If "edit", ask what to change and revise
-    - If "no", stop
-    - If "yes" or "proceed", continue
+11. **Ask the user to confirm** with the Guided decisions rule in the core standards. Selecting the first option is the go-ahead for the push and the PR shown in the plan, and nothing else:
+    - **Create this PR (Recommended)** -- push the branch if needed and open the PR with this title, base, and body
+    - **Edit the plan** -- ask what to change, revise, show the plan again, and ask again
+    - **Don't create** -- stop with nothing pushed
+
+    If the diff carries a possible secret (see Important Rules), ask about it as its own question in the same call, before anything is pushed:
+    - **Stop and remove it (Recommended)** -- nothing is pushed; once pushed, a secret has to be rotated, not just deleted
+    - **Push anyway** -- the user has confirmed the file holds no real secret
 
 12. **Execute**. Run sequentially:
 
@@ -159,6 +170,14 @@ All git and gh commands that modify state (push, pr create) require write permis
     PRBODY
     ```
 
+    When step 5 chose **Update it**, edit the existing PR instead of creating one, with the same stdin rule:
+
+    ```sh
+    gh pr edit <pr-number> --title "<title>" --body-file - <<'PRBODY'
+    <pr-body>
+    PRBODY
+    ```
+
     c. If the user specified reviewers in the user's message, add them:
 
     ```sh
@@ -173,8 +192,8 @@ All git and gh commands that modify state (push, pr create) require write permis
 ## Important Rules
 
 - **Never force push** unless the user explicitly requests it.
-- **Never create PRs to main/master** without confirming the base branch with the user.
+- **Never create PRs to main/master** without confirming the base branch with the user. Flag it in the step 10 plan; selecting **Create this PR** in step 11 on that plan is the confirmation.
 - **Never fabricate changes** -- all PR content must be derived from the actual diff and commit history.
 - **Respect spec-first workflow** -- if a spec exists for the branch, reference it.
 - **Do not commit** -- this command only creates PRs from existing commits. Use `/omni-commit` first if changes are uncommitted.
-- **Check for secrets** -- if the diff contains files that might have secrets (`.env`, `credentials.*`, `*secret*`), warn the user before pushing.
+- **Check for secrets** -- if the diff contains files that might have secrets (`.env`, `credentials.*`, `*secret*`), flag them in the step 10 plan and ask the step 11 secrets question before pushing.

@@ -98,7 +98,7 @@ BRS Core Standards: *claims about what the code does are executed, not reasoned.
 
 Execute as **eight sequential phases**. Do NOT skip any phase. Three of them stop:
 
-- **Phase 4** is an approval gate -- the verdicts must be reviewed before any code is edited.
+- **Phase 4** is an approval gate -- every verdict is put to the user as its own question before any code is edited.
 - **Phase 7** is a hand-off -- the skill has no commit of its own to make, and waits for the user to land the work.
 - **Phase 8** is an approval gate -- nothing is posted to GitHub without an explicit go-ahead.
 
@@ -226,7 +226,7 @@ Evidence belongs in the second table, never inline in the first -- multi-line pr
 
 Code-style every path, symbol, and verdict. That styling is the whole readability gain over a fenced block -- it is what makes `client.py:61` and `_apply_auth` land as identifiers rather than prose.
 
-Then print the counts -- `N findings -- A accept, R reject, D defer, X decline` -- and ask for a go-ahead.
+Then print the counts -- `N findings -- A accept, R reject, D defer, X decline`. The tables and counts are the payload; the questions below carry the choice.
 
 **`DISCARD` is not counted.** It is assigned in Phase 2 and never reaches evaluation, so listing it in a tally that sums to `N` inflates the work and reports boilerplate-skipping as judgment. Its granularity is arbitrary anyway -- a bot's four summary sections are either one discard or four, and nothing decides which. Print the discards below the tables as unnumbered prose, because that list is the anti-cherry-picking check and that is what makes it worth printing at all:
 
@@ -234,7 +234,17 @@ Then print the counts -- `N findings -- A accept, R reject, D defer, X decline` 
 
 A thread-anchored question is the exception. It is a `DISCARD` that still produces public text in Phase 8, so it goes in the verdict table marked `QUESTION` -- never buried in that footnote.
 
-**Override grammar**: `F3 -> accept`, `F5 -> reject`, `F2 -> defer #178`. The user's call sits at the top of the BRS precedence order -- apply it verbatim and mark the finding `OVERRIDE`. A finding flipped away from `ACCEPT` drops out of Phase 5.
+**Ask one question per finding**, with the Guided decisions rule in the core standards, in rounds until every row of the verdict table has an answer. There is no bulk "accept all": each finding is its own decision, because each one becomes its own public reply. Per row:
+
+- **Options** are the verdicts the evidence leaves viable for that finding, drawn from `ACCEPT`, `REJECT`, `DEFER`, and `DECLINE`. A `DEFER` option names its destination; with no destination it is not offered. Each option's pros and cons come from that row of the evidence table -- what the read or run showed for and against it.
+- **The recommendation** is the verdict Phase 3 proposed, listed first.
+- **An open question** -- a finding whose `REJECT` would rest on reasoning alone -- is prompted like any other row, but `REJECT` is not among its options, because the evidence minimum forbids proposing it. Recommend `ACCEPT` unless the evidence supports `DEFER` or `DECLINE`.
+- **A `QUESTION` row** asks whether to **Answer it in a reply (Recommended)** in Phase 8, or to **Treat it as a finding**, which sends it back through Phase 3 for a verdict and a question of its own.
+- **A secret-scanner escalation** keeps its row; its options say plainly that rotation and history purge are outside this skill.
+
+A selected option sets that finding's verdict. One that differs from the proposed verdict is marked `OVERRIDE`.
+
+**Override grammar** remains accepted as a free-text alternative to the questions: `F3 -> accept`, `F5 -> reject`, `F2 -> defer #178`. The user's call sits at the top of the BRS precedence order -- apply it verbatim, mark the finding `OVERRIDE`, and ask the questions still unanswered. A finding flipped away from `ACCEPT` drops out of Phase 5. Phase 5 starts only when every finding has an answer.
 
 Do NOT begin implementing "the obvious ones" while waiting. A reply of "yes, but what about F4?" is **not** a go-ahead: answer the question, then ask again.
 
@@ -308,7 +318,9 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
    git rev-parse FETCH_HEAD               # what the remote actually has -- must match
    ```
 
-   **Stop** if the tree is dirty, if the shas differ, or if the fetch fails. Name what is outstanding and ask again. Never post about work that is not on the remote.
+   **Stop** if the tree is dirty, if the shas differ, or if the fetch fails. Name what is outstanding, then ask with the Guided decisions rule in the core standards. Never post about work that is not on the remote:
+   - **Check again (Recommended)** -- once the user has committed and pushed what is outstanding, re-run this step from the top
+   - **Stop without posting** -- end the run; nothing reaches GitHub
 
 2. **Resolve each accepted finding's sha** from the commits that actually touched its files:
 
@@ -318,7 +330,10 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
 
    One commit for the batch gives every finding the same sha; separate commits give each finding its own. **If a finding's files produce no commit, that finding did not land** -- reclassify it `BLOCKED` and never say "Fixed" for it.
 
-3. **Confirm the outward bundle.** Enumerate explicitly: the number of inline replies, **the threads to be resolved, by path and line**, and the summary comment. Nothing is posted until the user says go.
+3. **Confirm the outward bundle.** Show it explicitly: the number of inline replies, **the threads to be resolved, by path and line**, and the summary comment. Then ask with the Guided decisions rule in the core standards -- nothing is posted until an approve option is selected:
+   - **Post all (Recommended)** -- post every reply, resolve the listed threads, and post the summary, exactly as shown
+   - **Edit the bundle** -- ask what to change, revise, show the bundle again, and ask again
+   - **Don't post** -- stop; the pushed commits stay, and nothing reaches GitHub
 
    **Fork PRs**: if the head repository is a fork the user cannot push to, they will have discovered it in Phase 7. Post replies and a summary describing the patch, and resolve nothing -- there is no landed commit to back a resolution.
 

@@ -63,7 +63,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    - A single file change is a valid commit on its own
    - If ALL changes are related, a single commit is fine
    - Spec/documentation files that accompany code changes may be grouped with those code changes OR committed separately as `docs:` -- use judgment
-   - If one file's changes belong to two different groups, say so in the plan. `git add <file>` stages the whole file and cannot split them, so the choice between splitting hunks by hand and accepting a coarser grouping is the user's
+   - If one file's changes belong to two different groups, say so in the plan. `git add <file>` stages the whole file and cannot split them, so the choice between splitting hunks by hand and accepting a coarser grouping is the user's -- put it to them as its own question, as the Commit Proposals rule describes, alongside the step 7 approval
 
 6. **For each logical group**, determine:
    - **Type**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
@@ -105,11 +105,10 @@ If the user's message includes `checkpoint`, the branch will be compacted before
 
    b. **Do not stage anything while proposing.** Staging mutates an index the user may have arranged deliberately. Staging happens in Phase 4, by explicit path.
 
-   Ask: "Proceed with these N commit(s)? (yes / no / edit)"
-
-   - If the user says "edit", ask what to change and revise the plan
-   - If the user says "no", stop
-   - If the user says "yes" or "proceed", continue to Phase 4
+   c. **Ask for the go-ahead** with the options the Commit Proposals rule lists, put through the Guided decisions rule in the core standards:
+      - **Commit as shown** -- continue to Phase 4
+      - **Edit the plan** -- ask what to change, revise the plan, show it again, and ask again
+      - **Don't commit** -- stop
 
    An approved plan authorizes only the commits it showed. If new changes appear or the grouping shifts, re-propose.
 
@@ -148,7 +147,9 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    - Read the error output
    - If a hook rewrote the files (formatting, lint fixes), re-stage those files by explicit path and retry the same commit
    - If the failure needs a code change you can make, make it, re-stage, and retry the same commit
-   - If the fix cannot be automated, report the error and stop. Do not reshuffle the remaining groups around the failure without asking
+   - If the fix cannot be automated, report the error and the commits already created, then ask with the Guided decisions rule in the core standards. Never reshuffle the remaining groups without that answer:
+     - **Stop here (Recommended)** -- the created commits stay, the failed group and everything after it remain uncommitted in the tree for the user to fix
+     - **Re-propose the remaining groups** -- show a revised plan for what is still pending and run the step 7 approval on it
 
 ### Phase 5: Summary
 
@@ -170,5 +171,5 @@ Types, the 50-character subject limit, imperative mood, body wrapping, and break
 
 - **Never commit secrets**: Skip `.env`, credentials, API keys, tokens. These are flagged in the plan (step 7a) and excluded by default, not raised after approval.
 - **Never force push or amend** unless the user explicitly requests it in the current message.
-- **Never commit to main/master** without flagging it in the plan and getting confirmation.
+- **Never commit to main/master** without flagging it in the plan and getting confirmation. Because the flag is part of the plan, selecting **Commit as shown** in step 7 is that confirmation.
 - **Respect .gitignore**: Do not stage files that should be ignored.

@@ -51,7 +51,7 @@ resolve + fetch -> inventory + classify -> gather intent (PR text, spec)
    - the current directory, by the same check;
    - otherwise search for existing clones: `find ~ -maxdepth 4 -type d -name .git -path "*/<repo>/.git" 2>/dev/null`, and keep each parent whose `git -C <dir> remote get-url origin` names `<owner>/<repo>`.
 
-   Exactly one match: use it and say which clone you are reading. Several: ask the user which one. None: stop and tell the user to run the skill from, or pass the path of, a clone of `<owner>/<repo>`. Never clone on their behalf.
+   Exactly one match: use it and say which clone you are reading. Several: list them, then ask which one with the Guided decisions rule in the core standards -- each clone is an option (four at most, by path and current branch), and the recommendation is the one already on the PR's head branch, or else the most recently fetched. None: stop and tell the user to run the skill from, or pass the path of, a clone of `<owner>/<repo>`. Never clone on their behalf.
 
    Run every later `git` and `gh` command against that clone (`git -C "$CLONE" ...`, `cd "$CLONE" && gh ...`), never against the current directory.
 

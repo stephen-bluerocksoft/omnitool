@@ -60,17 +60,19 @@ earlier stages record it for that stage; later stages find it already answered.
 | Run time (the hire's speckit cycle) | A tunable parameter with a default that ships safely; the hire applies it, marks it `UNCONFIRMED`, and raises `BLOCKER:` | The seed's Open questions, "Where it resolves: run time" |
 | Outside the repo | Firm data, a vendor, a platform capability, a policy only an outside party can set | An "awaiting input" coverage row naming who owes it -- added if the item has no row yet. It is never an open question and never asked as if the user could decide it; an interim rule, when one applies, goes in the row's Decision text and cites the ruling it comes from |
 
-**How to ask.** Gather the stage's questions first, then ask them together with the AskUserQuestion
-tool -- at most four per call, each stating the evidence in a sentence and offering two to four
-options, the recommended one first and marked "(Recommended)". Ask before writing the documents the
-answers change. Record each answer as a decision with its date and "product owner, in the
-`omni-prd-program` session" (or whoever answered), and cite it wherever it settles a row or a
-section.
+**How to ask.** Gather the stage's questions first, then ask them with the Guided decisions rule in
+the core standards, which sets the format. Draw each question's evidence and each option's pros and
+cons from the PRD, the code, and the recorded rulings, so the user decides from what the program
+documents will cite. Ask before writing the documents the answers change. Record each answer as a
+decision with its date and "product owner, in the `omni-prd-program` session" (or whoever
+answered), and cite it wherever it settles a row or a section.
 
 **No one to ask.** When the skill runs without a user who can answer -- as a subagent, or
-non-interactively -- do not invent answers. Write the documents with each question's default,
-mark the question "unanswered" in its table, add "blocked on unanswered questions" to the Status
-line, and list them first in the handoff.
+non-interactively -- do not prompt and do not invent answers. Write the documents with each
+question's default, mark the question "unanswered" in its table, add "blocked on unanswered
+questions" to the Status line, and list them first in the handoff in the shape the Guided decisions
+rule gives an open decision, the default as its recommendation, so the session that has the user
+can ask them.
 
 ## Full width: the rule this skill exists for
 

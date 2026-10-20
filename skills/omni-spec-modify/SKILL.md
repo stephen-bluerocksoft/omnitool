@@ -7,7 +7,13 @@ description: Change the requirements of an EXISTING in-flight feature spec befor
 
 Change an existing feature's specification *before* implementing it. This edits the spec artifacts and re-runs analysis; it does NOT write feature code (use `/omni-spec-implement` for that) and it does NOT create a new spec (use `/omni-spec-create`).
 
-**Confirm before editing the spec.** This flow rewrites an existing feature's spec artifacts and re-runs analysis. Before Step 1, state which spec you will modify and the change you understood, and confirm the user wants the spec updated now. If the request is exploratory ("what would it take to..."), answer in prose instead and offer to run this when they are ready. Skip the confirmation only when the user explicitly invoked `/omni-spec-modify`.
+**Confirm before editing the spec.** This flow rewrites an existing feature's spec artifacts and re-runs analysis. Before Step 1, state which spec you will modify and the change you understood, then ask with the Guided decisions rule in the core standards. Selecting the first option is the go-ahead for this flow on that spec and that change, and nothing else:
+
+- **Update the spec now (Recommended)** -- run Steps 1 to 6 for the change as stated
+- **Adjust the change first** -- ask what to change, restate it, and ask again
+- **Not now** -- stop with nothing edited
+
+If the request is exploratory ("what would it take to..."), answer in prose instead and offer to run this when they are ready. Skip the question only when the user explicitly invoked `/omni-spec-modify`.
 
 ## Runtime note
 
@@ -59,18 +65,26 @@ Read every file in the spec directory and understand the current state before ch
 | `tasks.md` | Task breakdown, completion status (`[ ]`/`[X]`), dependency graph |
 | `quickstart.md` | Setup steps, validation scenarios |
 
-Record the last FR ID (e.g. FR-011) and last task ID (e.g. T018) so new IDs continue sequentially. Include any `## Phase N: Convergence` section when computing the maximum -- its tasks are real task IDs, and new tasks must continue past them rather than collide. Do not renumber or reorder that section. Restate the requested change concretely. If it is ambiguous, ask the user or run the `speckit-clarify` skill before editing.
+Record the last FR ID (e.g. FR-011) and last task ID (e.g. T018) so new IDs continue sequentially. Include any `## Phase N: Convergence` section when computing the maximum -- its tasks are real task IDs, and new tasks must continue past them rather than collide. Do not renumber or reorder that section. Restate the requested change concretely. If it is ambiguous, resolve it before editing: run the `speckit-clarify` skill when the ambiguity is in the requirement itself, and put any other open choice to the user with the Guided decisions rule in the core standards. Where no one can answer, stop and report the open questions in that rule's shape rather than editing on a guess.
 
 ## Step 3: Apply the Change Top-Down
 
 Edit the artifacts in authority order so lower-authority artifacts conform to higher-authority ones. The specification hierarchy (highest first):
 
-1. `.specify/memory/constitution.md` -- Project principles (do NOT edit here; if the change conflicts with the constitution, stop and raise it)
+1. `.specify/memory/constitution.md` -- Project principles (never edit it -- the core standards forbid amending it to accommodate a feature; see the conflict rule below)
 2. `specs/[feature]/spec.md` -- Feature requirements
 3. `specs/[feature]/plan.md` -- Architecture decisions
 4. `specs/[feature]/data-model.md` -- Entity definitions
 5. `specs/[feature]/contracts/` -- API contracts
 6. `specs/[feature]/tasks.md` -- Task breakdown
+
+**When the change conflicts with the constitution**, edit nothing yet. Show the principle and the conflicting part of the change side by side. If a version of the change exists that conforms to the principle and still meets the user's stated need, ask with the Guided decisions rule in the core standards:
+
+- **Reshape the change to conform** -- state the conforming version; recommend it when it keeps what the user asked for
+- **Drop the conflicting part** -- apply the rest of the change; recommend it when the conflicting part is separable and the rest stands alone
+- **Stop without editing** -- leave the spec as it is; amending the constitution is a project-level decision made through `speckit-constitution`, never inside this flow
+
+If no conforming version exists, there is nothing to choose: stop, report the conflict, and END your turn.
 
 For the requested change:
 
@@ -81,7 +95,7 @@ For the requested change:
 ## Step 4: Analyze and Remediate
 
 1. Run the Speckit analyze phase (the `speckit-analyze` skill).
-2. Remediate ALL findings using the same CRITICAL/HIGH/MEDIUM/LOW severity rules as `omni-spec-create` Step 3d (Analyze and Remediate) -- update the relevant artifact, reconcile inconsistencies, resolve ambiguities with concrete decisions, and accept LOW findings only with a documented rationale.
+2. Remediate ALL findings using the same CRITICAL/HIGH/MEDIUM/LOW severity rules as `omni-spec-create` Step 3d (Analyze and Remediate) -- update the relevant artifact, reconcile inconsistencies, resolve an ambiguity yourself only where the artifacts, constitution, or code settle it (citing the evidence) and ask the user the rest as that step describes, and accept LOW findings only with a documented rationale.
 3. Re-run the analysis until zero CRITICAL, HIGH, and MEDIUM findings remain. If new findings emerge from edits, repeat the cycle.
 
 ## Step 5: Enforce Test Coverage

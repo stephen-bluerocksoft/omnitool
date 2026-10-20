@@ -11,11 +11,21 @@ Audit alignment between specification artifacts and the actual implementation. W
 
 This is NOT a code review or bug hunt. This command asks: **"Does the spec accurately describe what was built?"**
 
-**Confirm before updating specs.** This flow rewrites the spec artifacts (spec.md, plan.md, tasks.md, contracts/, data-model.md, ...) to match the implementation. Before Phase 1, state which feature spec you will align and confirm the user wants the spec files updated now. Skip this confirmation when the user explicitly invoked `/omni-spec-align`, or when this skill runs as a sub-step of `/omni-spec-implement` (that flow's confirmation already covers it).
+**Confirm before updating specs.** This flow rewrites the spec artifacts (spec.md, plan.md, tasks.md, contracts/, data-model.md, ...) to match the implementation. Before Phase 1, state which feature spec you will align, then ask with the Guided decisions rule in the core standards. Selecting the first option is the go-ahead for this flow on that spec, and nothing else:
+
+- **Align the spec now (Recommended)** -- run Phases 1 to 5 and update the artifacts to match the code
+- **Not now** -- stop with nothing edited
+
+Skip this question when the user explicitly invoked `/omni-spec-align`, or when this skill runs as a sub-step of `/omni-spec-implement` (that flow's confirmation already covers it).
 
 **Base branch**: below, `<base>` means the repository's main integration branch. Detect it once: try `git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p'`, and if empty fall back to whichever of `main` or `master` exists (`git rev-parse --verify main` / `git rev-parse --verify master`).
 
-**In-flight features only.** BRS projects follow Speckit's Flow-Forward model: a feature directory that has merged to the default branch is an immutable record. Before Phase 1, run `git cat-file -e <base>:specs/<NNN>-<name>/spec.md`. If it succeeds, **STOP** without editing anything: drift from a merged spec is either a bug to fix in code or a requirement change that needs a new spec through `/omni-spec-create`, whose `## Supersedes` section names the merged directory. Ask the user which, and END your turn.
+**In-flight features only.** BRS projects follow Speckit's Flow-Forward model: a feature directory that has merged to the default branch is an immutable record. Before Phase 1, run `git cat-file -e <base>:specs/<NNN>-<name>/spec.md`. If it succeeds, **STOP** without editing anything: drift from a merged spec is either a bug to fix in code or a requirement change that needs a new spec through `/omni-spec-create`, whose `## Supersedes` section names the merged directory. Show that the spec has merged and what the request says about the drift, then ask with the Guided decisions rule in the core standards:
+
+- **Fix the code to match the merged spec** -- the spec stays the governing record; recommend it when the code broke a requirement nobody chose to change
+- **Open a superseding spec with `/omni-spec-create`** -- the selection is that skill's go-ahead; recommend it when the drift is behavior the user wants to keep
+
+Ground the recommendation in evidence: if the request does not say which the drift is, read the spec and `git diff <base>` far enough to tell, editing nothing. A code fix is not this skill's work -- report the requirement the code breaks and END your turn. When this skill runs as a sub-step of `/omni-spec-implement`, do not ask: return the decision in the same shape and stop, and that skill asks it at its Step 7. With no user to answer, report it in that shape and END your turn.
 
 ## Instructions
 
@@ -155,4 +165,6 @@ Checklist of which artifacts were modified:
 
 ### Remaining Gaps
 
-List any issues that cannot be resolved by updating the spec alone (e.g., unimplemented requirements, features that need discussion). List every open `## Phase N: Convergence` task here, with its `source-ref` and severity -- these are the spec's unmet demands, and they must surface as gaps rather than be aligned away. If none, write "No remaining gaps."
+List any issues that cannot be resolved by updating the spec alone (e.g., unimplemented requirements, a deviation that is a design decision rather than a spec correction). List every open `## Phase N: Convergence` task here, with its `source-ref` and severity -- these are the spec's unmet demands, and they must surface as gaps rather than be aligned away. If none, write "No remaining gaps."
+
+A gap that needs a design decision is written in the shape the Guided decisions rule in the core standards gives a decision: its options, each with pros and cons, and a recommendation. Run standalone with the user present, ask those decisions after the output, with that rule. As a sub-step of `/omni-spec-implement`, only report them -- that skill asks them at its Step 7.

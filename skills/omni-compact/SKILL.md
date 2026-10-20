@@ -39,7 +39,9 @@ All git commands that modify repository state (reset, add, commit, branch) requi
    ```
 
    - If there are 0 commits ahead of base, **STOP** -- nothing to compact.
-   - If there are 3 or fewer commits, warn the user that the branch is already concise and ask whether to proceed.
+   - If there are 3 or fewer commits, show the list, then ask with the Guided decisions rule in the core standards whether to proceed:
+     - **Stop -- already concise** -- leaves the history as it is; recommend it unless the list shows noise to fold (review `fix:` commits, `wip`, checkpoint subjects)
+     - **Compact anyway** -- continues to step 4; recommend it when that noise is there
 
 4. **Check remote tracking**:
 
@@ -49,7 +51,9 @@ All git commands that modify repository state (reset, add, commit, branch) requi
    ```
 
    - If the branch has been pushed to the remote, **warn the user** that compaction will rewrite history and require a force push.
-   - If the user did not include `--force` in the user's message, ask for explicit confirmation before proceeding.
+   - If the user did not include `--force` in the user's message, ask for explicit confirmation with the Guided decisions rule in the core standards before proceeding. A force push replaces history other people may have pulled, so the safe option is the recommendation unless the evidence says otherwise:
+     - **Don't compact (Recommended)** -- stop; the pushed history stays intact
+     - **Compact and rewrite history** -- continue, and push with `--force-with-lease` afterwards. Recommend this one instead only when the evidence shows the branch is the user's own and nobody has based work on it (for example, no other contributor's commits on it and no open PR under review by others)
    - If the remote has commits not in the local branch, **STOP** -- the branches have diverged and compaction could lose remote-only changes.
 
 ### Phase 2: Lint and Auto-fix
@@ -225,11 +229,10 @@ All git commands that modify repository state (reset, add, commit, branch) requi
       - path/to/file2: hunks split between Commit 1 and Commit 2
     ```
 
-19. **Ask the user to confirm** before proceeding:
-    - "Proceed with compaction? (yes/no/edit)"
-    - If "edit", ask what to change and revise the plan
-    - If "no", delete the backup branch and stop
-    - If "yes" or "proceed", continue to Phase 7
+19. **Ask the user to confirm** before proceeding, with the Guided decisions rule in the core standards:
+    - **Compact as shown (Recommended)** -- continue to Phase 7
+    - **Edit the plan** -- ask what to change, revise the plan, show it again, and ask again
+    - **Don't compact** -- stop without rewriting anything, then ask step 26's backup question. Nothing has been rewritten, so the backup holds no unique state: recommend **Delete the backup** there
 
 ### Phase 7: Execute
 
@@ -327,7 +330,6 @@ All git commands that modify repository state (reset, add, commit, branch) requi
       ...
 
     The backup branch <backup-branch-name> has been preserved.
-    To delete it: git branch -D <backup-branch-name>
     To restore:  git reset --hard <backup-branch-name>
 
     Commits are local only (not pushed).
@@ -339,6 +341,10 @@ All git commands that modify repository state (reset, add, commit, branch) requi
     This branch was previously pushed. To update the remote:
       git push --force-with-lease origin <current-branch>
     ```
+
+26. **Offer the backup branch's deletion** after the summary, with the Guided decisions rule in the core standards. Never delete it without this answer:
+    - **Keep the backup (Recommended)** -- the safety net stays until the compacted branch has merged or been force-pushed and reviewed
+    - **Delete the backup** -- runs `git branch -D <backup-branch-name>`; the pre-compaction history is then recoverable only from the reflog
 
 ## Commit Message Format
 
@@ -352,9 +358,9 @@ Two things are specific to compaction and are not in that rule:
 ## Important Rules
 
 - **Never lose code**: The tree SHA after compaction MUST match the tree SHA before. If verification fails, restore from backup automatically.
-- **Always create a backup branch**: Before any destructive operation, create `<branch>-backup-<timestamp>`. Never delete it automatically -- let the user decide.
+- **Always create a backup branch**: Before any destructive operation, create `<branch>-backup-<timestamp>`. Never delete it automatically -- the user decides through the step 26 question.
 - **Never compact main/master**: Compaction is for feature branches only.
-- **Warn on pushed branches**: If the branch has been pushed, require explicit `--force` acknowledgment before proceeding.
+- **Warn on pushed branches**: If the branch has been pushed, require explicit acknowledgment before proceeding -- `--force` in the user's message, or the **Compact and rewrite history** option selected in step 4.
 - **Never commit secrets**: Skip `.env`, credentials, API keys, tokens. Warn the user if such files appear in the diff.
 - **Fold fix commits into features**: The core value of compaction is eliminating review/hunt noise. `fix:` commits from iterative review rounds should be absorbed into the `feat:` or `refactor:` commit they were fixing.
 - **Preserve the backup**: Always tell the user how to restore. The backup branch is their safety net.

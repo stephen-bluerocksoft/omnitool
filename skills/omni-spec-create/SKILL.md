@@ -9,7 +9,13 @@ This command ALWAYS creates a new spec. Even if an existing spec directory seems
 
 **Superseding a merged feature.** BRS projects follow Speckit's Flow-Forward model: a feature directory that has merged to the default branch is an immutable record. When the new feature changes one, read the predecessor's `spec.md` and, after Step 2, add a `## Supersedes` section to the new `spec.md` listing each predecessor directory with the requirement IDs (FR-NNN, SC-NNN, user stories) this spec replaces or removes, one line each. A requirement it does not list stays governed by the predecessor. Never edit the predecessor directory -- not even to add a back-pointer.
 
-**Confirm before scaffolding.** This flow creates a new git branch and scaffolds many files. Before running Step 1, state the feature you understood and confirm the user wants a full new spec created now. If the request is exploratory ("what would it take to..."), answer in prose instead and offer to run this when they are ready. Skip the confirmation only when the user explicitly asked to create the spec (e.g. invoked `/omni-spec-create` or said "create the spec").
+**Confirm before scaffolding.** This flow creates a new git branch and scaffolds many files. Before running Step 1, state the feature you understood -- and the merged feature it supersedes, if any -- then ask with the Guided decisions rule in the core standards. Selecting the first option is the go-ahead for this flow on the feature as stated, and nothing else:
+
+- **Create the spec now (Recommended)** -- create the branch and run Steps 1 to 4 on the feature as stated
+- **Adjust the feature first** -- ask what to change, restate it, and ask again
+- **Not now** -- stop with nothing created
+
+If the request is exploratory ("what would it take to..."), answer in prose instead and offer to run this when they are ready. Skip the question only when the user explicitly asked to create the spec (e.g. invoked `/omni-spec-create` or said "create the spec").
 
 ## Runtime note
 
@@ -17,7 +23,12 @@ Speckit installs its phases as **Claude Code skills** at `.claude/skills/speckit
 
 Older Speckit versions installed slash-command files at `.claude/commands/speckit.*.md` instead. That layout is **not supported** by this skill -- see Step 1.
 
-When BRS Codex subagents are installed (`spec-creator`, `spec-planner`, `spec-validator`), you MAY delegate the heavy phases to them to keep the main context clean; they wrap the same Speckit skills. Delegation is optional -- invoking the Speckit skills directly is equally valid.
+When BRS Codex subagents are installed (`spec-creator`, `spec-planner`), you MAY delegate the heavy phases to them to keep the main context clean; they wrap the same Speckit skills. Delegation is optional -- invoking the Speckit skills directly is equally valid.
+
+Delegation moves the work, not the questions. A subagent has no channel to the user, so every question this flow raises is still asked here, in the main session, with the Guided decisions rule in the core standards:
+
+- **`spec-creator` (Step 2)** never runs `speckit-clarify` -- Step 2a runs here after it returns. When its return values say `Constitution: created`, show that constitution to the user and get their review before Step 2a: the spec is about to be built on it
+- **`spec-planner` (Step 3)** leaves every ambiguity that needs a user decision untouched and lists it under **Blocked on** in its return values, with the artifact it affects and the question. Ask each one as Step 3d describes -- through `speckit-clarify` when it is underspecification in `spec.md`, otherwise directly -- then re-dispatch `spec-planner` with the answers so it applies them and re-runs the analysis. Repeat until **Blocked on** is "None". Where no one can answer, stop and report the list as Step 2a's non-interactive branch does
 
 ## Step 1: Verify Speckit Initialization
 
@@ -85,8 +96,9 @@ reason: the plan should be built on answers, not on guesses.
   say which, rather than skipping silently
 - Do not answer its questions on the user's behalf. An unanswered question is not approval
 - Where the session is non-interactive and nobody can answer, **stop before Step 3** and report the
-  open questions. Planning past them writes guesses into the artifacts that everything downstream
-  treats as requirements
+  open questions, each in the shape the Guided decisions rule in the core standards gives it.
+  Planning past them writes guesses into the artifacts that everything downstream treats as
+  requirements
 
 ## Step 3: Plan, Tasks, and Analysis
 
@@ -120,12 +132,12 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 - Update the relevant spec artifact (spec.md, plan.md, tasks.md, contracts/, data-model.md)
 - Coverage gaps: add or update tasks in tasks.md
 - Inconsistencies: reconcile conflicting artifacts
-- Ambiguities: **ask the user** -- you are in the main session and they are reachable. Resolve it yourself only where the spec, plan, constitution, or code settles it, and cite that evidence. Never invent a behavior and write it into spec.md: it stops reading as a guess and becomes a requirement
+- Ambiguities: **ask the user**, with the Guided decisions rule in the core standards -- the options are the candidate behaviors, each with what it costs the spec and the plan. This session has the user even when Step 3 is delegated: `spec-planner` returns these as its **Blocked on** list, and you ask them here (see the Runtime note). Resolve it yourself only where the spec, plan, constitution, or code settles it, and cite that evidence. Never invent a behavior and write it into spec.md: it stops reading as a guess and becomes a requirement
 
 **MEDIUM** -- Must be resolved. For each finding:
 
 - Coverage gap: add explicit mention in task descriptions in tasks.md
-- Underspecification: add the concrete decision to spec.md and ensure tasks.md reflects it when the spec or code determines it; otherwise put the question to the user
+- Underspecification: add the concrete decision to spec.md and ensure tasks.md reflects it when the spec or code determines it; otherwise ask the user, as for a CRITICAL/HIGH ambiguity
 - Inconsistency: update lower-authority artifact to match higher-authority one
 - Ambiguity: same test as CRITICAL/HIGH -- derivable means resolve it with the evidence cited; anything that is a design decision goes to the user
 

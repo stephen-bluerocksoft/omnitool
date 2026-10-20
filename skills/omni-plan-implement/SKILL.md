@@ -16,7 +16,7 @@ Locate the plan document to execute. Claude Code plan mode produces an approved 
    a. Search the workspace using `ls *.plan.md plans/*.md .claude/plans/*.md 2>/dev/null`
    b. If no workspace plans found, search the user-level Claude plans dir with `ls -t ~/.claude/plans/*.md 2>/dev/null | head -20`
    c. If the user provided input, filter candidates by matching it against filenames (case-insensitive partial match)
-   d. If multiple candidates remain, pick the most recently modified file. If the top candidates were modified within 60 seconds of each other, list them and ask the user which one to use.
+   d. If multiple candidates remain, pick the most recently modified file. If the top candidates were modified within 60 seconds of each other, list them, then ask which one to use with the Guided decisions rule in the core standards: each candidate plan is an option (the four most recent at most), described by its path, its `name`/`overview`, and its incomplete todo count, with the most recently modified one listed first as the recommendation.
 
 3. **Read the plan file**. Parse:
    - YAML frontmatter: `name`, `overview`, `todos` (array of `{id, content, status, dependencies}`)

@@ -5,7 +5,13 @@ description: Implement a feature from its spec artifacts, then converge it again
 
 # omni.spec.implement
 
-**Confirm before implementing.** This flow writes code across many files, rewrites the spec artifacts to match what was built, and runs the full test suite -- fixing pre-existing failures too (Step 6). Before running Step 1, state which spec/branch you will implement and how many incomplete tasks remain, then confirm the user wants to proceed now. Skip this confirmation only when the user explicitly invoked `/omni-spec-implement`.
+**Confirm before implementing.** This flow writes code across many files, rewrites the spec artifacts to match what was built, and runs the full test suite -- fixing pre-existing failures too (Step 6). Before running Step 1, state which spec/branch you will implement and how many incomplete tasks remain, then ask with the Guided decisions rule in the core standards. Selecting the first option is the go-ahead for this flow on that spec, and nothing else:
+
+- **Implement now (Recommended)** -- run Steps 1 to 7 on every incomplete task
+- **Implement a subset** -- ask which tasks, restate the scope, and ask again (Step 1 item 6)
+- **Not now** -- stop with nothing changed
+
+Skip this question only when the user explicitly invoked `/omni-spec-implement`.
 
 ## Runtime note
 
@@ -66,7 +72,13 @@ Speckit checklists validate **spec quality**, not code. Every item is a question
 1. Run `ls specs/<feature>/checklists/ 2>/dev/null`. If the directory is absent, or every item across every file is already `[X]`, skip to Step 2.
 2. For each checklist file, evaluate every unchecked item against `spec.md`, `plan.md`, `tasks.md`, `data-model.md`, and `contracts/`. Cite the artifact section that satisfies it.
 3. Mark an item `[X]` only when the artifacts genuinely satisfy it. Never mark an item to clear the gate -- a checklist walked dishonestly is worse than one left unchecked.
-4. Items that remain `[ ]` are genuine spec gaps. **STOP** and report each one with its checklist name, the item text, and what the artifacts are missing. Recommend `/omni-spec-modify` for a requirement change or `/omni-spec-create` for a missing artifact, then END your turn. Do not implement against a spec with open gaps, and do not offer to proceed anyway.
+4. Items that remain `[ ]` are genuine spec gaps. **STOP** and report each one with its checklist name, the item text, and what the artifacts are missing. Recommend `/omni-spec-modify` for a requirement change or `/omni-spec-create` for a missing artifact. Do not implement against a spec with open gaps, and do not offer to proceed anyway -- implementing is never one of the options.
+
+   When every gap is a requirement change and a user is present, ask with the Guided decisions rule in the core standards, after the report:
+   - **Close the gaps with `/omni-spec-modify` now (Recommended)** -- run that skill on the gaps reported; the selection is its go-ahead. It ends with its own summary, so re-run `/omni-spec-implement` afterwards
+   - **Stop here** -- the spec stays as it is; close the gaps yourself and re-run
+
+   Otherwise -- a missing artifact, or no one to answer -- END your turn after the report.
 5. If every item now passes, continue to Step 2. Speckit's checklist gate will compute PASS and proceed without prompting.
 
 ## Step 2: Implement
@@ -96,7 +108,7 @@ Run the converge/implement cycle until the feature converges:
 Handling specific gap types:
 
 - **`contradicts` against a constitution MUST principle** is the highest-severity finding. Never resolve it by weakening the constitution -- fix the code.
-- **`unrequested`** means the code contains work the spec, plan, and tasks never called for. This is a BRS standards violation ("the simplest solution that satisfies the spec wins"), not a nice-to-have. Default to removing the unrequested code. If it is genuinely load-bearing, it belongs in the spec -- say so in the Step 7 summary and recommend `/omni-spec-modify` rather than quietly keeping it.
+- **`unrequested`** means the code contains work the spec, plan, and tasks never called for. This is a BRS standards violation ("the simplest solution that satisfies the spec wins"), not a nice-to-have. Default to removing the unrequested code. If it is genuinely load-bearing, it belongs in the spec -- never quietly keep it. Report each kept item in the Step 7 summary and carry it into Step 7's decisions, with the options **Add it to the spec with `/omni-spec-modify` (Recommended)** -- it is load-bearing, so the spec should say so -- and **Remove it and rework what depends on it**.
 - Converge does **not** un-mark phantom `[X]` tasks; it captures the remaining work as new tasks instead. Do not go back and edit the old checkboxes.
 
 Checkbox integrity is handled a layer down, not here. When the BRS Codex `orchestrating-speckit-implementation` skill is installed, it runs inside every `speckit-implement` call and gates on `spec-task-verifier`, which confirms each `[X]` is backed by real, non-stub code. Converge covers spec-satisfaction; that pass covers task-claim integrity. Do not add a third verification pass of your own on top of either.
@@ -145,7 +157,7 @@ Bring the spec artifacts back in line with what was actually built -- the implem
 
 Do NOT re-derive the alignment procedure here. Run the **omni-spec-align** skill, which is the single source of truth for spec alignment: pass it the spec directory for the current branch. Because the implement confirmation at the top of this skill already covers this work, omni-spec-align runs as a **sub-step of omni-spec-implement** and skips its own confirmation gate.
 
-When it returns, carry its "Artifacts Updated" and "Remaining Gaps" results into the Step 7 summary.
+When it returns, carry its "Artifacts Updated" and "Remaining Gaps" results into the Step 7 summary. omni-spec-align does not prompt while running as this sub-step: a decision it hands back -- a merged spec it refused to align, or a gap that needs a design decision -- goes into Step 7's decisions, and Steps 6 and 7 still run.
 
 ## Step 6: Run Full Test Suite
 
@@ -188,9 +200,9 @@ Do NOT dismiss failures as "pre-existing" or "unrelated to this change." A green
 
 **Cap at 3 remediation cycles.** If failures persist after 3 cycles, stop and include the remaining failures in the summary as unresolved items with root-cause analysis for each.
 
-## Step 7: Summary (Text Only)
+## Step 7: Summary and Decisions
 
-**OUTPUT a summary and END your turn. Do NOT call any more tools.**
+**OUTPUT a summary, ask the open decisions, and END your turn.** The decision questions are the only tool calls this step makes.
 
 Present the combined results from all verification, alignment, and test steps:
 
@@ -240,4 +252,8 @@ For each layer that was run, report:
 
 Suggest the user review the changes and commit when satisfied. If there are unresolved issues from any cap (Step 3a converge cycles, Step 4, or Step 6), list them as action items. If convergence did not reach `converged`, say so plainly -- the feature is not fully built to spec, and the outstanding Convergence tasks remain in `tasks.md` for a follow-up `/omni-spec-implement` run. Do NOT suggest running the test suite -- it has already been run.
 
-Your response for this step MUST be a text message only -- no tool calls, no file edits.
+### Decisions
+
+After the summary, ask the open decisions with the Guided decisions rule in the core standards: each kept unrequested item from Step 3a, and each decision omni-spec-align handed back in Step 5. A selected option that names a skill is the go-ahead to run it on the item shown; any other answer is recorded and ends the turn. With no decisions open, END your turn after the summary. With no user to answer, list them in the summary in the rule's shape instead of asking.
+
+Apart from those questions, your response for this step MUST be a text message only -- no other tool calls, no file edits.

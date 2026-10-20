@@ -21,7 +21,7 @@ Each commit is one coherent change that is independently revertable. A single fi
 | Build and config | Manifests with their lockfile, CI config, build config |
 | Unrelated | Nothing -- these are separate commits |
 
-Never mix unrelated changes in one commit. If one file's changes belong to two different commits, say so in the proposal: `git add <file>` stages the whole file and cannot split them, so the user has to choose between splitting the hunks by hand and accepting a coarser grouping.
+Never mix unrelated changes in one commit. If one file's changes belong to two different commits, say so in the proposal: `git add <file>` stages the whole file and cannot split them, so that file is its own question, asked with the Guided decisions rule in the core standards -- **Split the hunks by hand** or **Accept the coarser grouping**. Recommend splitting when the two changes are unrelated, since the coarser commit would break the rule above; recommend the coarser grouping when they are close enough that reverting one without the other is not a real need.
 
 ## What to Show
 
@@ -38,14 +38,18 @@ Commit Plan (N)
 
 Not included:
   - path/four -- unrelated to this task, left in the working tree
-
-Proceed? (yes / no / edit)
 ```
 
 - **Subject lines** follow the conventional commit format defined in the global defaults. Show the exact subject you will commit, not a paraphrase of it.
 - **Files** are listed by explicit path. A count ("4 files") is not reviewable.
 - **A body** is worth writing when the commit is permanent history: landing on `main` or `dev`, a hotfix, or any branch that will not be squashed, rebased, or compacted before merge. On a branch whose history will be rewritten, a clear subject line is enough.
 - **Not included** is the part the user cannot reconstruct from the diff. List every changed file you are leaving out and why, including ones you judged out of scope. A scope decision buried in prose does not get reviewed.
+
+Show the plan as ordinary output, then ask for the go-ahead with the Guided decisions rule in the core standards. The options:
+
+- **Commit as shown (Recommended)** -- creates exactly the commits in the plan; selecting it is the go-ahead for those commits and no others
+- **Edit the plan** -- regroup, reword, or change what is included; revise the plan, show it again, and ask again
+- **Don't commit** -- leaves the working tree and index as they are
 
 ## Flag Before Asking
 

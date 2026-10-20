@@ -65,7 +65,8 @@ must not report a pass.
 Present, in this order:
 
 - **Version**, with a one-line reason (minor when anything user-facing was added, patch for fixes,
-  docs, and tests only; major only for a breaking change the user confirms).
+  docs, and tests only; major only for a breaking change the user confirms -- see the major-bump
+  question below).
 - **CI** on `HEAD_SHA`: green, or still running.
 - **What ships**: the PR table, and each moved pin with what it brings.
 - **Risk check**: migrations and their rollback safety, configuration, start-up validators -- each
@@ -75,7 +76,22 @@ Present, in this order:
 - **Rollback**: the previous tag, and whether it is an image re-pin or a data rollback.
 - **Steps**: the exact tag and push commands from the project's process.
 
-Ask for an explicit go-ahead. A question or comment in reply is not one.
+If an **Unverified** item blocks the release, do not ask for the go-ahead: report what to run and
+stop. Otherwise ask for an explicit go-ahead with the Guided decisions rule in the core standards. The
+tag push is irreversible, so the options are:
+
+- **Release as proposed (Recommended)** -- tag `HEAD_SHA` with the proposed version and push that tag
+  in Phase 5
+- **Change the version** -- name a different version; revise the proposal, show it again, and ask
+  again
+- **Don't release** -- stop with nothing tagged
+
+When the review found a breaking change, the version is its own question in the same call, before the
+go-ahead: **Major (Recommended)** when the diff shows the break (removed or renamed public surface,
+incompatible schema or configuration), or **Minor** when the user judges the change not breaking for
+this project's consumers.
+
+A question or comment in reply is not a go-ahead: answer it, then ask again.
 
 ## Phase 5: Tag
 

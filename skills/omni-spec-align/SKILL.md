@@ -1,6 +1,6 @@
 ---
 name: omni-spec-align
-description: Audit alignment between spec artifacts and the actual implementation, updating specs to match reality (implementation is the source of truth). Use when a feature's specs/<NNN>-<name>/ artifacts exist and the code has diverged from them -- e.g. after implementing. Also runs as the alignment sub-step of omni-spec-implement.
+description: Audit alignment between an in-flight feature's spec artifacts and the implementation on its branch, updating the spec to match reality (implementation is the source of truth). Use when the feature's specs/<NNN>-<name>/ artifacts have not yet merged to the default branch and the code has diverged from them -- e.g. after implementing. Never aligns a merged feature, which is immutable under Flow-Forward. Also runs as the alignment sub-step of omni-spec-implement.
 ---
 
 # omni.spec.align
@@ -14,6 +14,8 @@ This is NOT a code review or bug hunt. This command asks: **"Does the spec accur
 **Confirm before updating specs.** This flow rewrites the spec artifacts (spec.md, plan.md, tasks.md, contracts/, data-model.md, ...) to match the implementation. Before Phase 1, state which feature spec you will align and confirm the user wants the spec files updated now. Skip this confirmation when the user explicitly invoked `/omni-spec-align`, or when this skill runs as a sub-step of `/omni-spec-implement` (that flow's confirmation already covers it).
 
 **Base branch**: below, `<base>` means the repository's main integration branch. Detect it once: try `git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p'`, and if empty fall back to whichever of `main` or `master` exists (`git rev-parse --verify main` / `git rev-parse --verify master`).
+
+**In-flight features only.** BRS projects follow Speckit's Flow-Forward model: a feature directory that has merged to the default branch is an immutable record. Before Phase 1, run `git cat-file -e <base>:specs/<NNN>-<name>/spec.md`. If it succeeds, **STOP** without editing anything: drift from a merged spec is either a bug to fix in code or a requirement change that needs a new spec through `/omni-spec-create`, whose `## Supersedes` section names the merged directory. Ask the user which, and END your turn.
 
 ## Instructions
 

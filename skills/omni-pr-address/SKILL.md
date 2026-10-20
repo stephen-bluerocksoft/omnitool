@@ -33,7 +33,7 @@ Two failure modes sit on either side of this workflow, and most rules below exis
 | Understanding what a pull request implements | `omni-pr-explain` -- architecture page, never posts |
 | A local branch, commit, or working tree with no PR | `brs-review` -- text output only, never posts |
 | Opening the pull request in the first place | `omni-pr-create` |
-| An accepted finding that contradicts the spec | `/omni-spec-modify` for the PR's own feature, or a new superseding spec via `/omni-spec-create` for a merged one, then `/omni-spec-implement` |
+| An accepted finding that contradicts the spec | `/omni-spec-modify` for the PR's own feature, or a new superseding spec via `/omni-spec-create` for a merged one (`/omni-spec-modify` for either when the constitution records Living Spec), then `/omni-spec-implement` |
 | Committing and pushing the resulting changes | `/omni-commit` -- the user runs it at the Phase 7 hand-off |
 
 **If the pull request has no feedback, this skill stops.** It exists to answer findings somebody else raised. Do not fall back to reviewing the PR yourself and generating findings to address -- that is `brs-pr-review`'s job, and doing it here manufactures work the reviewer never asked for.
@@ -198,7 +198,7 @@ Assign every candidate a verdict, backed by evidence at or above the minimum in 
 
 3. **Gather evidence and assign the verdict.** Record, per finding: verdict, the evidence kinds used, and the specific command or file that produced them. A verdict whose evidence you cannot name is not ready for the gate.
 
-4. **Cross-check every `ACCEPT` against the spec.** In a repo with `specs/`, an accepted finding that contradicts `spec.md` does not get patched into the code -- route it to `/omni-spec-modify` when the spec is the PR's own in-flight feature, or to a new superseding spec via `/omni-spec-create` when the spec has already merged to the default branch -- a merged spec is never edited. Note the route at the gate.
+4. **Cross-check every `ACCEPT` against the spec.** In a repo with `specs/`, an accepted finding that contradicts `spec.md` does not get patched into the code -- route it to `/omni-spec-modify` when the spec is the PR's own in-flight feature, or to a new superseding spec via `/omni-spec-create` when the spec has already merged to the default branch -- under Flow-Forward, the default, a merged spec is never edited. When the project constitution records Living Spec, route a merged spec to `/omni-spec-modify` too. Note the route at the gate.
 
 ### Phase 4: Triage Gate -- STOP
 

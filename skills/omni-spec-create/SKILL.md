@@ -1,11 +1,13 @@
 ---
 name: omni-spec-create
-description: Create a brand-new feature specification using the spec-first (Speckit) workflow. Use when the user wants to spec, scope, or plan a NEW feature -- phrases like "write a spec for", "start a new feature", "scope out", or "let's plan X". Produces spec.md, plan.md, tasks.md, and any contracts/data models. Do NOT use to modify an existing spec (use omni-spec-modify for that).
+description: Create a brand-new feature specification using the spec-first (Speckit) workflow. Use when the user wants to spec, scope, or plan a NEW feature -- phrases like "write a spec for", "start a new feature", "scope out", or "let's plan X". Also use when changing a feature whose spec has merged to the default branch -- under Flow-Forward that change is a new spec that supersedes it. Produces spec.md, plan.md, tasks.md, and any contracts/data models. Do NOT use to modify an in-flight spec on its own branch (use omni-spec-modify for that).
 ---
 
 # omni.spec.create
 
 This command ALWAYS creates a new spec. Even if an existing spec directory seems related, create a new spec -- do NOT modify or extend existing specs.
+
+**Superseding a merged feature.** BRS projects follow Speckit's Flow-Forward model: a feature directory that has merged to the default branch is an immutable record. When the new feature changes one, read the predecessor's `spec.md` and, after Step 2, add a `## Supersedes` section to the new `spec.md` listing each predecessor directory with the requirement IDs (FR-NNN, SC-NNN, user stories) this spec replaces or removes, one line each. A requirement it does not list stays governed by the predecessor. Never edit the predecessor directory -- not even to add a back-pointer.
 
 **Confirm before scaffolding.** This flow creates a new git branch and scaffolds many files. Before running Step 1, state the feature you understood and confirm the user wants a full new spec created now. If the request is exploratory ("what would it take to..."), answer in prose instead and offer to run this when they are ready. Skip the confirmation only when the user explicitly asked to create the spec (e.g. invoked `/omni-spec-create` or said "create the spec").
 
@@ -159,6 +161,7 @@ Review tasks.md and verify every user story has at least one corresponding test 
 2. **OUTPUT a summary and END your turn. Do NOT call any more tools.**
    - **Lead with a "Core design" paragraph (REQUIRED).** Before any tables or lists, write 2-5 sentences of plain prose that describe the central approach the spec commits to -- the mechanism a reader needs to picture what is about to be implemented. Name the key moving parts, the primary flow, what is reused vs. built new, and any deliberate non-goals (e.g. "zero changes to X", "least-privilege Y"). This is a narrative overview, not a bullet list, and it must always appear even when the spec is simple. Derive it from plan.md (Technical Context, architecture) and research.md (design decisions) -- do not fabricate.
    - Present what was created: spec.md, plan.md, tasks.md, and any contracts or data models
+   - When the spec supersedes a merged feature, name each predecessor directory and the requirement IDs replaced
    - Include a table of analysis findings that were addressed and how each was resolved
    - List any LOW findings accepted with rationale
    - Confirm test tasks are present for each user story

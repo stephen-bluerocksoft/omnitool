@@ -1,6 +1,6 @@
 ---
 name: omni-spec-modify
-description: Change the requirements of an EXISTING feature spec before implementation, cascading the edit through plan, tasks, contracts, and analysis. Use when the user wants to add, change, or remove a requirement on a feature that already has a specs/<NNN>-<name>/ directory -- phrases like "update the spec to", "change the requirement", "the feature should now also". Do NOT use to create a new spec (use omni-spec-create) or to sync specs to already-built code (use omni-spec-align).
+description: Change the requirements of an EXISTING in-flight feature spec before implementation, cascading the edit through plan, tasks, contracts, and analysis. Use when the user wants to add, change, or remove a requirement on a feature whose specs/<NNN>-<name>/ directory exists on its own branch and has not merged to the default branch -- phrases like "update the spec to", "change the requirement", "the feature should now also". Do NOT use on a merged feature (Flow-Forward: use omni-spec-create for a new spec that supersedes it), to create a new spec (use omni-spec-create), or to sync specs to already-built code (use omni-spec-align).
 ---
 
 # omni.spec.modify
@@ -26,6 +26,7 @@ Older Speckit versions installed slash-command files at `.claude/commands/specki
 2. Run `git branch --show-current`. Identify the feature's spec directory from the branch name, user input, or by checking `specs/`. The branch should match a `specs/<NNN>-<name>/` directory (e.g. branch `005-my-feature` matches `specs/005-my-feature/`).
 3. If you are on `main`/`master`, or the branch does not match the target spec, `git checkout` the feature branch first -- spec edits belong on the feature branch, never on main.
 4. Verify `spec.md`, `plan.md`, and `tasks.md` exist in the spec directory. If any is missing, the feature was never fully specified -- suggest `/omni-spec-create` and stop.
+5. Confirm the feature is still in flight. Detect the default branch (`git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p'`, falling back to whichever of `main` or `master` exists), then run `git cat-file -e <default>:specs/<NNN>-<name>/spec.md`. If it succeeds the feature has merged, and under Speckit's Flow-Forward model a merged feature directory is never edited. **STOP**: tell the user the change needs a new spec through `/omni-spec-create`, whose `## Supersedes` section names this directory and the requirement IDs it replaces, and END your turn.
 
 ### Outdated Speckit (legacy commands layout)
 

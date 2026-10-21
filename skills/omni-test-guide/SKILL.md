@@ -1,6 +1,6 @@
 ---
 name: omni-test-guide
-description: Write a hands-on, top-to-bottom test guide that walks a person through every user-facing feature implemented on a branch, so they experience first-hand what was built. Inventories the branch's user-facing changes (UI, API, CLI, settings, notifications, background effects) from the diff, its specs, and its user docs; discovers how to run and drive the app in dev (start command, logins, seed data, simulation scripts); then orders every check as a strict waterfall -- each step depends only on steps above it, never on a later one -- and lints the result for forward references, undefined handles, and labels that do not exist in the code. Writes the guide as a checkbox Markdown file in the repo's gitignored temp/. A demo mode instead writes a short presenter script for the branch's headline features: a prep section run before the meeting, then a live walk with a talk track, aimed at clients or management. Use when the user wants to walk through, exercise, smoke-test, get hands-on with, or demo what an agent built on a branch -- phrases like "write me a test guide for this branch", "ad-hoc test plan", "walk me through what was implemented", "manual test script", "I want to click through everything we built", "demo script", "show the client what we built", "demo the big features to my manager". Not automated tests (use brs-test) and not an architecture explanation (use omni-pr-explain).
+description: Write a hands-on, top-to-bottom test guide that walks a person through every user-facing feature implemented on a branch, so they experience first-hand what was built. Inventories the branch's user-facing changes (UI, API, CLI, settings, notifications, background effects) from the diff, its specs, and its user docs; discovers how to run and drive the app in dev (start command, logins, seed data, simulation scripts); then orders every check as a strict waterfall -- each step depends only on steps above it, never on a later one -- and lints the result for forward references, undefined handles, and labels that do not exist in the code. Writes the guide as a checkbox Markdown file in the repo's gitignored temp/. A demo mode writes the same kind of guide for only the branch's headline features, each on its happy path, for showing the work to clients or management. Use when the user wants to walk through, exercise, smoke-test, get hands-on with, or demo what an agent built on a branch -- phrases like "write me a test guide for this branch", "ad-hoc test plan", "walk me through what was implemented", "manual test script", "I want to click through everything we built", "demo guide", "show the client what we built", "demo the big features to my manager". Not automated tests (use brs-test) and not an architecture explanation (use omni-pr-explain).
 ---
 
 # omni-test-guide
@@ -22,9 +22,9 @@ resolve branch -> inventory user-facing features -> discover the dev environment
 | Mode | Invoked by | Audience | What it covers |
 | ---- | ---------- | -------- | -------------- |
 | **Full** (default) | `/omni-test-guide`, or any request to walk through or test the branch | The developer, who wants first-hand awareness | Every user-facing feature, including validation errors, permissions, races, and settings |
-| **Demo** | `/omni-test-guide demo`, or a request to demo, present, or show the work to a client or manager | Clients or management, watching someone else drive | Only the headline features, each on its happy path, with a talk track |
+| **Demo** | `/omni-test-guide demo`, or a request to demo, present, or show the work to a client or manager | The developer, driving while clients or management watch | Only the headline features, each on its happy path |
 
-Demo mode runs the same phases. Where a phase differs, it has a **Demo mode** paragraph; everything else applies unchanged, including the waterfall rule. If the user names an internal audience ("my manager", "the team"), the script ends with a short progress summary. Otherwise it is client-safe and has no summary.
+Both modes produce the same kind of guide: checkbox steps to read and follow blindly, top to bottom, under the waterfall rule. Demo mode runs the same phases. Where a phase differs, it has a **Demo mode** paragraph; everything else applies unchanged.
 
 ## Scope Boundary
 
@@ -112,19 +112,13 @@ Order the checks so that every check's **Requires** is met by "Before you start"
 
 Before writing, print the ordered step list with each step's requires and produces to the scratchpad, and check it yourself: for each step, every requirement appears in an earlier step's produces list.
 
-**Demo mode: split prep from the live walk.** The waterfall rules above still apply, across both parts.
+**Demo mode: make the showcase results certain.**
 
-- **Prep** comes first. It is done before the meeting, ideally the same day, and contains:
-  - every slow step (anything over about ten seconds, such as LLM runs, simulators, or background jobs);
-  - every step that builds state over several actions;
-  - every step whose outcome is uncertain.
-
-  Each prep step that creates something the demo shows has an **Expect** check. When the outcome is uncertain, the step says to repeat it until the showcase result appears, and how to discard a miss. The audience never sees a branch or a retry.
-- **The live walk** contains only fast, deterministic clicks and typing on records prep made ready. Each moment is short: a few clicks, then the result on screen. Persona switches are kept to a minimum. Prefer a second browser profile, prepared and logged in during prep, to logging out in front of the audience.
-- **Leave one live trigger only when it is the wow.** An action whose result appears within seconds, such as typing into a search box, can stay live. A trigger that takes longer can stay live only if prep showed it runs reliably and the script gives the presenter a line to say while it runs. Otherwise prep runs it and the live walk opens the result.
-- **Settings changed for the demo** are restored in a short "After the demo" section.
-- **Re-check what a later prep step could disturb.** A prep step that runs after a confirmed showcase state, and could change it (another simulated email, another review), repeats the check for that state. The last prep step confirms every state the live moments will show.
-- **Retries make distinguishable records.** A repeat-until step gives each new attempt its own name and its own distinctive words, and a handle records which attempt succeeded. Otherwise a live search or list can show two results where the script promises one.
+- **Repeat until it shows.** When a step's outcome depends on a model's or external system's judgment, the step does not record whichever way it went. It says to repeat until the showcase result appears, and how to discard a miss, so every later step can expect that result.
+- **Re-check what a later step could disturb.** A step that runs after a confirmed showcase state, and could change it (another simulated email, another review), checks that state again.
+- **Retries make distinguishable records.** A repeat-until step gives each new attempt its own name and its own distinctive words, and a handle records which attempt succeeded. Otherwise a later search or list shows two results where the guide expects one.
+- **Write the loop out where it runs.** A repeat-until step spells out every action of a retry inline, never "repeat 2.1 and 2.2", and it loops with no cap, giving a naming sequence for each attempt (`Two`, `Three`, ...). It says what each extra run leaves behind (another email, a higher printed count, an extra proposal), and later steps' **Expect** lines tolerate that ("at least one row", "the last row").
+- **Long-running steps go early.** A background job the demo needs (a review, a scheduled run) starts in its own step well before the section that shows its result, so nothing waits on it mid-demo.
 
 ### Phase 6: Write the Guide
 
@@ -132,12 +126,7 @@ Before writing, print the ordered step list with each step's requires and produc
 2. **Step style**: imperative, concrete, copy-pasteable. A step names the page to act on ("Open N1 from the queue"), never just "refresh", because the step before it often leaves the reader somewhere else. A step finds a record the way the screen lists it: by a name handle, or by a link the reader was given, never by an ID the list does not show. When a list may hold older entries from earlier runs, the step names the entry ("the top, newest entry"). A value a later step compares against, such as a count, is written down in its own earlier step. Give exact values to type, exact commands with handles shown as `<P1>`, and exact buttons in bold. Each step ends with **Expect** and the observable result, including where to look (History, timeline, queue row, toast). Name the source section ("User guide: ...", "Spec 048 US2") at the section head, not on every step.
 3. **Location**: `temp/test-guide/<branch-slug>.md` in the repo when `git check-ignore -q temp` succeeds. Otherwise write it to the session scratchpad and say so. If the file exists, read it first, and ask with the Guided decisions rule before overwriting it, because the reader may have ticked boxes in it.
 
-**Demo mode.** Follow `references/demo-outline.md` instead, and write to `temp/test-guide/<branch-slug>-demo.md`.
-
-- Each moment has three parts: **Do** (the clicks), **Show** (where to point on screen), and **Say** (one to three plain sentences for the audience).
-- The **Say** lines talk about outcomes for the user: what the user no longer has to do, what they can now see, and what is now safer. Never use spec IDs, ticket numbers, internal module names, model names, agent or workflow jargon, or the words "LLM" or "AI agent" unless the product itself shows them on screen.
-- A **Say** line claims only what the walk shows. Never promise a feature, date, or capability the inventory does not support.
-- The script opens with a one-paragraph summary of what the presenter will show, and the expected running time (count about 1-2 minutes per moment). For an internal audience it closes with "Where this stands": what shipped on the branch, what is listed as not available yet, and what is not covered, all taken from the inventory and the user docs.
+**Demo mode.** Use the same outline and step style, and write to `temp/test-guide/<branch-slug>-demo.md`. Name each section by its outcome for the user ("Replies file themselves"), not by spec or module. End the guide with "Not shown in this demo" in place of "Not covered": one line for each feature left out, with the reason.
 
 ### Phase 7: Lint the Guide
 
@@ -152,8 +141,7 @@ Run every check. Fix what fails, then re-run them all.
 
 **Demo mode.**
 
-- **Coverage** (check 5) means every chosen moment appears in the live walk, and every left-out feature is listed in the report rather than in the script.
-- **Add a jargon check**: grep the **Say** lines for spec and ticket patterns (`FR-`, `US[0-9]`, `spec [0-9]`, `#[0-9]`), model and agent terms, and internal module or workflow names found in Phase 2. Rewrite every hit.
+- **Coverage** (check 5) means every chosen moment has a section, and every left-out feature is listed under "Not shown in this demo".
 - **The blind walk** prompt also names the demo section of `references/blind-walk.md`.
 
 ### Phase 8: Report
@@ -174,11 +162,11 @@ Then list, separately, every doc/code disagreement found, every expectation you 
 **Demo mode** reports instead:
 
 ```text
-Demo script for <branch> (<audience: client-safe | internal>)
+Demo guide for <branch>
 File: <path>
-Moments: <M>, about <minutes> min live; prep: <P> steps, about <minutes> min
-Left out: <X> features (listed below)
-Lint: forward refs 0, handle errors 0, unmatched labels 0, jargon hits 0, blind-walk issues fixed <n>
+Walk: <M> moments in <S> sections, <K> steps, <H> handles; personas: <list>
+Left out: <X> features (listed under "Not shown in this demo")
+Lint: forward refs 0, handle errors 0, unmatched labels 0, blind-walk issues fixed <n>
 ```
 
 Then list the moments in order (one line each), and the left-out features with their reasons.
@@ -192,7 +180,7 @@ Then list the moments in order (one line each), and the left-out features with t
 - Invent an expected message, label, or behaviour
 - Run the guide's steps, or anything that changes app state or costs money
 - Write the guide to a tracked path, or edit tracked files
-- In demo mode, leave a slow or uncertain step in the live walk, or claim anything in a **Say** line that the walk does not show
+- In demo mode, leave a showcase result to chance: an uncertain step repeats until it shows
 
 **ALWAYS:**
 

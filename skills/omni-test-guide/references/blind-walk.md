@@ -22,12 +22,10 @@ For each step, decide whether you could perform it using only "Before you start"
 
 Do not judge the feature, the wording, or whether the expected behaviour is correct. Judge only whether the walk can be followed in order.
 
-## Demo scripts
+## Demo guides
 
-If the prompt says the file is a demo script, it has a prep part and a live walk. Walk both as above, and also report these issues in the live walk:
+If the prompt says the file is a demo guide, also report:
 
-9. **Risky live step**: a step that runs a command, waits on a background job or a model, or whose result could differ between runs, with no prep step that already produced or confirmed it.
-10. **Unsupported claim**: a **Say** line claiming something its **Do** and **Show** lines do not put on screen.
-11. **Internal jargon**: a **Say** line using a spec or ticket ID, a model or agent term, or an internal module name that the product does not show on screen.
+9. **Left to chance**: a step whose result could differ between runs, where the guide records whichever way it went instead of repeating until the showcase result appears.
 
-Return a list, one entry per issue: step number, issue type (1-11), one sentence on what is missing, and the earliest place it could be fixed. If there are no issues, return exactly `No issues.`
+Return a list, one entry per issue: step number, issue type (1-9), one sentence on what is missing, and the earliest place it could be fixed. If there are no issues, return exactly `No issues.`

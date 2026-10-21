@@ -5,7 +5,7 @@ The guide is one Markdown file of checkbox steps, read and ticked top to bottom.
 ## 1. Title and purpose
 
 ```markdown
-# <Feature area>: hands-on test guide
+# <Feature area>: hands-on walkthrough
 
 Hands-on walk through every user-facing feature on `<branch>` (PR #<n>). Follow it top to bottom;
 every step uses only what earlier steps set up. Expected results come from <docs/user-guide/x.md |

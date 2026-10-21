@@ -1,6 +1,6 @@
 # Blind walk brief
 
-You are checking a hands-on test guide. You are read-only: do not edit any file, run the app, or execute any command from the guide.
+You are checking a hands-on walkthrough guide. You are read-only: do not edit any file, run the app, or execute any command from the guide.
 
 Read the guide at the path you were given, top to bottom, exactly once, as if you were a tester who has never seen the codebase. Do not read ahead. Keep a running state as you go:
 

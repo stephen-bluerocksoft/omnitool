@@ -1,7 +1,6 @@
 ---
 name: omni-timetrack
 description: Generate a timetrack entry summarizing work for upper management. Use when reporting daily or weekly work to management.
-disable-model-invocation: true
 ---
 
 ## Outline
@@ -91,10 +90,10 @@ disable-model-invocation: true
 
 The user pastes the timetrack into a system that **does not support markdown**. The **deliverable** must be plain text: no `#` headings, no `**bold**`, no backticks, no markdown lists other than lines starting with `-` and a space.
 
-9. **Determine the day of week** for each date using a shell command -- do NOT attempt to calculate it mentally:
+9. **Determine the day of week** for each date using a shell command -- do NOT attempt to calculate it mentally. GNU `date` (Linux) takes `-d`; BSD `date` (macOS) does not, so fall back to its `-j -f` form:
 
    ```sh
-   date -j -f "%Y-%m-%d" "YYYY-MM-DD" "+%A"
+   date -d "YYYY-MM-DD" "+%A" 2>/dev/null || date -j -f "%Y-%m-%d" "YYYY-MM-DD" "+%A"
    ```
 
 10. **Write the timetrack entry** using this structure:

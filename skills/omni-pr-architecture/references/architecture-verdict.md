@@ -4,12 +4,13 @@ How Phase 6 decides whether the PR's architecture is ready to approve, and how P
 
 ## Rubric
 
-The lenses, vetting, placement, severity, and budget are BRS's shared architecture pass -- the same one `brs-review` and `brs-pr-review` run -- so BRS has one architecture rubric, not two. Read both files in full from the BRS Codex install:
+The lenses, vetting, placement, severity, and budget are BRS's shared architecture pass -- the same one `brs-review` and `brs-pr-review` run -- so BRS has one architecture rubric, not two. Read these from the BRS Codex install:
 
 - `~/.claude/skills/brs-pr-review/references/architecture-review.md`
 - `~/.claude/skills/brs-pr-review/references/severity.md`
+- `~/.claude/skills/brs-pr-review/references/review-template.md` (read in Phase 8's body, below)
 
-If either is missing, do not improvise a rubric. Skip Phases 6 and 8, publish the page without an Architecture assessment section, put a notice in its header saying the verdict did not run and why, and tell the user to run `make install` in the BRS Codex repository.
+If any is missing, do not improvise a rubric. Skip Phases 6 and 8, publish the page without an Architecture assessment section, put a notice in its header saying the verdict did not run and why, and tell the user to run `make install` in the BRS Codex repository.
 
 Where the rubric says to work on a branch or in the repository root, work from git objects at `HEAD` in `CLONE` instead -- this skill never checks out. When the changeset holds only Markdown or configuration with no executable code, the rubric skips its pass; the verdict is then "not applicable", and Phase 8 does not run.
 
@@ -56,39 +57,28 @@ State the reason in one sentence: the findings that decide a Request changes, or
 
 ## Review body
 
-Phase 8 posts this body, written to the session scratchpad as `architecture-review.md`. It is self-contained -- the explanation page is private, so the body never links to it.
+Phase 8 posts this body, written to the session scratchpad as `architecture-review.md`. It follows `brs-pr-review`'s review template -- `~/.claude/skills/brs-pr-review/references/review-template.md`, read in full -- so the architecture review looks and reads like the code review beside it: the verdict callout with count pills, the `---` dividers, categories in bold, every finding a collapsed entry with its ID pill, severity badge, and plain-language headline, and the template's fields, badge markup, and blank-line rules. Where the template and this section differ, this section wins; nothing else about the template changes.
 
-```markdown
-<!-- omni-pr-architecture:verdict -->
-## Architecture review: <PR title>
+The body is self-contained -- the explanation page is private, so the body never links to it. Never post architecture findings as inline comments; the template's rule for them applies.
 
-**Verdict: <verdict>** -- architecture only. Defects are the code review's.
-Assessed at `<HEAD short sha>` against <the governing rules read, by path>.
+### Differences from the template
 
-<one-sentence reason>
+- **Marker and heading.** The body's first line is `<!-- omni-pr-architecture:verdict -->`, and its heading is `## Architecture Review: <title>` -- not `## PR Review:`, so neither this skill's feedback ledger nor `brs-pr-review`'s re-review mistakes it for a code-review round.
+- **Verdict values.** `APPROVE` with `[!TIP]`, `REQUEST CHANGES` with `[!CAUTION]`, and `APPROVE PENDING CODE-REVIEW FIXES` with `[!WARNING]` -- the template's callout for a value a consuming prompt defines. `### Verdict` carries the same value.
+- **Summary.** After the callout, one or two sentences on what the PR builds, then one line: "Architecture only -- defects belong to the code review and do not decide this verdict." For an approval pending fixes, a top-level `[!WARNING]` callout follows, listing the must-fix code-review items the approval waits on, one line each (`> - <ID> <headline> -- <status>, <link>`). There is no Design themes line; when one root cause spans several findings, the verdict's justification names it.
+- **Must Fix holds every finding that decides Request changes**: Blocker and Critical, and a Major marked hard to reverse. A hard-to-reverse Major carries this badge after its severity badge, and its `Impact` names the area:
 
-### Findings
-<each in-change finding: ID A1.., severity, hard-to-reverse area if any,
-headline, where (paths), why it matters, recommendation, the standard or rule
-it cites; credited and linked when a reviewer raised it first>
+  | Badge | Markup |
+  | ----- | ------ |
+  | Hard to reverse | `<img alt="Hard to reverse" src="https://img.shields.io/badge/Hard%20to%20reverse-cf222e?style=flat-square">` |
 
-### Conformance
-<each departure, or "No departures from <rules read>.">
-
-### Pending code-review fixes
-<only for Approve pending code-review fixes: each must-fix item's ID, headline,
-status, and link>
-
-### Follow-ups for the author
-<each with its reason and repository, or "None.">
-
-### Questions for the author
-<the page's Questions for the author, numbered, word for word; omit the
-section when the page has none>
-
-### Checked and sound
-<one line naming the design decisions examined and found safe>
-```
+- **Recommended holds the other Majors.** Architecture findings are never Minor.
+- **IDs.** Number findings `A1`, `A2`, ... across Must Fix and Recommended in display order, in place of the template's `M` and `R` numbers -- the same IDs the page uses, and never confused with the code review's `M1` or `R1` on the same PR. Follow-ups keep the template's `F` numbers.
+- **Categories** name the part of the design, not the review phase: `**Data model**`, `**Boundaries**`, `**External contracts**`, `**Trust boundaries**`, `**Failure modes**`, `**Performance and cost**`, `**Operability**`, `**Conformance**` (departures from the constitution, `AGENTS.md`, or the core standards), or whatever names the group. The template's ordering rules apply.
+- **Fields.** `Where`, `Cause`, `Impact`, `Decide`, `Fix`, and `Test` as the template defines them, filled from the rubric's candidate: its scenario and evidence in `Cause`, why it matters and the standard or rule it breaks in `Impact`, its recommendation in `Fix`, and its "keep it fixed" check in `Test`. A finding a reviewer raised first adds that review's URL to `Where` and credits the reviewer in `Cause`.
+- **Follow-ups for the author** use the template's `F` entries unchanged.
+- **Questions for the author** is an added section, between Follow-ups and Verdict, with its own `---` divider: the page's questions, numbered, word for word. Omit the section and its divider when the page has none.
+- **Review notes** holds the commit assessed, the rules read (by path, noting any the PR itself changes), "no departures" when conformance found none, the rubric's checked-and-sound line, items past the budget, and any earlier architecture verdict this one replaces.
 
 Write it in the same plain style as the page. No secrets, values, or record contents.
 

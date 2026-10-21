@@ -63,6 +63,10 @@ Raise these in the proposal itself, not after the user approves:
 ## After Approval
 
 - **Stage each commit's files by explicit path, then commit with the message on stdin**: `git commit -F - <<'MSG'`, the message, then `MSG` on its own line. Never `git commit -m "$(cat <<'EOF' ... EOF)"` -- bash 3.2, the macOS system shell, mis-parses a heredoc inside command substitution and breaks on apostrophes.
-- **A rejected commit created nothing**; its group is still pending. If a hook rewrote files (formatting, lint fixes), re-stage them by explicit path and retry the same commit. If the failure needs a code change you can make, make it, re-stage, and retry. Otherwise report the error and the commits already created, then ask with the Guided decisions rule in the core standards, and never reshuffle the remaining groups without the answer:
+- **A rejected commit created nothing**; its group is still pending. If a hook rewrote files itself (formatting, lint auto-fixes), re-stage them by explicit path and retry the same commit -- the user's own tooling made that change, not you.
+- **A fix you write changes what was approved.** If the failure needs a code change you can make, make it, show its diff beside the hook's error, and ask with the Guided decisions rule in the core standards before committing:
+  - **Commit with this fix (Recommended)** -- re-stage by explicit path and retry the same commit
+  - **Stop here** -- the fix stays uncommitted in the tree with the rest of the group; commits already created stay
+- **Any other failure**: report the error and the commits already created, then ask with the Guided decisions rule, and never reshuffle the remaining groups without the answer:
   - **Stop here (Recommended)** -- the created commits stay; the failed group and everything after it stay uncommitted in the tree
   - **Re-propose the remaining groups** -- show a revised plan for what is still pending and ask for the go-ahead again

@@ -82,11 +82,19 @@ handler) | identifier (method + path, route, command, schedule) | path | purpose
 
 ## Data
 Entities, tables, and fields this area creates, changes, or reads, marked
-created / changed / read. Key fields and relationships only.
+created / changed / read. Key fields and relationships, plus each created or
+changed entity's role: what it represents, which code writes it and when, and
+its lifecycle (append-only, mutable under a version, removed on some event).
+
+## UI changes
+For each screen or major component this area adds or changes: what a user saw
+there at BASE ("did not exist" when new) and what they see at HEAD, in terms
+of what is shown and what can be done. "none" when the area has no UI.
 
 ## Connections
 One line each: this area -> target area or external system | interface
-(function call, HTTP, queue, event, workflow, storage) | what flows across.
+(function call, HTTP, queue, event, workflow, storage) | what flows across |
+sync or async (does the caller wait for the result, or hand it off).
 
 ## State machines
 For each state machine added or changed: name | path | states | transitions

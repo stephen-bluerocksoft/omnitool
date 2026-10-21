@@ -105,7 +105,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
 
    b. **Do not stage anything while proposing.** Staging mutates an index the user may have arranged deliberately. Staging happens in Phase 4, by explicit path.
 
-   c. **Ask for the go-ahead** with the options the Commit Proposals rule lists, put through the Guided decisions rule in the core standards:
+   c. **Ask for the go-ahead** with the options the Commit Proposals rule lists, put through the Guided decisions rule in the core standards. Print the plan in the same message as the question, immediately before it:
       - **Commit as shown** -- continue to Phase 4
       - **Edit the plan** -- ask what to change, revise the plan, show it again, and ask again
       - **Don't commit** -- stop

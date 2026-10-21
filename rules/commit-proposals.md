@@ -45,7 +45,7 @@ Not included:
 - **A body** is worth writing when the commit is permanent history: landing on `main` or `dev`, a hotfix, or any branch that will not be squashed, rebased, or compacted before merge. On a branch whose history will be rewritten, a clear subject line is enough.
 - **Not included** is the part the user cannot reconstruct from the diff. List every changed file you are leaving out and why, including ones you judged out of scope. A scope decision buried in prose does not get reviewed.
 
-Show the plan as ordinary output, then ask for the go-ahead with the Guided decisions rule in the core standards. The options:
+Print the full plan in the visible text of the message that asks -- not in thinking, not only in an earlier turn, and never by reference ("the plan above") -- then ask for the go-ahead with the Guided decisions rule in the core standards. "Commit as shown" means shown in that message. The options:
 
 - **Commit as shown (Recommended)** -- creates exactly the commits in the plan; selecting it is the go-ahead for those commits and no others
 - **Edit the plan** -- regroup, reword, or change what is included; revise the plan, show it again, and ask again

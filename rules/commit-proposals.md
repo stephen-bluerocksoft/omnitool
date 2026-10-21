@@ -2,7 +2,7 @@
 
 Committing requires an explicit go-ahead. This rule governs the moment you ask for it: what to put in front of the user so they can approve, redraw the grouping, or say no without reading the whole diff themselves. It does not authorize committing, and an approved proposal authorizes only the commits it showed.
 
-`/omni-commit` implements this end to end and layers its own grouping and execution procedure on top. Everything here is the floor for every other case: an ad-hoc commit, a hand-off at the end of a task, a fix the user asked you to land.
+`/omni-commit` implements this end to end and layers its own scoping and grouping procedure on top. Everything here is the floor for every other case: an ad-hoc commit, a hand-off at the end of a task, a fix the user asked you to land.
 
 ## Before Proposing
 
@@ -59,3 +59,10 @@ Raise these in the proposal itself, not after the user approves:
 - The current branch is `main` or `master`.
 - Changes inside a submodule -- the submodule commits separately from the parent's pointer update, so the proposal needs both.
 - Anything that would need `--amend` or a force push. Never do either without an explicit request in the current message.
+
+## After Approval
+
+- **Stage each commit's files by explicit path, then commit with the message on stdin**: `git commit -F - <<'MSG'`, the message, then `MSG` on its own line. Never `git commit -m "$(cat <<'EOF' ... EOF)"` -- bash 3.2, the macOS system shell, mis-parses a heredoc inside command substitution and breaks on apostrophes.
+- **A rejected commit created nothing**; its group is still pending. If a hook rewrote files (formatting, lint fixes), re-stage them by explicit path and retry the same commit. If the failure needs a code change you can make, make it, re-stage, and retry. Otherwise report the error and the commits already created, then ask with the Guided decisions rule in the core standards, and never reshuffle the remaining groups without the answer:
+  - **Stop here (Recommended)** -- the created commits stay; the failed group and everything after it stay uncommitted in the tree
+  - **Re-propose the remaining groups** -- show a revised plan for what is still pending and ask for the go-ahead again

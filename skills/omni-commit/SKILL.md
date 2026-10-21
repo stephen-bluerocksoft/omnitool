@@ -122,7 +122,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    git add <file1> <file2> ...
    ```
 
-   b. Create the commit with the message on stdin:
+   b. Create the commit with the message on stdin, as After Approval in the Commit Proposals rule requires:
 
    ```sh
    git commit -F - <<'MSG'
@@ -135,7 +135,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    MSG
    ```
 
-   Do **not** use `git commit -m "$(cat <<'EOF' ... EOF)"` -- bash 3.2 mis-parses a heredoc inside command substitution and breaks on apostrophes. See [references/commit-message-heredoc.md](references/commit-message-heredoc.md) for the full rationale and for choosing a delimiter. A subject-only commit uses the same form with no blank line and no bullets after it.
+   See [references/commit-message-heredoc.md](references/commit-message-heredoc.md) for the full rationale and for choosing a delimiter. A subject-only commit uses the same form with no blank line and no bullets after it.
 
    c. Verify the commit succeeded:
 
@@ -143,13 +143,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    git log --oneline -1
    ```
 
-9. **If a commit fails** (e.g., pre-commit hook rejection), nothing was committed -- the group is still pending:
-   - Read the error output
-   - If a hook rewrote the files (formatting, lint fixes), re-stage those files by explicit path and retry the same commit
-   - If the failure needs a code change you can make, make it, re-stage, and retry the same commit
-   - If the fix cannot be automated, report the error and the commits already created, then ask with the Guided decisions rule in the core standards. Never reshuffle the remaining groups without that answer:
-     - **Stop here (Recommended)** -- the created commits stay, the failed group and everything after it remain uncommitted in the tree for the user to fix
-     - **Re-propose the remaining groups** -- show a revised plan for what is still pending and run the step 7 approval on it
+9. **If a commit fails** (e.g., pre-commit hook rejection), read the error output and recover as After Approval in the Commit Proposals rule describes. Its **Re-propose the remaining groups** option runs the step 7 approval on the revised plan.
 
 ### Phase 5: Summary
 

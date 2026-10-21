@@ -28,6 +28,7 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |
 | `omni-release` | Review what ships since the last tag, check migrations, configuration and rollback safety, then tag and confirm the release after approval |
 | `omni-pr-explain` | Explain what a pull request implements as a system-architecture page with diagrams, published as a private Artifact (design review lives in brs-pr-review) |
+| `omni-test-guide` | Write a top-to-bottom, hands-on test guide that walks you through every user-facing feature built on a branch, with no forward references |
 | `omni-timetrack` | Generate a timetrack entry summarizing work for management |
 
 ## Agents

@@ -408,26 +408,43 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
 ```text
 ### Review findings addressed -- `<head-sha>`
 
-<Lede, one sentence with counts: N findings evaluated; A addressed in `<sha>`,
-R rejected, D deferred, X declined.>
+<Lede, one sentence with counts: N findings evaluated: A accepted, R rejected,
+D deferred, X declined, B blocked -- omitting any zero count.>
 
-- **[<area>] <finding headline>** -- <what changed, concretely>. `<path>`, `<path>`
-- **[<area>] <finding headline>** -- Rejected: <the premise that does not hold>. Evidence: <what showed it>.
-- **[<area>] <finding headline>** -- Deferred to <issue | follow-up | spec NNN>: <why it is not this PR's work>.
-- **[<area>] <finding headline>** -- Declined: <the deliberate choice, and why>.
+#### Accepted (<A>)
+
+- **[<area>] <finding headline>** -- Fixed in `<sha>`. <What changed, concretely.> `<path>`, `<path>`
+
+#### Rejected (<R>)
+
+- **[<area>] <finding headline>** -- <The premise that does not hold.> Evidence: <what showed it>.
+
+#### Deferred (<D>)
+
+- **[<area>] <finding headline>** -- To <issue | follow-up | spec NNN>. <Why it is not this PR's work.>
+
+#### Declined (<X>)
+
+- **[<area>] <finding headline>** -- <The deliberate choice, and why.>
+
+#### Blocked (<B>)
+
+- **[<area>] <finding headline>** -- <What blocks it.>
 
 **Verification:** <what was actually run, with results>. <What was NOT run, and who covers it.>
 
 <sub>Not treated as findings: <one clause per DISCARD, with why>.</sub>
 ```
 
-- **Every finding that was not accepted gets its own bullet, naming the verdict verbatim and the reason.** `Rejected`, `Deferred`, `Declined`, `Blocked` -- the same word the gate assigned. A summary listing only the wins reads like verification and does not get reviewed.
-- A bare "Not changed" is not a disposition. It reads as either `REJECT` or `DECLINE`, and the difference is whether the reviewer erred -- the one thing they will look for. Name the verdict.
-- A `Rejected` bullet carries the evidence, not just the conclusion; a `Deferred` bullet carries the destination the verdict named. Neither reason may be new -- both restate what was on the Phase 4 table.
+- **Group findings under one heading per verdict, in the order shown, each with its count.** The heading is the disposition: a reader sees what happened to every finding without reading a bullet. Omit a group with no findings; never print `(0)`. Within a group, keep source-severity order.
+- **The heading words are fixed:** `Accepted`, `Rejected`, `Deferred`, `Declined`, `Blocked` -- the verdict the gate assigned, never a synonym ("Addressed", "Fixed", "Won't fix"). Do not repeat the verdict word inside the bullet; the heading carries it.
+- **Every finding gets its own bullet under its verdict's group, accepted or not.** A summary listing only the wins reads like verification and does not get reviewed.
+- A bare "Not changed" is not a disposition. It reads as either `REJECT` or `DECLINE`, and the difference is whether the reviewer erred -- the one thing they will look for. File it under the right heading.
+- An `Accepted` bullet opens with `Fixed in <sha>`; a `Rejected` bullet carries the evidence, not just the conclusion; a `Deferred` bullet opens with the destination the verdict named. No reason may be new -- each restates what was on the Phase 4 table.
 - **No "also cleaned up" bullet.** Every bullet maps to a finding the gate approved. A change with no finding behind it should not have survived Phase 6's scope check, and disclosing it here launders it into the record instead of removing it.
 - The trailing not-run sentence in **Verification** is mandatory.
 - When zero findings were accepted there is no commit: title the comment `### Review findings evaluated -- no code changes`.
-- If the run produced more than one commit, the title carries HEAD and each bullet carries its own sha.
+- If the run produced more than one commit, the title carries HEAD; each `Accepted` bullet already names its own sha.
 
 ### Terminal output
 

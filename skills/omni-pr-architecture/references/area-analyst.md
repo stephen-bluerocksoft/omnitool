@@ -85,11 +85,14 @@ Entities, tables, and fields this area creates, changes, or reads, marked
 created / changed / read. Key fields and relationships, plus each created or
 changed entity's role: what it represents, which code writes it and when, and
 its lifecycle (append-only, mutable under a version, removed on some event).
-
-## UI changes
-For each screen or major component this area adds or changes: what a user saw
-there at BASE ("did not exist" when new) and what they see at HEAD, in terms
-of what is shown and what can be done. "none" when the area has no UI.
+For each JSON or JSONB column the area writes: the type that defines its shape
+(Pydantic model, TypedDict, JSON Schema, tool argument schema) with its path,
+its fields and types, and nested structures -- or "free-form" when no code
+defines it.
+For each spec data model entity in the area task: the table, column, type, or
+vocabulary that implements it at HEAD with its path, and every difference from
+the spec's declaration (fields missing or added; types, keys, constraints,
+relationships, lifecycle rules) -- or "not built in this area".
 
 ## Connections
 One line each: this area -> target area or external system | interface
@@ -125,8 +128,9 @@ Paths:
 <area paths, or an explicit file list when the area is part of a flat directory>
 
 Relevant intent:
-<user stories, requirement lines, plan decisions, and entities relevant to this
-area -- or the whole intent map when relevance is unclear>
+<user stories, requirement lines, plan decisions, and the spec data model
+entities (with their declared fields, relationships, and rules) relevant to
+this area -- or the whole intent map when relevance is unclear>
 <any area-specific ask, e.g. "produce a complete route table" for the API area,
 "give each table's columns, keys and CHECKs" for the data-model area, or "list
 every tool with read/write and the workflow that uses it" for an agent area>

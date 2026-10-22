@@ -122,7 +122,7 @@ resolve + fetch -> inventory + classify -> gather intent (PR text, spec, review 
    - user stories (`US-#` or "User Story N") with their one-line goal
    - functional requirements (`FR-###`) with their one-line statement
    - the plan's architectural decisions (components, storage, integrations, patterns)
-   - the declared entities
+   - the **spec data model**: read `data-model.md` in full, and the entity and payload shapes in `contracts/`. For every entity the spec declares -- persisted tables, embedded or JSON structures, value objects, vocabularies and enums, request and response payloads, in-memory or workflow state -- record its name as the spec gives it, its kind, its purpose, its fields with types and constraints, its relationships, its lifecycle or state transitions, and its validation rules. Do this for every spec slug the diff adds or modifies, not only the one the PR names.
 
    This is the **intent map** -- the outline the page is organized around and the yardstick for the drift check. If the PR touches more than one spec slug, build one map per slug.
 
@@ -169,12 +169,14 @@ resolve + fetch -> inventory + classify -> gather intent (PR text, spec, review 
 2. **Synthesize the cross-area picture** from the verified returns:
    - **Components**: every new or modified component, grouped by area, marked new or modified, plus the existing components the PR integrates with.
    - **Connections**: which area calls which, through what interface (HTTP endpoint, function call, queue, workflow, event).
-   - **Data model delta**: new and changed entities, their key fields, relationships, and role -- what each represents, who writes it and when, and its lifecycle -- cross-checked against the migrations bucket.
+   - **Data model delta**: new and changed entities, their key fields, relationships, and role -- what each represents, who writes it and when, and its lifecycle -- cross-checked against the migrations bucket; plus the code-defined shape of each JSON column they hold.
+   - **Spec data model mapping**: for every entity in each spec's data model, where it was built at `HEAD` -- a table, a column, a JSON shape, a type, a vocabulary -- or that it was not built, verified with `git grep` like any other claim. For each built entity, compare it with the spec: fields declared but missing, fields added, types, keys, constraints, and relationships that differ, and lifecycle rules the code does or does not enforce. Record each difference with both sides stated, and anything built that no spec entity declares.
    - **Key flows**: the two to four end-to-end flows that matter most -- a user action or trigger traced through UI, API, service, storage, and any external system. Mark where each flow stops waiting: the point a request returns while work continues in the background.
    - **State machines**: every state machine the PR adds or changes, with its states and transitions.
-   - **Surfaces**: the API surface (method, path, purpose) and the UI surface as before and after per screen.
+   - **API surface**: new and changed endpoints (method, path, purpose). The UI appears only as components in the architecture; how it looks and feels is for a person using it.
 
 3. **Drift check against the intent map** (only when a spec governs the PR). This is a high-level note, not a converge pass -- say so on the page.
+   - **Spec data model**: a declared entity that was not built, or that was built with a different shape, is drift. Report it in the Spec data model section (its mapping table), and as a gap on the spec map row of the requirement it serves.
    - **Not found**: a requirement with no implementing evidence in any analyst return. Before listing it, read the requirement's full text, then search for it yourself (`git grep` for the requirement's key terms at `HEAD`) and record the search you ran. Some requirements need no code of their own -- "the ladder stops through the state change" is satisfied by a rule that only applies in certain states. When an existing mechanism satisfies the requirement, mark it implemented and record the mechanism in the coverage notes, never as a gap.
    - **Beyond spec**: a capability an analyst reported that maps to no requirement.
    - **Plan departures**: a plan decision the code visibly does differently.
@@ -187,9 +189,9 @@ Follow `references/architecture-verdict.md`: read the BRS architecture rubric fr
 
 ### Phase 7: Render and Publish
 
-1. **Load the page skills** with the Skill tool: `artifact-design`, then `artifact-diagramming`. Follow their page contract (title, theme tokens, dark mode, allowed CDNs, phone-width layout).
+1. **Load the page skills** with the Skill tool: `artifact-design`, then `artifact-diagramming`. Follow their page contract (title, allowed CDNs, phone-width layout, both themes). The page's visual system is fixed: build it from `references/page-style.md`, with its stylesheet, viewer markup, and script copied verbatim and its size chart and architecture grid followed exactly. Never choose a palette, typeface, or layout of your own. `artifact-design` gives an existing design system precedence, and that file is this skill's.
 
-2. **Write the page** to `pr-explain/<repo>-pr-<n>.html` in the session scratchpad directory -- the published Artifact is the durable copy, and the scratchpad is never tracked by any repository. Follow `references/page-outline.md` for sections, ordering, and diagrams. Before publishing, check the HTML parses with balanced tags and grep it for anything that looks like a seed value, email address, or phone number.
+2. **Write the page** to `pr-explain/<repo>-pr-<n>.html` in the session scratchpad directory -- the published Artifact is the durable copy, and the scratchpad is never tracked by any repository. Follow `references/page-outline.md` for sections, ordering, and diagrams, and `references/page-style.md` for every class and style. Before publishing, check the HTML parses with balanced tags and grep it for anything that looks like a seed value, email address, or phone number.
 
 3. **Publish** with the Artifact tool: `file_path` the page, `icon: "diagram"`, and a one-sentence `description` naming the repository, PR number, and title. If the Artifact tool is unavailable (running as a subagent, or a host without it), the local file is the deliverable: write it instead to `temp/pr-explain/<repo>-pr-<n>.html` in `CLONE` if `git -C "$CLONE" check-ignore -q temp` succeeds, otherwise keep it in the scratchpad, and say it was not published. Never write it to a tracked path.
 

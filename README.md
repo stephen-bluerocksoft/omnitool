@@ -27,7 +27,6 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-pr-create` | Create a pull request from the current branch using gh CLI |
 | `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |
 | `omni-release` | Review what ships since the last tag, check migrations, configuration and rollback safety, then tag and confirm the release after approval |
-| `omni-pr-architecture` | Explain what a pull request implements as a system-architecture page with diagrams, published as a private Artifact, then an architecture verdict it posts only on your go-ahead (defect review lives in brs-pr-review) |
 | `omni-walkthrough` | Write a top-to-bottom, hands-on walkthrough guide that walks you through every user-facing feature built on a branch, with no forward references; `demo` mode covers only the headline features, for showing the work to clients or management |
 | `omni-timetrack` | Generate a timetrack entry summarizing work for management |
 

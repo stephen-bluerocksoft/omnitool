@@ -1,6 +1,6 @@
 ---
 name: omni-walkthrough
-description: Write a hands-on, top-to-bottom walkthrough guide that walks a person through every user-facing feature implemented on a branch, so they experience first-hand what was built. Inventories the branch's user-facing changes (UI, API, CLI, settings, notifications, background effects) from the diff, its specs, and its user docs; discovers how to run and drive the app in dev (start command, logins, seed data, simulation scripts); then orders every check as a strict waterfall -- each step depends only on steps above it, never on a later one -- and lints the result for forward references, undefined handles, and labels that do not exist in the code. Writes the guide as a checkbox Markdown file in the repo's gitignored temp/. A demo mode writes the same kind of guide for only the branch's headline features, each on its happy path, for showing the work to clients or management. Use when the user wants to walk through, exercise, smoke-test, get hands-on with, or demo what an agent built on a branch -- phrases like "write me a test guide for this branch", "ad-hoc test plan", "walk me through what was implemented", "manual test script", "I want to click through everything we built", "demo guide", "show the client what we built", "demo the big features to my manager". Not automated tests (use brs-test) and not an architecture explanation (use omni-pr-architecture).
+description: Write a hands-on, top-to-bottom walkthrough guide that walks a person through every user-facing feature implemented on a branch, so they experience first-hand what was built. Inventories the branch's user-facing changes (UI, API, CLI, settings, notifications, background effects) from the diff, its specs, and its user docs; discovers how to run and drive the app in dev (start command, logins, seed data, simulation scripts); then orders every check as a strict waterfall -- each step depends only on steps above it, never on a later one -- and lints the result for forward references, undefined handles, and labels that do not exist in the code. Writes the guide as a checkbox Markdown file in the repo's gitignored temp/. A demo mode writes the same kind of guide for only the branch's headline features, each on its happy path, for showing the work to clients or management. Use when the user wants to walk through, exercise, smoke-test, get hands-on with, or demo what an agent built on a branch -- phrases like "write me a test guide for this branch", "ad-hoc test plan", "walk me through what was implemented", "manual test script", "I want to click through everything we built", "demo guide", "show the client what we built", "demo the big features to my manager". Not automated tests (use brs-test) and not an architecture explanation (use brs-pr-architecture).
 ---
 
 # omni-walkthrough
@@ -32,7 +32,7 @@ Both modes produce the same kind of guide: checkbox steps to read and follow bli
 | ------ | ----- |
 | A manual, hands-on walk through what a branch built | `omni-walkthrough` (this skill) |
 | Writing automated tests for gaps | `brs-test` |
-| Explaining a PR's architecture | `omni-pr-architecture` |
+| Explaining a PR's architecture | `brs-pr-architecture` (BRS Codex) |
 | Verifying the code satisfies its spec | `speckit-converge` (via `/omni-spec-implement`) |
 
 ## Ground Rules

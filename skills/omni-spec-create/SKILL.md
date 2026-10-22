@@ -82,7 +82,15 @@ Run the Speckit specify phase to create the feature spec, handling any clarifyin
 
 Invoke the `speckit-specify` skill with the feature description.
 
-Record the **branch name** and **spec directory path** from the phase output for subsequent steps.
+Record the **spec directory path** from the phase output for subsequent steps.
+
+**Make sure the feature is on its own branch.** The phase creates a branch only through a `before_specify` hook. Without one it creates no branch and does not say so, leaving the new files uncommitted on whatever was checked out. Detect the default branch with `git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p'`, falling back to whichever of `main` or `master` exists, and compare it with `git branch --show-current`:
+
+- **On a feature branch** -- the hook already branched. Create nothing
+- **Still on the default branch** -- run `git checkout -b <NNN-feature-name>`, named after the spec directory. The new files are uncommitted and carry over
+- **The checkout fails** -- report the error and stop. Never stash, discard, or commit files to get past it, and never continue with the spec on the default branch
+
+Record the resulting **branch name** for subsequent steps.
 
 ## Step 2a: Clarify
 

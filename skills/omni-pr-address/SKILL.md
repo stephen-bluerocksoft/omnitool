@@ -54,7 +54,7 @@ Exactly five classifications. Four are verdicts assigned in Phase 3; `DISCARD` i
 
 `DECLINE` exists so a disagreement of judgment is never mislabelled. Folding it into `REJECT` tells a reviewer they erred when they did not. Folding it into `DEFER` promises later work that will not happen. Both put a falsehood on a public thread.
 
-`DEFER` MUST name where the work goes -- an issue number, a named follow-up, or a spec ID. A `DEFER` with no destination is a `DECLINE` in nicer words; downgrade it or take it to the gate.
+`DEFER` MUST name where the work goes -- an issue number, a named follow-up, or a spec ID. A `DEFER` with no destination is a `DECLINE` in nicer words; downgrade it or take it to the gate. When the work belongs in another repository or a separate pull request and no issue tracks it yet, the destination is the issue the user files with `/brs-file-issue` -- the gate asks for it, and Phase 8 does not post until its reference is in hand.
 
 **Three supporting states, which are not verdicts:**
 
@@ -98,7 +98,7 @@ BRS Core Standards: *claims about what the code does are executed, not reasoned.
 
 Execute as **eight sequential phases**. Do NOT skip any phase. Three of them stop:
 
-- **Phase 4** is an approval gate -- every verdict is put to the user as its own question before any code is edited.
+- **Phase 4** is an approval gate -- the `ACCEPT` verdicts are approved together, and every other verdict is put to the user as its own question, before any code is edited.
 - **Phase 7** is a hand-off -- the skill has no commit of its own to make, and waits for the user to land the work.
 - **Phase 8** is an approval gate -- nothing is posted to GitHub without an explicit go-ahead.
 
@@ -234,15 +234,25 @@ Then print the counts -- `N findings -- A accept, R reject, D defer, X decline`.
 
 A thread-anchored question is the exception. It is a `DISCARD` that still produces public text in Phase 8, so it goes in the verdict table marked `QUESTION` -- never buried in that footnote.
 
-**Ask one question per finding**, with the Guided decisions rule in the core standards, in rounds until every row of the verdict table has an answer. There is no bulk "accept all": each finding is its own decision, because each one becomes its own public reply. Per row:
+Ask with the Guided decisions rule in the core standards, in rounds until every row of the verdict table has an answer. **The `ACCEPT` rows share one question; every other row gets its own.** An `ACCEPT` agrees with the reviewer and its reply only reports the fix, so approving the batch is one decision. A `REJECT`, `DEFER`, or `DECLINE` pushes back on a reviewer in public, and each one is its own decision.
 
-- **Options** are the verdicts the evidence leaves viable for that finding, drawn from `ACCEPT`, `REJECT`, `DEFER`, and `DECLINE`. A `DEFER` option names its destination; with no destination it is not offered. Each option's pros and cons come from that row of the evidence table -- what the read or run showed for and against it.
+**The `ACCEPT` batch** -- one question naming every proposed `ACCEPT` by `#` and headline:
+
+- **Accept all `<n>` (Recommended)** -- every listed finding stays `ACCEPT` and goes to Phase 5.
+- **Pull some out** -- ask which `#`s to pull; each one pulled gets its own question in the next round, with the options a non-`ACCEPT` row would get. Everything not pulled stays `ACCEPT`.
+
+Skip the batch question when no row is `ACCEPT`. A single `ACCEPT` is still asked as the batch question, with the same two options.
+
+**Every other row** -- `REJECT`, `DEFER`, `DECLINE`, open questions, `QUESTION` rows, and secret-scanner escalations -- one question each:
+
+- **Options** are the verdicts the evidence leaves viable for that finding, drawn from `ACCEPT`, `REJECT`, `DEFER`, and `DECLINE`. A `DEFER` option names its destination; with no destination it is not offered, except as the `/brs-file-issue` option below. Each option's pros and cons come from that row of the evidence table -- what the read or run showed for and against it.
 - **The recommendation** is the verdict Phase 3 proposed, listed first.
+- **A `DEFER` because the fix belongs in another repository or a separate pull request**, with no existing issue to point at, offers **Defer, and record it with `/brs-file-issue` (Recommended)**. Its description tells the user to run `/brs-file-issue` for that finding -- naming the target repository when it is not this one -- and that the issue it files becomes the `DEFER` destination. `brs-file-issue` is `disable-model-invocation: true`, so only the user can start it; never file the issue yourself with `gh issue create`. Pair it with `DECLINE` as the alternative for when the work is not worth tracking. When an issue already tracks the work, offer `DEFER` to that issue instead.
 - **An open question** -- a finding whose `REJECT` would rest on reasoning alone -- is prompted like any other row, but `REJECT` is not among its options, because the evidence minimum forbids proposing it. Recommend `ACCEPT` unless the evidence supports `DEFER` or `DECLINE`.
 - **A `QUESTION` row** asks whether to **Answer it in a reply (Recommended)** in Phase 8, or to **Treat it as a finding**, which sends it back through Phase 3 for a verdict and a question of its own.
 - **A secret-scanner escalation** keeps its row; its options say plainly that rotation and history purge are outside this skill.
 
-A selected option sets that finding's verdict. One that differs from the proposed verdict is marked `OVERRIDE`.
+A selected option sets that finding's verdict. One that differs from the proposed verdict is marked `OVERRIDE`. A `DEFER` recorded with `/brs-file-issue` is marked **issue pending** until the user supplies the issue reference (`owner/repo#N`); it does not hold up Phase 5, since a `DEFER` edits no code, but Phase 7 repeats the reminder and Phase 8 does not post without the reference.
 
 **Override grammar** remains accepted as a free-text alternative to the questions: `F3 -> accept`, `F5 -> reject`, `F2 -> defer #178`. The user's call sits at the top of the BRS precedence order -- apply it verbatim, mark the finding `OVERRIDE`, and ask the questions still unanswered. A finding flipped away from `ACCEPT` drops out of Phase 5. Phase 5 starts only when every finding has an answer.
 
@@ -292,12 +302,15 @@ Report and stop:
 
 - Each accepted finding, what changed for it, and the files it touched.
 - Any `BLOCKED` findings, with what blocks them.
+- Any `DEFER` still marked issue pending, each with the repository to file it in -- run `/brs-file-issue` for it and pass back the reference.
 - Phase 6's verification results, including what was not run.
 - The full list of files left modified in the working tree (`git status --porcelain`).
 
 Then hand off:
 
-> Changes are in the working tree on `<branch>`, uncommitted. Commit and push however you want them to land -- `/omni-commit` groups them into conventional commits. Tell me when the push is done and I will post the replies and the summary.
+> Changes are in the working tree on `<branch>`, uncommitted. Commit and push however you want them to land -- `/omni-commit` groups them into conventional commits. Tell me when the push is done -- and the issue reference for each pending `DEFER` -- and I will post the replies and the summary.
+
+When no `DEFER` is pending, drop that clause from the hand-off.
 
 `/omni-commit` is `disable-model-invocation: true`, so only the user can invoke it. Do not attempt it, and do not hand-roll a commit in its place.
 
@@ -330,14 +343,18 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
 
    One commit for the batch gives every finding the same sha; separate commits give each finding its own. **If a finding's files produce no commit, that finding did not land** -- reclassify it `BLOCKED` and never say "Fixed" for it.
 
-3. **Confirm the outward bundle.** Show it explicitly: the number of inline replies, **the threads to be resolved, by path and line**, and the summary comment. Then ask with the Guided decisions rule in the core standards -- nothing is posted until an approve option is selected:
+3. **Resolve each pending `DEFER`'s issue.** Every `DEFER` still marked issue pending needs the reference the user filed with `/brs-file-issue`. Confirm it exists with `gh issue view <N> --repo <owner/repo> --json url -q .url` and use that URL as the `Tracked:` line. A `DEFER` with no reference never reaches GitHub. Name each one that is missing, then ask with the Guided decisions rule in the core standards:
+   - **Wait for the issue (Recommended)** -- the user runs `/brs-file-issue` and passes back the reference; re-run this step
+   - **Change it to `DECLINE`** -- the work will not be tracked; the reply and summary bullet use the `DECLINE` form, and the finding is marked `OVERRIDE`
+
+4. **Confirm the outward bundle.** Show it explicitly: the number of inline replies, **the threads to be resolved, by path and line**, and the summary comment. Then ask with the Guided decisions rule in the core standards -- nothing is posted until an approve option is selected:
    - **Post all (Recommended)** -- post every reply, resolve the listed threads, and post the summary, exactly as shown
    - **Edit the bundle** -- ask what to change, revise, show the bundle again, and ask again
    - **Don't post** -- stop; the pushed commits stay, and nothing reaches GitHub
 
    **Fork PRs**: if the head repository is a fork the user cannot push to, they will have discovered it in Phase 7. Post replies and a summary describing the patch, and resolve nothing -- there is no landed commit to back a resolution.
 
-4. **Post inline replies.**
+5. **Post inline replies.**
 
    ```bash
    gh api repos/<owner>/<repo>/pulls/<n>/comments/<databaseId>/replies -f body='<reply text>'
@@ -360,7 +377,7 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
    BLOCKED   Attempted, not landed. <What blocks it.>
    ```
 
-5. **Resolve threads.** The invariant: **every thread this skill resolves is backed by a commit confirmed on the remote in step 1.**
+6. **Resolve threads.** The invariant: **every thread this skill resolves is backed by a commit confirmed on the remote in step 1.**
 
    ```bash
    gh api graphql -f query='mutation {
@@ -370,7 +387,7 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
 
    Never resolve a `REJECT`, `DEFER`, `DECLINE`, `DISCARD`, or `BLOCKED`, and never resolve a thread you did not reply to first. A finding that HEAD already satisfied gets a reply citing the sha that fixed it and an **open** thread -- the reviewer closes that one, not you. Threads left open are exactly the list of things you pushed back on, which is what makes a closed PR readable later.
 
-6. **Post the summary comment.** Read the body from stdin -- never `--body "$(cat <<'HEREDOC' ...)"`, because bash 3.2 on macOS mis-parses a heredoc inside command substitution and breaks on any unpaired quote. Pick a delimiter the body cannot contain:
+7. **Post the summary comment.** Read the body from stdin -- never `--body "$(cat <<'HEREDOC' ...)"`, because bash 3.2 on macOS mis-parses a heredoc inside command substitution and breaks on any unpaired quote. Pick a delimiter the body cannot contain:
 
    ```bash
    gh pr comment <n> --body-file - <<'PRBODY'
@@ -378,7 +395,7 @@ Do NOT post anything to GitHub in this phase. Do NOT switch or clean branches --
    PRBODY
    ```
 
-7. **Leave the branch alone.** Return to `STARTING_BRANCH` only if it differs from the PR branch and the tree is clean. **Do NOT delete the PR branch** -- `brs-pr-review` deletes the branch it checked out for a review, but this branch carries the user's commits and the open pull request.
+8. **Leave the branch alone.** Return to `STARTING_BRANCH` only if it differs from the PR branch and the tree is clean. **Do NOT delete the PR branch** -- `brs-pr-review` deletes the branch it checked out for a review, but this branch carries the user's commits and the open pull request.
 
 ## Output Format
 
@@ -434,6 +451,7 @@ Follow it with the one-line disposition for every finding not accepted -- verdic
 - **NEVER** post a `Fixed in <sha>` reply before confirming that sha is on the remote.
 - **NEVER** resolve a thread that is not backed by a commit confirmed on the remote, or one you have not replied to.
 - **NEVER** assign `REJECT` on reasoning alone -- name the command or the read, or take it to the gate.
+- **NEVER** file an issue yourself -- a `DEFER` that needs one is recorded by the user with `/brs-file-issue`, and posts only once its reference is in hand.
 - **NEVER** treat advisory prose, a reviewer's self-report, or vendor boilerplate as a work item.
 - **NEVER** fix anything outside the accepted findings -- including a standards violation you spotted yourself in a file you were already editing.
 - **NEVER** delete the PR branch.

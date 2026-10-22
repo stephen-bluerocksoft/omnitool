@@ -55,6 +55,7 @@ DEPRECATED_SKILLS=(
     "omni-epic-review"       # promoted to BRS brs-review sliced mode
     "omni-epic-seed"         # renamed to omni-prd-program
     "omni-test-guide"        # renamed to omni-walkthrough
+    "omni-pr-explain"        # renamed to omni-pr-architecture
 )
 
 echo "Omnitool Installer"

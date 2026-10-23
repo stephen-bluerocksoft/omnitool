@@ -2,32 +2,6 @@
 
 Universal workflow defaults that apply to every project.
 
-## Conventional Commits
-
-All commit messages MUST use the Conventional Commits format.
-
-Format: `<type>[optional scope]: <description>` (first line 50 chars max, body wraps at 72)
-
-| Type | When to Use |
-| ---- | ----------- |
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `refactor` | Code change that is neither fix nor feature |
-| `test` | Adding or correcting tests |
-| `perf` | Performance improvement |
-| `style` | Formatting, no logic change |
-| `build` | Build system or dependency changes |
-| `ci` | CI configuration changes |
-| `chore` | Anything else that touches neither src nor tests |
-| `revert` | Reverts a previous commit |
-
-Use imperative mood ("add" not "added"). Breaking changes: add `!` before colon or `BREAKING CHANGE:` footer.
-
-## Python Environment
-
-Before running Python scripts, check for and activate the project's virtual environment (`.venv/`, `venv/`, or `env/`). Never run Python against the system interpreter when a project venv exists. If no venv is found and one is needed, create it (`python -m venv .venv`) and install dependencies before proceeding.
-
-## Temporary Files
-
-All throwaway artifacts (scratch scripts, debug output, session notes, work summaries) MUST go in `temp/`. This directory is gitignored.
+- Scratch work goes in the session scratchpad when the harness provides one, otherwise in the repository's gitignored `temp/`. Files a person will reopen -- reports, issue drafts, plans -- go in `temp/`.
+- Spec work goes through `/omni-spec-create`, `/omni-spec-modify`, `/omni-spec-align`, and `/omni-spec-implement`, which wrap the BRS spec agents. In a Speckit repository, implement through `/omni-spec-implement`, never by hand.
+- A subagent's "done" is a claim: check its files, logic, and test run yourself before marking the task complete.

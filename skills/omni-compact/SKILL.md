@@ -348,7 +348,7 @@ All git commands that modify repository state (reset, add, commit, branch) requi
 
 ## Commit Message Format
 
-Types, the 50-character subject limit, imperative mood, body wrapping, and breaking-change syntax are defined once in the Conventional Commits section of the global defaults rule, which is always loaded. Do not restate them here.
+Types, the 50-character subject limit, imperative mood, body wrapping, and breaking-change syntax are defined once in the Version Control section of the BRS core standards, which is always loaded. Do not restate them here.
 
 Two things are specific to compaction and are not in that rule:
 

@@ -90,7 +90,7 @@ For the requested change:
 
 1. **`spec.md` first** -- add, modify, or remove functional requirements (FR-NNN), user stories, acceptance scenarios, edge cases, and assumptions. New FRs get sequential IDs continuing from the last one. When removing scope, mark it removed rather than silently deleting history.
 2. **Cascade downward** -- update `plan.md` (technical decisions, project structure), `data-model.md` (entities, fields, relationships), and `contracts/` (schemas, status codes) so each stays consistent with the revised `spec.md`.
-3. **`tasks.md` last** -- add tasks for new work (sequential IDs, cross-referenced to the FRs they implement), update tasks whose scope changed, and mark tasks that the change makes obsolete. Preserve `[X]` tasks that are still valid; do not reset completed work that the change does not touch.
+3. **`tasks.md` last** -- add tasks for new work (sequential IDs, cross-referenced to the FRs they implement), update tasks whose scope changed, and mark tasks that the change makes obsolete. Preserve `[X]` tasks that are still valid; do not reset completed work that the change does not touch. Cut each new or rescoped task as [the task-splitting reference](../omni-spec-create/references/task-splitting.md) describes.
 
 ## Step 4: Analyze and Remediate
 

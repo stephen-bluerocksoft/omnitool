@@ -158,7 +158,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
 
 ## Commit Message Format
 
-Types, the 50-character subject limit, imperative mood, body wrapping, and breaking-change syntax are defined once in the Conventional Commits section of the global defaults rule, which is always loaded. Do not restate them here -- a second copy is what let `build` and `ci` go missing from one list and not the other.
+Types, the 50-character subject limit, imperative mood, body wrapping, and breaking-change syntax are defined once in the Version Control section of the BRS core standards, which is always loaded. Do not restate them here -- a second copy is what let `build` and `ci` go missing from one list and not the other.
 
 ## Important Rules
 

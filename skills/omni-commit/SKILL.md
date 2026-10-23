@@ -1,7 +1,6 @@
 ---
 name: omni-commit
-description: Group changes into conventional commits, propose them for approval, and commit what is approved. Use when ready to commit staged or unstaged changes.
-disable-model-invocation: true
+description: Propose and create git commits -- group the working tree's changes into conventional commits, show the plan for approval, and commit only what is approved. Use whenever a commit is about to be made, including at the end of a task -- phrases like "commit this", "commit what we changed", "make a commit", "land this fix", "the work is ready". Never commits without an approved plan, and never on main or master. Not for rewriting existing history (use omni-compact).
 ---
 
 ## Permissions
@@ -10,7 +9,7 @@ All git commands that modify repository state (add, commit, reset, etc.) require
 
 ## Context
 
-This command is the end-to-end implementation of the Commit Proposals rule in the user rules, which is always loaded. That rule defines what a proposal must contain and what has to be flagged in it; this outline adds the grouping and execution procedure around it. Follow both -- do not restate the rule here.
+Read [references/commit-proposals.md](references/commit-proposals.md) before Phase 1. It defines what a proposal must contain and what has to be flagged in it; this outline adds the grouping and execution procedure around it. Follow both -- do not restate the reference here. The skill is model-invocable, so it also runs for commits nobody typed `/omni-commit` for; the approval in step 7 is what makes that safe.
 
 Commits are **permanent history by default**. Whether `/omni-compact` will rewrite them later is not something this command can verify, and the two ways of guessing wrong are not equally cheap: a body written on a branch that gets compacted costs a few discarded lines, while a subject-only commit that turns out to be permanent loses the "why" for good.
 
@@ -63,7 +62,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    - A single file change is a valid commit on its own
    - If ALL changes are related, a single commit is fine
    - Spec/documentation files that accompany code changes may be grouped with those code changes OR committed separately as `docs:` -- use judgment
-   - If one file's changes belong to two different groups, say so in the plan. `git add <file>` stages the whole file and cannot split them, so the choice between splitting hunks by hand and accepting a coarser grouping is the user's -- put it to them as its own question, as the Commit Proposals rule describes, alongside the step 7 approval
+   - If one file's changes belong to two different groups, say so in the plan. `git add <file>` stages the whole file and cannot split them, so the choice between splitting hunks by hand and accepting a coarser grouping is the user's -- put it to them as its own question, as `references/commit-proposals.md` describes, alongside the step 7 approval
 
 6. **For each logical group**, determine:
    - **Type**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
@@ -99,13 +98,13 @@ If the user's message includes `checkpoint`, the branch will be compacted before
 
    a. **Raise these in the plan itself**, not after the user approves:
       - Any `.env`, credential, key, token, or certificate file among the changes -- name it and exclude it by default
-      - The current branch is `main` or `master`
+      - The current branch is `main` or `master` -- do not propose at all: stop and offer to create a branch, since the BRS guard hook blocks the commit
       - Changes inside a git submodule (e.g., `ood/ondemand/`) -- the submodule commits separately from the parent's pointer update, so the plan needs both
       - Anything that would need `--amend` or a force push
 
    b. **Do not stage anything while proposing.** Staging mutates an index the user may have arranged deliberately. Staging happens in Phase 4, by explicit path.
 
-   c. **Ask for the go-ahead** with the options the Commit Proposals rule lists, put through the Guided decisions rule in the core standards. Print the plan in the same message as the question, immediately before it:
+   c. **Ask for the go-ahead** with the options `references/commit-proposals.md` lists, put through the Guided decisions rule in the core standards. Print the plan in the same message as the question, immediately before it:
       - **Commit as shown** -- continue to Phase 4
       - **Edit the plan** -- ask what to change, revise the plan, show it again, and ask again
       - **Don't commit** -- stop
@@ -122,7 +121,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    git add <file1> <file2> ...
    ```
 
-   b. Create the commit with the message on stdin, as After Approval in the Commit Proposals rule requires:
+   b. Create the commit with the message on stdin, as After Approval in `references/commit-proposals.md` requires:
 
    ```sh
    git commit -F - <<'MSG'
@@ -143,7 +142,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    git log --oneline -1
    ```
 
-9. **If a commit fails** (e.g., pre-commit hook rejection), read the error output and recover as After Approval in the Commit Proposals rule describes. Its **Re-propose the remaining groups** option runs the step 7 approval on the revised plan.
+9. **If a commit fails** (e.g., pre-commit hook rejection), read the error output and recover as After Approval in `references/commit-proposals.md` describes. Its **Re-propose the remaining groups** option runs the step 7 approval on the revised plan.
 
 ### Phase 5: Summary
 
@@ -165,5 +164,5 @@ Types, the 50-character subject limit, imperative mood, body wrapping, and break
 
 - **Never commit secrets**: Skip `.env`, credentials, API keys, tokens. These are flagged in the plan (step 7a) and excluded by default, not raised after approval.
 - **Never force push or amend** unless the user explicitly requests it in the current message.
-- **Never commit to main/master** without flagging it in the plan and getting confirmation. Because the flag is part of the plan, selecting **Commit as shown** in step 7 is that confirmation.
+- **Never commit to main/master.** Stop before proposing and offer to create a branch; the BRS core standards forbid it and the BRS guard hook blocks it.
 - **Respect .gitignore**: Do not stage files that should be ignored.

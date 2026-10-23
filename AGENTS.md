@@ -14,7 +14,7 @@ Root `CLAUDE.md` is a one-line shim containing `@AGENTS.md`. Claude Code's built
 
 ## Setup Commands
 
-- Check skill frontmatter (description length, no angle brackets): `make check`
+- Check skill frontmatter (description length, no angle brackets) and the always-loaded rules' size ceiling: `make check`. The rules load into every session, so `RULES_MAX_LINES` and `RULES_MAX_WORDS` in `scripts/check-skills.sh` only move down; a PR that grows the rules raises them with its reason
 - Lint every Markdown file: `make lint`
 - Install globally: `make install`
 - Pull latest and reinstall: `make update`

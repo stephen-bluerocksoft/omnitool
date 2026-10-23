@@ -6,7 +6,7 @@ help:
 	@echo ""
 	@echo "Usage: make <target>"
 	@echo ""
-	@echo "  check      Check skill frontmatter: one-line descriptions of at most 1,024 characters, no angle brackets"
+	@echo "  check      Check skill frontmatter (one-line descriptions, at most 1,024 characters, no angle brackets) and the always-loaded rules size"
 	@echo "  lint       Check every Markdown file against .markdownlint.jsonc"
 	@echo "  install    Install skills and agents to ~/.claude/ and inject rules into ~/.claude/CLAUDE.md"
 	@echo "  update     Pull latest changes and run install"

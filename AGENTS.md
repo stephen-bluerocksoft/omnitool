@@ -10,7 +10,7 @@ This is a **content-only repository** -- it contains Markdown files, shell scrip
 
 Skills follow the open [Agent Skills](https://agentskills.io/) standard. This repository follows the [AGENTS.md](https://agents.md/) open format for agent guidance.
 
-Root `CLAUDE.md` is a one-line shim containing `@AGENTS.md`: Claude Code reads `CLAUDE.md` and never `AGENTS.md`, so the import is what makes this file load there. Do not delete it, and do not copy content into it -- this file stays the single source.
+Root `CLAUDE.md` is a one-line shim containing `@AGENTS.md`. Claude Code's built-in AGENTS.md support loads this file by default only when a repository has no `CLAUDE.md`, and a person can switch it off, so the import is what guarantees it loads in Claude Code; the built-in never loads an imported file twice. Do not delete it, and do not copy content into it -- this file stays the single source.
 
 ## Setup Commands
 

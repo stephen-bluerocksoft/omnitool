@@ -40,10 +40,7 @@ Global rules that apply across all projects. Each file in `rules/` is one rule. 
 
 | Rule | Purpose |
 | ---- | ------- |
-| `global-defaults` | Conventional commits, Python venv, temp files |
-| `spec-first-development` | Speckit workflow, constitution compliance, branch naming |
-| `task-management` | Task splitting, completion verification, sub-agent verification |
-| `documentation-standards` | Source documentation from code, never fabricate |
+| `global-defaults` | Where scratch files go, how spec work is routed, and checking a subagent's work |
 
 ## Installation
 

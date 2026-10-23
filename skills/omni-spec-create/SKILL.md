@@ -131,6 +131,7 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 
 1. Run the Speckit tasks phase (`speckit-tasks`)
 2. This generates tasks.md from the plan
+3. Check every task against [references/task-splitting.md](references/task-splitting.md), and split or rewrite any that fail it before analysis
 
 ### 3d: Analyze and Remediate
 

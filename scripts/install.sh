@@ -25,7 +25,6 @@ OMNITOOL_END_MARKER="<!-- OMNITOOL-RULES-END -->"
 # Rules injected into CLAUDE.md, in reading order. Add new rule files here.
 RULES_ORDER=(
     "global-defaults"
-    "commit-proposals"
     "spec-first-development"
     "task-management"
     "documentation-standards"

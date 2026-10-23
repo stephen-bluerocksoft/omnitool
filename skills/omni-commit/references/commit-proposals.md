@@ -1,8 +1,8 @@
 # Commit Proposals
 
-Committing requires an explicit go-ahead. This rule governs the moment you ask for it: what to put in front of the user so they can approve, redraw the grouping, or say no without reading the whole diff themselves. It does not authorize committing, and an approved proposal authorizes only the commits it showed.
+Committing requires an explicit go-ahead. This reference governs the moment you ask for it: what to put in front of the user so they can approve, redraw the grouping, or say no without reading the whole diff themselves. It does not authorize committing, and an approved proposal authorizes only the commits it showed.
 
-`/omni-commit` implements this end to end and layers its own scoping and grouping procedure on top. Everything here is the floor for every other case: an ad-hoc commit, a hand-off at the end of a task, a fix the user asked you to land.
+`omni-commit` loads this file for every commit it proposes and layers its own scoping and grouping procedure on top. The skill is model-invocable, so the same floor covers an ad-hoc commit, a hand-off at the end of a task, and a fix the user asked you to land.
 
 ## Before Proposing
 
@@ -56,7 +56,7 @@ Print the full plan in the visible text of the message that asks -- not in think
 Raise these in the proposal itself, not after the user approves:
 
 - Any `.env`, credential, key, token, or certificate file among the changes -- name it and exclude it by default.
-- The current branch is `main` or `master`.
+- The current branch is `main` or `master`. Never commit there: stop before proposing and offer to create a branch. The BRS guard hook blocks the commit anyway.
 - Changes inside a submodule -- the submodule commits separately from the parent's pointer update, so the proposal needs both.
 - Anything that would need `--amend` or a force push. Never do either without an explicit request in the current message.
 

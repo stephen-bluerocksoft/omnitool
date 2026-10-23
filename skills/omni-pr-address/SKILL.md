@@ -96,7 +96,7 @@ BRS Core Standards: *claims about what the code does are executed, not reasoned.
 
 ## Instructions
 
-Execute as **eight sequential phases**. Do NOT skip any phase. Three of them stop:
+Three phases stop:
 
 - **Phase 4** is an approval gate -- the `ACCEPT` verdicts are approved together, and every other verdict is put to the user as its own question, before any code is edited.
 - **Phase 7** is a hand-off -- the skill has no commit of its own to make, and waits for the user to land the work.

@@ -29,8 +29,6 @@ Ground the recommendation in evidence: if the request does not say which the dri
 
 ## Instructions
 
-Execute the audit as **five sequential phases**. Do NOT skip any phase. Each phase builds on the previous one.
-
 ### Phase 1: Read All Spec Artifacts
 
 Identify the feature's spec directory from user input, branch name, or by checking `specs/`. Read every file in `specs/<NNN>-<name>/`:

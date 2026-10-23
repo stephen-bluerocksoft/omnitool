@@ -14,6 +14,7 @@ Root `CLAUDE.md` is a one-line shim containing `@AGENTS.md`: Claude Code reads `
 
 ## Setup Commands
 
+- Check skill frontmatter (description length, no angle brackets): `make check`
 - Lint every Markdown file: `make lint`
 - Install globally: `make install`
 - Pull latest and reinstall: `make update`

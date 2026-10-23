@@ -23,3 +23,14 @@ jobs:
       # branch red without a commit here. Rules live in .markdownlint.jsonc.
       - name: markdownlint
         run: npx --yes markdownlint-cli@0.48.0 --ignore temp '**/*.md'
+
+  skills:
+    name: Skill frontmatter
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Check skill frontmatter
+        run: make check

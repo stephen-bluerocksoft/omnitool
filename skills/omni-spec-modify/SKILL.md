@@ -1,6 +1,6 @@
 ---
 name: omni-spec-modify
-description: Change the requirements of an EXISTING in-flight feature spec before implementation, cascading the edit through plan, tasks, contracts, and analysis. Use when the user wants to add, change, or remove a requirement on a feature whose specs/<NNN>-<name>/ directory exists on its own branch and has not merged to the default branch -- phrases like "update the spec to", "change the requirement", "the feature should now also". Do NOT use on a merged feature under Flow-Forward, the default (use omni-spec-create for a new spec that supersedes it) -- a project whose constitution records Living Spec uses this skill on merged features too; to create a new spec (use omni-spec-create), or to sync specs to already-built code (use omni-spec-align).
+description: Change the requirements of an EXISTING in-flight feature spec before implementation, cascading the edit through plan, tasks, contracts, and analysis. Use when the user wants to add, change, or remove a requirement on a feature whose specs/NNN-name/ directory exists on its own branch and has not merged to the default branch -- phrases like "update the spec to", "change the requirement", "the feature should now also". Do NOT use on a merged feature under Flow-Forward, the default (use omni-spec-create for a new spec that supersedes it) -- a project whose constitution records Living Spec uses this skill on merged features too; to create a new spec (use omni-spec-create), or to sync specs to already-built code (use omni-spec-align).
 ---
 
 # omni.spec.modify

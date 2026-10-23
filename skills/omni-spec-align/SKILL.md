@@ -1,6 +1,6 @@
 ---
 name: omni-spec-align
-description: Audit alignment between an in-flight feature's spec artifacts and the implementation on its branch, updating the spec to match reality (implementation is the source of truth). Use when the feature's specs/<NNN>-<name>/ artifacts have not yet merged to the default branch and the code has diverged from them -- e.g. after implementing. Under Flow-Forward, the default, it never aligns a merged feature; a project whose constitution records Living Spec aligns merged features too. Also runs as the alignment sub-step of omni-spec-implement.
+description: Audit alignment between an in-flight feature's spec artifacts and the implementation on its branch, updating the spec to match reality (implementation is the source of truth). Use when the feature's specs/NNN-name/ artifacts have not yet merged to the default branch and the code has diverged from them -- e.g. after implementing. Under Flow-Forward, the default, it never aligns a merged feature; a project whose constitution records Living Spec aligns merged features too. Also runs as the alignment sub-step of omni-spec-implement.
 ---
 
 # omni.spec.align

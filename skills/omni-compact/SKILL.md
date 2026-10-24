@@ -2,6 +2,7 @@
 name: omni-compact
 description: Compact a feature branch's noisy commit history into clean, logical commits. Use when a branch is ready for PR and needs history cleanup.
 disable-model-invocation: true
+compatibility: Requires BRS Codex installed -- runs its detect-base.sh from brs-review
 ---
 
 ## Permissions
@@ -22,9 +23,13 @@ All git commands that modify repository state (reset, add, commit, branch) requi
    - If on `main` or `master`, **STOP**. Compaction must be done on a feature branch.
    - If there are uncommitted changes, **STOP**. All changes must be committed before compacting. Suggest the user run `/omni-commit` first.
 
-2. **Determine base branch**. Resolve in this order:
-   - Explicitly provided by the user in the user's message (e.g., "base: dev")
-   - Default: `dev` if it exists, otherwise `main`
+2. **Determine base branch** with the script BRS Codex installs in brs-review. It prints the base the user named (e.g., "base: dev") after checking it exists, and otherwise the nearest of `main`, `master`, and `dev`:
+
+   ```sh
+   bash ~/.claude/skills/brs-review/scripts/detect-base.sh [<base the user named>]
+   ```
+
+   A non-zero exit means no base was found, the named base does not exist, or BRS Codex is not installed: **STOP** and report its message. Never compact against a guessed base -- the base sets which commits get rewritten.
 
    Find the merge-base:
 

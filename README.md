@@ -12,6 +12,8 @@ make install
 
 This copies skills and agents into `~/.claude/` and injects the global rules into `~/.claude/CLAUDE.md`, so they are available in every Claude Code session. Skills follow the open [Agent Skills](https://agentskills.io/) standard.
 
+`omni-compact` and `omni-pr-create` find the base branch with `detect-base.sh`, which BRS Codex installs into its `brs-review` skill, so install BRS Codex too. Without it, both skills stop instead of guessing a base.
+
 ## Skills
 
 | Skill | Description |

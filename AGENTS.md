@@ -79,7 +79,7 @@ Claude Code honors `readonly` in subagent frontmatter. If you later reuse the sa
 
 ## Installation
 
-`scripts/install.sh` copies skills to `~/.claude/skills/`, agents to `~/.claude/agents/`, and injects the `rules/` files into `~/.claude/CLAUDE.md` between OMNITOOL markers. The install is idempotent and safe to run alongside the BRS Codex installer (which owns a separate marker block).
+`scripts/install.sh` copies skills to `~/.claude/skills/`, agents to `~/.claude/agents/`, and injects the `rules/` files into `~/.claude/CLAUDE.md` between OMNITOOL markers. The install is idempotent and safe to run alongside the BRS Codex installer (which owns a separate marker block). `omni-compact` and `omni-pr-create` depend on that installer: they run `~/.claude/skills/brs-review/scripts/detect-base.sh`.
 
 ## Key concepts
 

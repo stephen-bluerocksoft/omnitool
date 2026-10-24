@@ -2,6 +2,7 @@
 name: omni-pr-create
 description: Create a pull request from the current branch using gh CLI. Use when ready to open a PR for review.
 disable-model-invocation: true
+compatibility: Requires BRS Codex installed -- runs its detect-base.sh from brs-review
 ---
 
 ## Permissions
@@ -26,10 +27,13 @@ All git and gh commands that modify state (push, pr create) require write permis
      - **Proceed without them** -- the PR covers committed work only and the changes stay in the tree; recommend it when they are unrelated to the branch
      - **Stop** -- end the run with nothing pushed
 
-2. **Determine base branch**. The base branch is resolved in this order:
-   - Explicitly provided by the user in the user's message (e.g., "into dev", "base: main")
-   - The branch's upstream tracking branch (if set)
-   - Default: `main`
+2. **Determine base branch** with the script BRS Codex installs in brs-review. It prints the base the user named (e.g., "into dev", "base: main") after checking it exists, and otherwise the nearest of `main`, `master`, and `dev`:
+
+   ```sh
+   bash ~/.claude/skills/brs-review/scripts/detect-base.sh [<base the user named>]
+   ```
+
+   A non-zero exit means no base was found, the named base does not exist, or BRS Codex is not installed: **STOP** and report its message. Never use the branch's upstream tracking branch as the base -- for a pushed feature branch that is the branch itself.
 
 3. **Gather commit history and diff against base**. Run in parallel:
 

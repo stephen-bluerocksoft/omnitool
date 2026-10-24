@@ -284,12 +284,12 @@ Then two layers, both recorded.
 
 1. **Per-finding proof.** For each implemented finding, name the specific check that establishes the fix. For a behavior defect, that check is a test **confirmed to fail against the pre-fix code** -- run it against the unfixed state before you call it passing. For a docs or config defect, it is the render, parse, or lint that would have caught the error.
 
-2. **Suite layer.** Run the layers the diff actually touches:
+2. **Suite layer.** Run the layers the diff actually touches, with the project's own test commands -- `AGENTS.md` or Makefile targets first. Where the project names none, fall back to the layer's runner from the directory that holds its config:
 
-   | Layer | Detection | Command |
-   | ----- | --------- | ------- |
-   | Backend (pytest) | `pytest.ini`, `pyproject.toml [tool.pytest]`, `tests/` with `.py` | `cd backend && pytest` (activate the venv first) |
-   | Frontend (Jest/Vitest) | `package.json` with a `test` script | `cd frontend && npm test -- --watchAll=false` |
+   | Layer | Detection | Fallback command |
+   | ----- | --------- | ---------------- |
+   | Backend (pytest) | `pytest.ini`, `pyproject.toml [tool.pytest]`, `tests/` with `.py` | `pytest`, in the project's virtual environment |
+   | Frontend (Jest/Vitest) | `package.json` with a `test` script | `npm test`, non-interactive (`-- --watchAll=false` for Jest) |
    | E2E (Playwright) | `playwright.config.*` or `e2e/` with `.spec.ts` | `npx playwright test` |
 
 Record two lists, equally load-bearing: **what ran, with results**, and **what did not run, and who covers it**. The second is not optional -- it feeds the summary comment's Verification paragraph verbatim, and BRS Core Standards make reporting it a MUST. Never call a failure pre-existing without running it on the base ref.
@@ -463,17 +463,9 @@ Follow it with the one-line disposition for every finding not accepted -- verdic
 
 ## Important Rules
 
-- **NEVER** implement a finding the user has not approved at the triage gate.
-- **NEVER** commit, stage, push, amend, or switch branches away from uncommitted work -- the user decides how the changes land.
-- **NEVER** post a `Fixed in <sha>` reply before confirming that sha is on the remote.
-- **NEVER** resolve a thread that is not backed by a commit confirmed on the remote, or one you have not replied to.
-- **NEVER** assign `REJECT` on reasoning alone -- name the command or the read, or take it to the gate.
-- **NEVER** file an issue yourself -- a `DEFER` that needs one is recorded by the user with `/brs-file-issue`, and posts only once its reference is in hand.
-- **NEVER** treat advisory prose, a reviewer's self-report, or vendor boilerplate as a work item.
-- **NEVER** fix anything outside the accepted findings -- including a standards violation you spotted yourself in a file you were already editing.
-- **NEVER** delete the PR branch.
-- **NEVER** ingest this skill's own prior comments as feedback.
-- **ALWAYS** re-read the code at HEAD before judging feedback written against an older commit.
-- **ALWAYS** state what was not run -- in the terminal output and in the summary comment.
-- **ALWAYS** name the verdict and the reason for every finding not accepted -- in the terminal output and in the summary comment.
-- **ALWAYS** reply to every thread you evaluated, whatever the verdict.
+Each rule is stated in the phase where it applies. The four that matter most:
+
+- No commit, stage, or push -- the user decides how the changes land.
+- No `REJECT` on reasoning alone -- name the command or the read, or take it to the gate.
+- No `Fixed in <sha>` reply before that sha is on the remote.
+- Resolve only threads you replied to and that a commit confirmed on the remote backs.

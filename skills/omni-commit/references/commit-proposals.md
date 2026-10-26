@@ -42,7 +42,7 @@ Not included:
 
 - **Subject lines** follow the conventional commit format defined in the global defaults. Show the exact subject you will commit, not a paraphrase of it.
 - **Files** are listed by explicit path. A count ("4 files") is not reviewable.
-- **A body** is worth writing when the commit is permanent history: landing on `main` or `dev`, a hotfix, or any branch that will not be squashed, rebased, or compacted before merge. On a branch whose history will be rewritten, a clear subject line is enough.
+- **A body** is worth writing when the commit is permanent history: landing on `main` or `dev`, a hotfix, or any branch that will not be squashed or rebased before merge. On a branch whose history will be rewritten, a clear subject line is enough.
 - **Not included** is the part the user cannot reconstruct from the diff. List every changed file you are leaving out and why, including ones you judged out of scope. A scope decision buried in prose does not get reviewed.
 
 Print the full plan in the visible text of the message that asks -- not in thinking, not only in an earlier turn, and never by reference ("the plan above") -- then ask for the go-ahead with the Guided decisions rule in the core standards. "Commit as shown" means shown in that message. The options:

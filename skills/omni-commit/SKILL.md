@@ -1,6 +1,6 @@
 ---
 name: omni-commit
-description: Propose and create git commits -- group the working tree's changes into conventional commits, show the plan for approval, and commit only what is approved. Use whenever a commit is about to be made, including at the end of a task -- phrases like "commit this", "commit what we changed", "make a commit", "land this fix", "the work is ready". Never commits without an approved plan, and never on main or master. Not for rewriting existing history (use omni-compact).
+description: Propose and create git commits -- group the working tree's changes into conventional commits, show the plan for approval, and commit only what is approved. Use whenever a commit is about to be made, including at the end of a task -- phrases like "commit this", "commit what we changed", "make a commit", "land this fix", "the work is ready". Never commits without an approved plan, and never on main or master. Not for rewriting existing history.
 ---
 
 ## Permissions
@@ -11,9 +11,9 @@ All git commands that modify repository state (add, commit, reset, etc.) require
 
 Read [references/commit-proposals.md](references/commit-proposals.md) before Phase 1. It defines what a proposal must contain and what has to be flagged in it; this outline adds the grouping and execution procedure around it. Follow both -- do not restate the reference here. The skill is model-invocable, so it also runs for commits nobody typed `/omni-commit` for; the approval in step 7 is what makes that safe.
 
-Commits are **permanent history by default**. Whether `/omni-compact` will rewrite them later is not something this command can verify, and the two ways of guessing wrong are not equally cheap: a body written on a branch that gets compacted costs a few discarded lines, while a subject-only commit that turns out to be permanent loses the "why" for good.
+Commits are **permanent history by default**. Whether the branch will be squashed or rewritten later is not something this command can verify, and the two ways of guessing wrong are not equally cheap: a body written on a branch that gets squashed costs a few discarded lines, while a subject-only commit that turns out to be permanent loses the "why" for good.
 
-If the user's message includes `checkpoint`, the branch will be compacted before PR and a clear subject line is enough. That is a hint about the message, not a different procedure: every phase below still runs, unchanged.
+If the user's message includes `checkpoint`, the branch will be squashed or rewritten before merge and a clear subject line is enough. That is a hint about the message, not a different procedure: every phase below still runs, unchanged.
 
 ## Outline
 
@@ -68,7 +68,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    - **Type**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
    - **Scope** (optional): A noun describing the section of the codebase (e.g., `auth`, `api`, `dashboard`, `k8s`)
    - **Description**: Short imperative summary, keeping the full first line at or under 50 characters
-   - **Body**: Bulleted list of changes, each line starting with `-` and a space. Each bullet explains one change (what and why). Wrap lines at 72 characters. Skip the body only when the branch will be rewritten before merge -- `checkpoint`, or a branch you have confirmed is compacted or squashed before it lands
+   - **Body**: Bulleted list of changes, each line starting with `-` and a space. Each bullet explains one change (what and why). Wrap lines at 72 characters. Skip the body only when the branch will be rewritten before merge -- `checkpoint`, or a branch you have confirmed is squashed or rewritten before it lands
    - **Breaking change**: Add `!` before colon or a `BREAKING CHANGE:` footer if applicable
    - **Footers** (optional): `Refs:`, `Fixes:`, `Closes #N` if relevant
 

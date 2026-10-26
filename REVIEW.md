@@ -5,7 +5,7 @@
 - A skill tells Claude to do the wrong thing, and every session that loads it does: commit, push, post, or file without an explicit go-ahead; push `HEAD` instead of a named branch; stage with `git add -A` or `git add .`
 - A shell snippet in a skill breaks when run: a heredoc nested inside a command substitution, or a command or flag the tool it calls no longer accepts
 - A skill contradicts the BRS core standards it runs under, or restates a rule BRS Codex owns, so the two drift apart
-- A call into BRS Codex's installed copies breaks: `omni-compact` and `omni-pr-create` run `~/.claude/skills/brs-review/scripts/detect-base.sh`
+- A call into BRS Codex's installed copies breaks: `omni-pr-create` runs `~/.claude/skills/brs-review/scripts/detect-base.sh`
 
 ## Severity here
 

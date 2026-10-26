@@ -12,7 +12,7 @@ make install
 
 This copies skills and agents into `~/.claude/` and injects the global rules into `~/.claude/CLAUDE.md`, so they are available in every Claude Code session. Skills follow the open [Agent Skills](https://agentskills.io/) standard.
 
-`omni-compact` and `omni-pr-create` find the base branch with `detect-base.sh`, which BRS Codex installs into its `brs-review` skill, so install BRS Codex too. Without it, both skills stop instead of guessing a base.
+`omni-pr-create` finds the base branch with `detect-base.sh`, which BRS Codex installs into its `brs-review` skill, so install BRS Codex too. Without it, the skill stops instead of guessing a base.
 
 ## Skills
 
@@ -25,7 +25,6 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-prd-program` | Turn a PRD into a program of devbot epics -- program.md, design.md, and per-epic seeds |
 | `omni-spec-align` | Audit and sync an in-flight feature's spec artifacts with the implementation on its branch (any feature's, when the project constitution records Living Spec) |
 | `omni-commit` | Group changes into conventional commits, propose them for approval, and commit what is approved |
-| `omni-compact` | Compact a feature branch's noisy commit history into clean, logical commits |
 | `omni-pr-create` | Create a pull request from the current branch using gh CLI |
 | `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |
 | `omni-release` | Review what ships since the last tag, check migrations, configuration and rollback safety, then tag and confirm the release after approval |

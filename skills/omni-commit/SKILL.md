@@ -62,7 +62,7 @@ If the user's message includes `checkpoint`, the branch will be compacted before
    - A single file change is a valid commit on its own
    - If ALL changes are related, a single commit is fine
    - Spec/documentation files that accompany code changes may be grouped with those code changes OR committed separately as `docs:` -- use judgment
-   - If one file's changes belong to two different groups, say so in the plan. `git add <file>` stages the whole file and cannot split them, so the choice between splitting hunks by hand and accepting a coarser grouping is the user's -- put it to them as its own question, as `references/commit-proposals.md` describes, alongside the step 7 approval
+   - If one file's changes belong to two different groups, split its hunks between them -- do not ask. List the file under each commit with the hunks it takes, as `references/commit-proposals.md` shows, so the step 7 approval covers the split
 
 6. **For each logical group**, determine:
    - **Type**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
@@ -119,6 +119,12 @@ If the user's message includes `checkpoint`, the branch will be compacted before
 
    ```sh
    git add <file1> <file2> ...
+   ```
+
+   For a file whose hunks the plan split, stage only this commit's hunks: write a patch holding just those hunks from `git diff -- <file>` to the scratchpad, then apply it to the index and confirm with `git diff --cached -- <file>`:
+
+   ```sh
+   git apply --cached <patch-file>
    ```
 
    b. Create the commit with the message on stdin, as After Approval in `references/commit-proposals.md` requires:

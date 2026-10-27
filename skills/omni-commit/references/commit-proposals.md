@@ -21,7 +21,7 @@ Each commit is one coherent change that is independently revertable. A single fi
 | Build and config | Manifests with their lockfile, CI config, build config |
 | Unrelated | Nothing -- these are separate commits |
 
-Never mix unrelated changes in one commit. If one file's changes belong to two different commits, say so in the proposal: `git add <file>` stages the whole file and cannot split them, so that file is its own question, asked with the Guided decisions rule in the core standards -- **Split the hunks by hand** or **Accept the coarser grouping**. Recommend splitting when the two changes are unrelated, since the coarser commit would break the rule above; recommend the coarser grouping when they are close enough that reverting one without the other is not a real need.
+Never mix unrelated changes in one commit. If one file's changes belong to two different commits, split its hunks between them without asking: list the file under each commit with the hunks it takes (`Files: path/one (hunks: <what they change>)`), and the plan approval covers the split. When two changes share a single hunk and cannot be separated without editing the patch, name it under **Flags** and say which commit takes the whole hunk.
 
 ## What to Show
 

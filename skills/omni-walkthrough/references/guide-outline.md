@@ -7,8 +7,8 @@ The guide is one Markdown file of checkbox steps, read and ticked top to bottom.
 ```markdown
 # <Feature area>: hands-on walkthrough
 
-Hands-on walk through every user-facing feature on `<branch>` (PR #<n>). Follow it top to bottom;
-every step uses only what earlier steps set up. Expected results come from <docs/user-guide/x.md |
+Hands-on tour of every user-facing feature on `<branch>` (PR #<n>), each on its happy path. Follow it
+top to bottom; every step uses only what earlier steps set up. Expected results come from <docs/user-guide/x.md |
 specs 045-051 | the code>; each section names its source so you can read the full rule when a step
 surprises you.
 ```
@@ -40,7 +40,7 @@ A table the reader fills in as they go. It is defined before step 1.1 and filled
 Number sections `1.`, `2.`, ... and steps `1.1`, `1.2`, ... so the reader can say where they stopped. Each section opens with its persona and source, and the settings it assumes when it relies on any:
 
 ```markdown
-## 2. Editing fields and proposed changes
+## 2. Edits become proposed changes
 
 Persona: `clerk@localhost`. Source: user guide "Proposed changes".
 
@@ -61,9 +61,18 @@ Patterns:
 - **Setup step**: its own checkbox and its own "Expect", directly above the first check that needs it.
 - **Persona switch**: `- [ ] **3.1** Log out, then log in as \`admin@localhost\`. Expect the **Settings** menu.`
 - **Setting changed, then restored**: the restoring step comes after the last check that needs the setting, and says "Restore".
-- **Judgment-dependent outcome**: "Expect one of **Revival proposed** or a history-only entry; write down which." The next step works either way.
+- **Judgment-dependent outcome**: "Expect **Revival proposed**. If a history-only entry appears instead, run the capture again with the next name in the sequence, until **Revival proposed** appears; write down the attempt that showed it as **P3**." Every later step can then expect that result.
 - **Expected failure**: say so in the step ("the script exits non-zero; that is expected, because the email waits for a match").
 
-## 5. Not covered
+## 5. Not walked
 
-Bullets, each naming the feature and the reason it cannot be walked in dev: no simulator, needs a real external system, needs data the tooling cannot produce, or needs an order the walk cannot satisfy. This is the only section where forward or external pointers are acceptable.
+The edge behaviours the branch enforces but the walk does not step through: validation errors, permission denials, races, limits, and duplicates. One bullet each, naming the feature, the behaviour, and the test that covers it, or "no test found":
+
+```markdown
+- Edit fields: a malformed phone is rejected with "Enter a valid phone number" -- `tests/test_fields.py`
+- Revival: a second revival on the same prospect is refused -- no test found
+```
+
+## 6. Not covered
+
+Bullets, each naming the feature and the reason it cannot be walked in dev: no simulator, needs a real external system, needs data the tooling cannot produce, or needs an order the walk cannot satisfy. This section and "Not walked" are the only ones where forward or external pointers are acceptable.

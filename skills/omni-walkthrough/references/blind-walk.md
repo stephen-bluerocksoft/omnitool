@@ -19,13 +19,9 @@ For each step, decide whether you could perform it using only "Before you start"
 6. **Unverifiable expectation**: the "Expect" does not say where to look or what you should see.
 7. **Consumed state**: an earlier step declined, deleted, dismissed, or changed the record that this step needs in its prior state.
 8. **Unrestored setting**: a setting changed by the walk is never restored by the end.
+9. **Left to chance**: a step whose result could differ between runs, where the guide records whichever way it went instead of repeating until the happy-path result appears.
+10. **Edge case walked**: a step that walks a validation error, permission denial, race, limit, or duplicate instead of listing it under "Not walked".
 
 Do not judge the feature, the wording, or whether the expected behaviour is correct. Judge only whether the walk can be followed in order.
 
-## Demo guides
-
-If the prompt says the file is a demo guide, also report:
-
-9. **Left to chance**: a step whose result could differ between runs, where the guide records whichever way it went instead of repeating until the showcase result appears.
-
-Return a list, one entry per issue: step number, issue type (1-9), one sentence on what is missing, and the earliest place it could be fixed. If there are no issues, return exactly `No issues.`
+Return a list, one entry per issue: step number, issue type (1-10), one sentence on what is missing, and the earliest place it could be fixed. If there are no issues, return exactly `No issues.`

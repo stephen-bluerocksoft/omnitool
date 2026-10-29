@@ -51,8 +51,10 @@ Detailed design: [design.md](design.md). Epic documents: `[epic docs root]/<epic
 
 [One paragraph per epic, product level: what a user can do when it is done, and its boundary with
 its neighbours. Name the PRD items it owns at full width. For an adopted epic, describe what was
-actually built, not what its seed proposed. For a planned epic, end with its rough size (small,
-medium, or large -- roughly three, six, or nine units).]
+actually built, not what its seed proposed, and end with its measured size (production lines added,
+and per spec). For a planned epic, end with its estimated size: a range of production lines, the
+analogy it rests on, and the rough unit count that follows at up to ~2,000 lines a unit
+(references/sizing.md).]
 
 ## Order and its reasons
 

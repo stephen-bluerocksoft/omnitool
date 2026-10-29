@@ -196,7 +196,9 @@ seed covers every item `program.md` assigns to the epic.
   branch it stacks on, or the merge-base with `origin/<default branch>`, never a local default branch
   that may be stale (otherwise upstream merges show up as the epic's work) -- and read the amendment
   notes of the specs it produced. Where the documents and the code disagree, the code is the epic's
-  scope, and the stale document is a Finding.
+  scope, and the stale document is a Finding. Measure the production code each built epic added,
+  per epic and per spec, as [references/sizing.md](references/sizing.md) describes: it calibrates
+  every size estimate in Step P3.
 - **Program documents.** An existing `design.md` and, when revising, `program.md`. Compare against
   the current branch's `design.md`; when `origin/<default branch>` holds a different one, say so in
   Sources.
@@ -227,9 +229,13 @@ unverifiable claim is an open question.
 
 ### Step P3: Split into epics
 
-1. Start from the PRD's epic list. Merge PRD epics that cannot ship alone; split one too large to
-   decompose into three to nine units (epic mode checks the count when it proposes them). Each epic
-   is a shippable product slice.
+1. Start from the PRD's epic list. Merge PRD epics that cannot ship alone. Size each epic by the
+   production code it will add, not by its unit count: soft ~10,000 to ~20,000 lines per epic and
+   up to ~2,000 per unit, estimated against the built epics' measured sizes
+   ([references/sizing.md](references/sizing.md)). Merge an epic below the band into the neighbour
+   it depends on or shares a seam with, and split one above it; an epic an outside gate keeps
+   apart may stay small, with that reason recorded. Epic mode re-checks the estimate when it
+   proposes units. Each epic is a shippable product slice.
 2. An epic the PRD does not name is allowed when its items share something that makes them ship
    together -- one outside dependency, one technical seam -- and it is listed as a departure with an
    open question asking whether to keep it.
@@ -381,9 +387,13 @@ answer under Program position, so the narrowing is the user's decision rather th
 
 ### Step E6: Propose the units
 
-Three to nine units, prerequisites first, each a shippable behavior slice that becomes one future
-Speckit spec. For each: Covers, Delivers (product scope, **not** a task list), Current-state anchor
-(real files and symbols), Depends on, Done (machine-checkable), Open questions, Budget hint.
+Prerequisites first, each a shippable behavior slice that becomes one future Speckit spec. The count
+follows from the code, not a target: estimate each unit's production code against the measured
+specs, keep it at or under ~2,000 lines, and fold a unit far under that into the neighbour it
+depends on ([references/sizing.md](references/sizing.md)). When the units' total falls outside the
+epic band `program.md` sized it for, report it in the handoff as drift for a program-mode run. For
+each: Covers, Delivers (product scope, **not** a task list), Current-state anchor (real files and
+symbols), Depends on, Done (machine-checkable), Open questions, Budget hint with its estimated lines.
 
 A dev unit proposes a slug as "next available `NNN-<name>`" -- never a real `specs/NNN` number. A
 unit producing only docs, infra, build or test tooling, a human handoff, or a discover experiment is

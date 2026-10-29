@@ -69,8 +69,9 @@ outcome. Every PRD item in Program position appears in at least one row.]
 - **Rails (rough, about 2x the honest estimate):** ~[N] turns, [runtime], ~[M] tokens.
 - **Scope boundary:** hires do [X]; human handoffs are [Y]. Defines the non-goals and the
   done-condition guard clauses.
-- **Units:** [N] proposed units. Slugged units run one at a time -- Spec Kit tracks a single active
-  feature per repo. Ordered [why].
+- **Units:** [N] proposed units, ~[K] lines of production code estimated in all (program.md sized
+  the epic at [range]). Slugged units run one at a time -- Spec Kit tracks a single active feature
+  per repo. Ordered [why].
 
 ## Phases -> units (each becomes a Speckit spec)
 
@@ -84,9 +85,9 @@ outcome. Every PRD item in Program position appears in at least one row.]
   `converged` for `specs/<slug>`, or two converge -> implement cycles have run and only LOW/MEDIUM
   `unrequested` findings remain.]
 - **Open questions:** [genuine ambiguities and the default assumption applied].
-- **Budget hint:** [rough effort].
+- **Budget hint:** [rough effort]; ~[N] lines of production code, at most ~2,000.
 
-[...repeat per unit, 3 to 9 total...]
+[...repeat per unit; the count follows from the estimate...]
 
 ## Risks and invariants
 

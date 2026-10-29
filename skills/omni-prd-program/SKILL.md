@@ -33,10 +33,11 @@ switches to revision mode when that directory already exists.
 | `/omni-prd-program seed <epic-slug>` | Epic | Seeds that epic, or revises its existing seed in place |
 
 `next` and `seed` find the program themselves; put the PRD path or the program directory before them
-(`/omni-prd-program docs/prd/<slug> next`) only when the repo holds more than one program. A new PRD
-is best placed in its program directory, `docs/prd/<slug>/`, before the first run: Step 1 takes the
-slug from that directory. Other wording is read by the same rules -- "seed the next epic" is `next`,
-"audit the epics against the PRD" is program mode.
+(`/omni-prd-program docs/prd/<slug> next`) only when the repo holds more than one program, and so
+does every `next` command this skill prints or offers. A new PRD is best placed in its program
+directory, `docs/prd/<slug>/`, before the first run: Step 1 takes the slug from that directory.
+Other wording is read by the same rules -- "seed the next epic" is `next`, "audit the epics against
+the PRD" is program mode.
 
 ## Ground rules
 
@@ -48,8 +49,10 @@ slug from that directory. Other wording is read by the same rules -- "seed the n
   it in this session, a ruling is recorded somewhere you can cite, or the code or constitution
   unambiguously determines it. A guess written into a plan stops reading as a guess and becomes a
   requirement the epics get built to.
-- **Stop at the documents.** Never run `/devbot-plan`, create an epic directory, author speckit
-  specs, commit, or push. Write the files, print the handoff, end the turn.
+- **Stop at the documents, then offer the next stage.** Never create an epic directory, author
+  speckit specs, commit, or push. After the handoff, ask with AskUserQuestion whether to run the next
+  stage, with the options its step gives; on that pick invoke it with the Skill tool, otherwise end
+  the turn. Never run it unasked; with no one to ask, end at the handoff.
 - **Offline.** Like `/devbot-init`, `/devbot-plan`, and `/devbot-review`, this never needs a running
   devbot.
 - **Never clobber.** `program.md`, `coverage.md`, `design.md`, and the seeds are durable documents people edit.
@@ -335,7 +338,8 @@ it past about 600 lines, the matrix goes in `<program dir>/coverage.md`, as the 
 - Record each change for the handoff; group bulk changes by their cause ("the new 'deferred'
   definition moved these rows: ...") rather than listing rows one by one.
 
-**OUTPUT the handoff, then END your turn -- call no further tools after it.**
+**OUTPUT the handoff, then ask the next-step question (Ground rules)**: "Stop to review" (Recommended
+-- the documents are reviewed and committed before seeding), or `/omni-prd-program next`.
 
 > Program written to `<program dir>/program.md`, with the coverage matrix in `coverage.md`;
 > `design.md` updated. Next: review them, then run `/omni-prd-program next` to seed
@@ -347,9 +351,7 @@ has no `## devbot program conventions` block -- run `/devbot-init` before `/devb
 Step 1 found none. Then: any unanswered program-mode questions, first; the decisions made in this
 session; the epics in order; the questions routed to later stages, grouped by stage; the "awaiting
 input" rows as one line naming who owes them; every Finding; and -- when revising -- the changes
-made. Committing the documents is the user's call; say nothing that implies it happened. When the
-repo holds more than one program, write the `next` command as `/omni-prd-program <program dir>
-next`.
+made. Committing the documents is the user's call; say nothing that implies it happened.
 
 ## Epic mode
 
@@ -459,7 +461,9 @@ re-read it first and keep its manual edits, as for `program.md` in Step P7. When
 already exists, the seed has been planned from: say in the handoff that `/devbot-plan` will revise
 the epic from the new seed.
 
-**OUTPUT the handoff, then END your turn -- call no further tools after it.**
+**OUTPUT the handoff, then ask the next-step question (Ground rules)**: run `/devbot-plan
+<epic-slug>` with the seed, `program.md` and `design.md` as its sources (Recommended -- it walks the
+user through the plan itself), or "Stop here to review the seed". Call no other tool.
 
 > Seed written to `<program dir>/seeds/<epic-slug>.md`. Next: run `/devbot-plan <epic-slug>` pointing at the
 > seed, `<program dir>/program.md`, and `<program dir>/design.md`, then `/devbot-review <epic-slug>`.
@@ -470,8 +474,7 @@ unit count, the decisions made at seeding, the questions routed to `/devbot-plan
 and any drift from `program.md` (an item that would move or be dropped, a contract the code
 contradicts), which needs a program-mode run to record. Epic mode never edits `program.md` itself.
 Committing the seed is the user's call; say nothing that implies it happened. Drop the "Once it is
-planned" sentence when this is the last epic in order, and add the program directory to the `next`
-command when the repo holds more than one program.
+planned" sentence when this is the last epic in order.
 
 ## Quality rules
 

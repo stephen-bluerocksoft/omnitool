@@ -1,108 +1,111 @@
 ---
 name: omni-timetrack
-description: Generate a timetrack entry summarizing work for upper management. Use when reporting daily or weekly work to management.
+description: Generate a timetrack entry summarizing work for upper management, for one day or any date range, across every repository, branch, pull request, review and issue the person touched. Use when reporting daily, weekly or monthly work to management.
 ---
 
 ## Outline
 
-### Phase 1: Determine Date Range
+The work is in more places than any one source shows. GitHub's commit search covers only each repository's default branch, so on its own it misses:
 
-1. **Parse date from user input**. If the user's message contains a date or date range, use it. Otherwise default to **today** (current calendar date).
+- repositories that merge into another branch, such as `dev`
+- open pull request branches
+- work that was never pushed
+- issues filed and comments
+- the real dates behind squash merges, which it dates by the day someone merged them
 
-2. **Resolve the date(s)** into `--since` / `--until` flags for git log. Examples:
+`scripts/collect.py` joins every source into one events file. This skill runs it, adds Slack where it is connected, and writes the summary.
 
-   - "today" → `--since="YYYY-MM-DDT00:00:00" --until="YYYY-MM-DDT23:59:59"` (today's date)
-   - "yesterday" → same pattern, one day back
-   - "this week" → Monday of current week through today
-   - "2026-02-15" → that specific day
-   - "2026-02-10 to 2026-02-14" → that range
+### Phase 1: Determine the range and timezone
 
-### Phase 2: Gather Context (Current Repo)
+1. **Parse the date or range** from the user's message. Default to **today**. Resolve phrases into first and last days, inclusive:
 
-3. **Collect local commits**. Run in parallel:
+   - "today", "yesterday" -- that one day
+   - "this week" -- Monday of the current week through today
+   - "October", "last month" -- the first through the last day of that month
+   - "2026-02-10 to 2026-02-14" -- that range
+
+2. **Settle the timezone** the days are counted in. Machines often run on UTC while the person works elsewhere, and a wrong timezone moves late-evening work to the next day.
+
+   - Use a timezone the user named.
+   - Otherwise read the system timezone (`timedatectl show -p Timezone --value`, or `readlink /etc/localtime` on macOS).
+   - If it is UTC, or unknown, compare it with the offsets on the person's recent commits (`git log -20 --format=%ai` in any of their clones). If they disagree, ask the user which timezone to use, as an IANA name such as `America/Los_Angeles`.
+
+### Phase 2: Collect
+
+3. **Run the collector** from this skill's directory. It takes a few minutes for a month, because GitHub's search API allows 30 requests a minute. Run it in the background when the range is longer than a week.
 
    ```sh
-   git log --since="<start>" --until="<end>" --all --format="%ai %h %s%n%b---" --reverse
-   git log --since="<start>" --until="<end>" --all --stat --format="%h %s" --reverse
+   python3 -I <skill-dir>/scripts/collect.py --since <first-day> --until <last-day> \
+     --tz <timezone> --out <scratch-dir>/timetrack --root ~/Work --root ~
    ```
 
-4. **Check for merged PRs** in the current repo (metadata for attribution, not just listing):
+   - `--root` names folders to search for clones, four levels deep by default (`--depth`). Pass the folders where the person keeps repositories; the default is the home folder.
+   - `--email` adds a commit email the person uses that is not their global `git config user.email`.
+   - `--no-transcripts` skips Claude Code session transcripts if the user asks.
 
-   ```sh
-   gh pr list --state merged --search "merged:>=<start-date>" --json number,title,mergedAt,url,author,mergedBy,reviews --limit 50
-   ```
+   It needs `gh` (signed in) and `git`, and Python 3.11 or newer.
 
-   For **each PR** you might mention in the timetrack, resolve the user's role before writing copy. When in doubt, use `gh pr view <number> --json author,mergedBy,reviews,commits` for the current repo, or `gh pr view <number> -R owner/repo --json ...` for other repositories, or the Pulls API. You need whether the authenticated user **authored**, **merged**, **reviewed** (submitted review), or only has **commits** on the branch.
+4. **Read `coverage.txt` first.**
+   - Every source is listed as `ok`, `partial`, `FAILED` or `skipped`, with the reason. A `FAILED` or `partial` source is a gap to report to the user, never one to fill by guessing.
+   - Check that the timezone offsets seen on local commits match the chosen timezone. If they don't, return to step 2.
 
-   If `gh` is not available or fails, rely on commit authorship only and **do not** imply PR merges the user did not author or merge.
+5. **Read `events.tsv`.** It has one row per event, with these columns: `date`, `time`, `kind`, `repo`, `ref`, `title`, `detail`. For ranges longer than a week, read it one week at a time (for example `awk -F'\t' '$1 >= "2026-10-01" && $1 <= "2026-10-07"'`). The kinds:
 
-4b. **Attribution rules for PRs** (prevents reviewing others' work from reading as your delivery):
+   | Kind | What it is | Dated by |
+   | ---- | ---------- | -------- |
+   | `commit` | A commit by the person that is on a remote, from any branch | When it was written (author date) |
+   | `commit-unpushed` | A commit that exists only in a local clone | When it was written |
+   | `merge-commit` | A merge commit by the person with no matching pull request record | When it was made |
+   | `pr-opened` | A pull request the person opened; `detail` gives its base branch and state | When it was opened |
+   | `pr-merged` | A pull request that landed; `detail` names its author and who merged it | When it merged |
+   | `review` | A review the person submitted on someone else's pull request; `detail` gives the author and the verdict | When it was submitted |
+   | `pr-comment`, `issue-comment` | A comment by the person; `detail` names the thread's author | When it was posted |
+   | `issue-filed` | An issue the person opened | When it was opened |
+   | `session` | A day's Claude Code sessions in one repository: session count, branches, typed prompts, time span | The first message that day |
+
+   The collector has already removed duplicate copies left by rebases, and leaves out commits by bots and by other people. A squash merge appears as a `pr-merged` event on its merge day, while its own commits carry the days the work was done.
+
+6. **Search Slack** when a Slack search tool is available. Search for the person's own messages in the range (`from:<their user id>` with `after:`/`before:` or `during:`). Use them only for coordination and decisions that leave no GitHub record: a blocking issue raised with the team, a plan shared, a question settled. Summarize; never quote direct messages. If no Slack tool is connected, say so in the coverage note.
+
+### Phase 3: Attribute
+
+7. **Match the wording to the person's role** before writing about any pull request:
 
    | Evidence | How to phrase (plain text) |
    | -------- | -------------------------- |
-   | User is PR **author** (or their commits are the substantive change) | Delivery language is OK: what shipped, outcomes, "in PR #N" if helpful. |
-   | User **reviewed** (appears in `reviews`) but is **not** the author | **Must** lead with review role: e.g. "Code review on PR #N:" or "Reviewed PR #N (repo name):" then summarize **what the PR changes** without implying you wrote it. Do **not** use "Merged PR #N to..." for review-only work. |
-   | User is **mergedBy** but **not** author | Say **merged** or **integrated** and name that it came from another contributor/team if known (e.g. "Merged PR #N from contributor X ..." or "Integrated PR #N ..."). Do not describe the feature work as if you implemented it unless your commits are in that PR. |
-   | PR merged in range but user's only tie is review | Same as review row: explicit **review** framing only. |
+   | The person is the PR author, or their commits are the substantive change | Delivery language is OK: what shipped, outcomes, "in PR #N" if helpful. |
+   | A `review` or `pr-comment` event, and the person is not the author | **Must** lead with the review role: "Code review on PR #N:" or "Reviewed PR #N (repo name):", then summarize what the PR changes without implying the person wrote it. Never "Merged PR #N to..." for review-only work. |
+   | `pr-merged` where `merged_by` is the person and `author` is not | Say **merged** or **integrated**, and name the contributor when known. Do not describe the feature as the person's work unless their commits are in that PR. |
+   | `pr-merged` where `author` is the person and `merged_by` is someone else | The work is the person's; on the merge day it **landed** ("PR #N landed"). Describe the work itself on the days its commits were written. |
 
-   **Anti-pattern to avoid**: Phrases like "Merged PR 45 to strengthen CI..." when the user's role was **reviewer** -- that reads as you shipped the change. Replace with review-first wording and, where useful, a short nod to authorship ("author's PR", "contributor PR", or the author's login if appropriate for your audience).
+   **Anti-pattern to avoid**: phrases like "Merged PR 45 to strengthen CI..." when the person's role was reviewer. That reads as if they shipped the change.
 
-### Phase 2b: Gather Context (All Repos)
+8. **Weigh the softer evidence.**
+   - **`session` rows:** a session shows work happened in a repository on a branch, never that something shipped. Use one to describe a day's focus only where commits, pull requests or reviews don't already cover it. Phrase it as work in progress ("Worked on the sign-up epic"), taking the topic from the branch name.
+   - **`commit-unpushed` rows:** describe them normally, and mark them "(local, not yet pushed)".
+   - **`issue-filed` rows:** summarize by count and theme per repository ("Filed 12 core-agent issues covering email trigger and ingest gaps"), not one line per issue.
+   - **Comments:** fold comments into the review or discussion they belong to.
 
-5. **Discover the authenticated GitHub username**:
+9. **Group into themes** per repository and day: new features, bug fixes, infrastructure and DevOps, documentation, refactoring and cleanup, testing, code review, issues and planning, coordination.
 
-   ```sh
-   gh api user --jq '.login'
-   ```
-
-6. **Search for commits across all repos** using the GitHub Search API. Use the committer-date qualifier to match the date range:
-
-   ```sh
-   gh api "search/commits?q=author:<username>+committer-date:<start-date>..<end-date>&sort=committer-date&per_page=100" \
-     --jq '.items[] | "\(.repository.full_name) | \(.sha[:7]) | \(.commit.message | split("\n")[0])"'
-   ```
-
-   - This returns commits from **all repositories** the user has pushed to (public and private repos the token can access).
-   - For a single day, the date qualifier is `committer-date:YYYY-MM-DD`.
-   - For a range, use `committer-date:YYYY-MM-DD..YYYY-MM-DD`.
-
-7. **Identify other repos with activity**. Compare the cross-repo results against the current repo name. For any *other* repos that appear:
-
-   - Fetch their commit details for richer context:
-
-     ```sh
-     gh api "search/commits?q=author:<username>+repo:<owner>/<repo>+committer-date:<date-range>&per_page=100" \
-       --jq '.items[] | "\(.sha[:7]) \(.commit.message)"'
-     ```
-
-   - Include these in the timetrack entry under their own repo heading line (plain text; see Phase 3).
-
-8. **Identify themes**. Group commits (from all repos) into logical work areas:
-
-   - New features
-   - Bug fixes
-   - Infrastructure / DevOps
-   - Documentation
-   - Refactoring / cleanup
-   - Testing
-
-### Phase 3: Generate the Entry (plain-text output only)
+### Phase 4: Write the entry (plain-text output only)
 
 The user pastes the timetrack into a system that **does not support markdown**. The **deliverable** must be plain text: no `#` headings, no `**bold**`, no backticks, no markdown lists other than lines starting with `-` and a space.
 
-9. **Determine the day of week** for each date using a shell command -- do NOT attempt to calculate it mentally. GNU `date` (Linux) takes `-d`; BSD `date` (macOS) does not, so fall back to its `-j -f` form:
+10. **Get the day of the week** for each date with a shell command; do NOT calculate it mentally. GNU `date` (Linux) takes `-d`; BSD `date` (macOS) does not, so fall back to its `-j -f` form:
 
-   ```sh
-   date -d "YYYY-MM-DD" "+%A" 2>/dev/null || date -j -f "%Y-%m-%d" "YYYY-MM-DD" "+%A"
-   ```
+    ```sh
+    date -d "YYYY-MM-DD" "+%A" 2>/dev/null || date -j -f "%Y-%m-%d" "YYYY-MM-DD" "+%A"
+    ```
 
-10. **Write the timetrack entry** using this structure:
+11. **Write the timetrack entry** using this structure:
 
-    - First line: `YYYY-MM-DD (Day of Week)` (using the shell-verified day name from step 9)
-    - Blank line, then a repo or project name as a single line (ALL CAPS or Title Case is fine).
-    - Blank line, then each **theme** as a short title line (plain text only).
-    - Under each theme, one or more lines starting with `-` and a space (1-2 sentences each).
-    - Repeat for other repos. For multiple days in range, repeat the date line and sections per day.
+    - First line: `YYYY-MM-DD (Day of Week)`, using the day name from step 10.
+    - Blank line, then a repository name as a single line.
+    - Blank line, then each **theme** as a short title line.
+    - Under each theme, one or more lines starting with `-` and a space, 1-2 sentences each.
+    - Repeat for other repositories, then for each day in the range.
+    - **Every day in the range gets an entry.** A day with no events is the date line followed by `- No recorded activity.` (`coverage.txt` lists those days).
 
     Example shape (illustrative; the real output must match this plain-text style):
 
@@ -114,13 +117,17 @@ The user pastes the timetrack into a system that **does not support markdown**. 
     Customer reporting improvements
     - Shipped clearer export flow so ops can close month without manual spreadsheets.
 
-    Bug fixes
-    - Resolved timeout errors affecting morning batch runs.
+    Code review
+    - Reviewed PR #42 from a contributor (faster nightly imports) and requested changes.
 
     other-org/other-repo
 
-    Documentation
-    - Updated runbooks for the handoff to the support team.
+    Issues and planning
+    - Filed 5 issues covering gaps found in the onboarding flow.
+
+    2026-04-07 (Tuesday)
+
+    - No recorded activity.
     ```
 
     Guidelines:
@@ -129,18 +136,22 @@ The user pastes the timetrack into a system that **does not support markdown**. 
     - Group related commits into a single bullet rather than listing each commit
     - Use plain language; avoid jargon (no "enum", "migration", "dependency injection")
     - Lead with the *what* and *why*, not the *how*
-    - When referencing a PR, **match language to role** (see step 4b): reviewed vs authored vs merged-by-you. Never describe reviewed-only PRs as your own merge or implementation.
-    - Mention PR numbers where relevant, with correct attribution
-    - Do NOT fabricate work -- only describe what is in the actual commit history and PR metadata
+    - Mention PR numbers where relevant, with the attribution from step 7
+    - Do NOT fabricate work -- describe only what the events and Slack messages show
 
-11. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Markdown renderers turn bare `-` lines into bullets, which strips the dash on copy-paste; a code block preserves the characters exactly and provides a one-click copy button.
+12. **Present the timetrack** inside a single markdown code fence (` ```text `) so the user can copy the literal text with dashes intact. Markdown renderers turn bare `-` lines into bullets, which strips the dash on copy-paste; a code block keeps the characters exactly and provides a one-click copy button.
 
-12. **If no commits exist** for the date range (local or cross-repo), report that clearly and suggest checking a different date.
+13. **After the code fence, give a short coverage note** to the user, outside the copied text:
+    - the timezone used
+    - each source that failed, was partial or was skipped, including Slack
+    - unpushed work and uncommitted changes the collector found
+    - what no source covers: repositories with no local clone, pull request or issue in the range; email; meetings
 
 ## Important Rules
 
-- **Never fabricate work** -- all content must come from the actual git history.
+- **Never fabricate work** -- every line traces to an event or a Slack message.
 - **Keep it concise** -- each theme should be 1-3 sentences, not paragraphs.
 - **Management-friendly language** -- translate technical changes into business outcomes.
-- **Respect date boundaries** -- only include commits within the requested range.
-- **Include PR references** -- mention PR numbers when relevant, with **correct attribution** (review vs author vs merger per step 4b).
+- **Respect date boundaries** -- the collector buckets by the chosen timezone; never move an event to another day.
+- **Correct attribution** -- review, authorship and merging are worded per step 7.
+- **Transcripts stay private** -- the collector reads only repository, branch and timing from them, never prompt text, because sessions can contain client data.

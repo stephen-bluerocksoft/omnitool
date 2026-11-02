@@ -49,7 +49,7 @@ The work is in more places than any one source shows. GitHub's commit search cov
    - Every source is listed as `ok`, `partial`, `FAILED` or `skipped`, with the reason. A `FAILED` or `partial` source is a gap to report to the user, never one to fill by guessing.
    - Check that the timezone offsets seen on local commits match the chosen timezone. If they don't, return to step 2.
 
-5. **Read `events.tsv`.** It has one row per event, with these columns: `date`, `time`, `kind`, `repo`, `ref`, `title`, `detail`. For ranges longer than a week, read it one week at a time (for example `awk -F'\t' '$1 >= "2026-10-01" && $1 <= "2026-10-07"'`). The kinds:
+5. **Read `events.tsv`.** It has one row per event, with these columns: `date`, `time`, `kind`, `repo`, `ref`, `title`, `detail`. For ranges longer than a week, read it one week at a time by matching the date at the start of each row (for example `grep -E '^2026-10-0[1-7]' events.tsv` for October 1-7). The kinds:
 
    | Kind | What it is | Dated by |
    | ---- | ---------- | -------- |

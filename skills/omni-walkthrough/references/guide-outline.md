@@ -44,24 +44,48 @@ Number sections `1.`, `2.`, ... and steps `1.1`, `1.2`, ... so the reader can sa
 
 Persona: `clerk@localhost`. Source: user guide "Proposed changes".
 
-- [ ] **2.1** Run `make e2e-capture`. Expect a new prospect ID, a link, and a thread ID in the
-  output. Write them down as **P1** and **T1**.
-- [ ] **2.2** Open the link for P1. Expect a **Timeline** with a **Referring attorney email** entry.
-- [ ] **2.3** Press **Edit fields**, set **Referring attorney phone** to `555-0100`, and press
-  **Save changes**. Expect "Changes saved". This sets up the proposal in 2.5.
-- [ ] **2.4** Run `make e2e-capture FOLLOWUP=<T1>`. Expect no new prospect; it takes about 60 s.
-- [ ] **2.5** Refresh P1. Expect under **Proposed changes** the phone with "now 555-0100, proposed
-  ...".
+- **2.1** Capture a referral
+  - [ ] Run `make e2e-capture`.
+  - [ ] Expect a new prospect ID, a link, and a thread ID in the output.
+  - [ ] Write them down as **P1** and **T1**.
+- **2.2** Open the new prospect
+  - [ ] Open the link for P1.
+  - [ ] Expect a **Timeline** with a **Referring attorney email** entry.
+- **2.3** Edit a field
+  - This sets up the proposal in 2.5.
+  - [ ] Press **Edit fields**.
+  - [ ] Set **Referring attorney phone** to `555-0100`.
+  - [ ] Press **Save changes**.
+  - [ ] Expect "Changes saved".
+- **2.4** Send a follow-up
+  - [ ] Run `make e2e-capture FOLLOWUP=<T1>`.
+  - [ ] Expect no new prospect; it takes about 60 s.
+- **2.5** See the proposed change
+  - [ ] Refresh P1.
+  - [ ] Expect under **Proposed changes** the phone with "now 555-0100, proposed ...".
 ```
+
+A numbered step is a plain bullet with a short label, and each action under it is one checkbox, so the reader never hunts through a sentence for the next button mid-demo.
 
 Note that 2.3 says what it sets up for a later step. A forward note like this explains why a step is there. It is allowed because the reader does not have to act on it or jump to it. A forward *dependency*, where an earlier step can only be done after a later one, is never allowed.
 
 Patterns:
 
-- **Setup step**: its own checkbox and its own "Expect", directly above the first check that needs it.
-- **Persona switch**: `- [ ] **3.1** Log out, then log in as \`admin@localhost\`. Expect the **Settings** menu.`
+- **Setup step**: its own number and its own "Expect", directly above the first check that needs it.
+- **Persona switch**: its own numbered step, with one checkbox each for logging out, logging in as `admin@localhost`, and "Expect the **Settings** menu."
 - **Setting changed, then restored**: the restoring step comes after the last check that needs the setting, and says "Restore".
-- **Judgment-dependent outcome**: "Expect **Revival proposed**. If a history-only entry appears instead, run the capture again with the next name in the sequence, until **Revival proposed** appears; write down the attempt that showed it as **P3**." Every later step can then expect that result.
+- **Judgment-dependent outcome**: a plain bullet states the miss, with one plain bullet per retry action under it, above the checkbox that expects the result. Every later step can then expect that result:
+
+  ```markdown
+  - **3.2** The revival is proposed
+    - [ ] Run the capture.
+    - If a history-only entry appears instead:
+      - Run the capture again with the next name in the sequence.
+      - Keep going until **Revival proposed** appears.
+    - [ ] Expect **Revival proposed**.
+    - [ ] Write down the attempt that showed it as **P3**.
+  ```
+
 - **Expected failure**: say so in the step ("the script exits non-zero; that is expected, because the email waits for a match").
 
 ## 5. Not walked

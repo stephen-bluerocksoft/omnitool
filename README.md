@@ -28,7 +28,7 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-pr-create` | Create a pull request from the current branch using gh CLI |
 | `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |
 | `omni-release` | Review what ships since the last tag, check migrations, configuration and rollback safety, then tag and confirm the release after approval |
-| `omni-walkthrough` | Write a top-to-bottom, hands-on tour of every user-facing feature built on a branch, each on its happy path, with no forward references and edge cases listed rather than walked; `demo` mode covers only the headline features, for showing the work to clients or management |
+| `omni-walkthrough` | Write a top-to-bottom, hands-on tour of every user-facing feature built on a branch, each on its happy path, with no forward references and edge cases listed rather than walked, then run it in a browser against the local dev stack and record a video once you confirm; `demo` mode covers only the headline features, for showing the work to clients or management |
 | `omni-timetrack` | Generate a timetrack entry summarizing work for management, for a day or any range, from commits on every branch (pushed or not), pull requests, reviews, comments, issues, Claude Code sessions and Slack |
 
 ## Agents

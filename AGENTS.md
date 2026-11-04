@@ -6,7 +6,7 @@ This file guides AI coding agents working on the Omnitool repository. For human-
 
 Omnitool is a personal collection of AI coding tools, skills, agents, and workflows. It is built for Claude Code, and installs skills, agents, and rules globally for use across all projects.
 
-This is a **content-only repository** -- it contains Markdown files, shell scripts, and a Makefile. There is no application code, no package manager, and no test suite. The one exception is `skills/omni-timetrack/scripts/collect.py`, a standard-library-only Python script: it converts timestamps across timezones, removes duplicate commits left by rebases, and streams large session transcripts, which bash would spread across hard-to-read `date` and `jq` workarounds.
+This is a **content-only repository** -- it contains Markdown files, shell scripts, and a Makefile. There is no application code, no package manager, and no test suite. There are two exceptions. `skills/omni-timetrack/scripts/collect.py` is a standard-library-only Python script: it converts timestamps across timezones, removes duplicate commits left by rebases, and streams large session transcripts, which bash would spread across hard-to-read `date` and `jq` workarounds. `skills/omni-walkthrough/scripts/recorder.mjs` is a Node module that drives a browser and records it: it needs `playwright-core`, which the skill installs at a pinned version in the target project's gitignored `temp/`, never in this repository.
 
 Skills follow the open [Agent Skills](https://agentskills.io/) standard. This repository follows the [AGENTS.md](https://agents.md/) open format for agent guidance.
 
@@ -36,6 +36,7 @@ omnitool/
 - All content files are Markdown (`.md`)
 - Shell scripts use `bash` with `set -e` and `set -o pipefail`
 - Python scripts use only the standard library, need Python 3.11 or newer, and pass Ruff with the BRS Codex `templates/python/ruff.toml`
+- The one Node module runs on Node 20 or newer and imports only its pinned `playwright-core` and Node built-ins
 - No emojis in any Markdown file
 - Follow markdownlint standards -- `make lint` enforces them, and the rules the repo turns off are documented with their reasons in `.markdownlint.jsonc`
 - Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`

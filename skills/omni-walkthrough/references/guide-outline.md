@@ -20,6 +20,7 @@ Everything the reader does once, before step 1.1, with a checkbox for each actio
 - start or reset the app (exact command), and the URL
 - the logins: one line per persona, saying what the persona can and cannot do
 - how to work with several personas (a private window per persona, or log out between them)
+- the prep script, once Phase 10 has written one in place of manual setup: the command, what it changes, and how to restore it
 - each input simulator: the command, what it prints, run time and cost, and any expected non-zero exit
 - seeded data the walk relies on, only when a seed script creates it deterministically
 

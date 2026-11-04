@@ -21,7 +21,8 @@ For each step, decide whether you could perform it using only "Before you start"
 8. **Unrestored setting**: a setting changed by the walk is never restored by the end.
 9. **Left to chance**: a step whose result could differ between runs, where the guide records whichever way it went instead of repeating until the happy-path result appears.
 10. **Edge case walked**: a step that walks a validation error, permission denial, race, limit, or duplicate instead of listing it under "Not walked".
+11. **Bundled actions**: one checkbox holds more than one action, such as two button presses, a press and an "Expect", or a typed value and a point-out, or a numbered step is itself a checkbox instead of a label over its checkboxes.
 
 Do not judge the feature, the wording, or whether the expected behaviour is correct. Judge only whether the walk can be followed in order.
 
-Return a list, one entry per issue: step number, issue type (1-10), one sentence on what is missing, and the earliest place it could be fixed. If there are no issues, return exactly `No issues.`
+Return a list, one entry per issue: step number, issue type (1-11), one sentence on what is missing, and the earliest place it could be fixed. If there are no issues, return exactly `No issues.`

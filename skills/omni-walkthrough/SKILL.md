@@ -104,7 +104,7 @@ Name every record the guide creates with a **handle**, such as `P1` for the firs
 
 Order the checks so that every check's **Requires** is met by "Before you start" or by an earlier step's **Produces**. Use these rules:
 
-1. **Setup is its own step, placed just before its first use.** If a check needs a fresh record, an auto-declined record, or a second message in a thread, a setup step directly above it creates that state. The setup step has its own checkbox and its own "Expect", so the reader knows the setup worked.
+1. **Setup is its own step, placed just before its first use.** If a check needs a fresh record, an auto-declined record, or a second message in a thread, a setup step directly above it creates that state. The setup step has its own number and its own "Expect", so the reader knows the setup worked.
 2. **Long-lead state is built early.** State that takes several actions or a slow run (N failed attempts, an LLM workflow, a scheduled job) is set up in its own step, before the section that needs it. Never write "first do X" inside a later check.
 3. **Never consume state a later step needs.** If a step declines, deletes, dismisses, or merges a record, no later step may need that record in its prior state. Give the later step its own record (a new handle) rather than reordering into a jump.
 4. **Config changes are bracketed.** A step that changes a setting is followed, after the checks that need it, by a step that restores it. Each section states the settings it assumes.
@@ -127,7 +127,8 @@ Before writing, print the ordered step list with each step's requires and produc
 
 1. **Shape**: follow `references/guide-outline.md`: title, purpose line, "Before you start", a handle table, numbered walk sections with checkbox steps, "Not walked", and "Not covered". Name each section by its outcome for the user ("Replies file themselves"), not by spec or module.
 2. **Step style**: imperative, concrete, copy-pasteable. A step names the page to act on ("Open N1 from the queue"), never just "refresh", because the step before it often leaves the reader somewhere else. A step finds a record the way the screen lists it: by a name handle, or by a link the reader was given, never by an ID the list does not show. When a list may hold older entries from earlier runs, the step names the entry ("the top, newest entry"). A value a later step compares against, such as a count, is written down in its own earlier step. Give exact values to type, exact commands with handles shown as `<P1>`, and exact buttons in bold. Each step ends with **Expect** and the observable result, including where to look (History, timeline, queue row, toast). Name the source section ("User guide: ...", "Spec 048 US2") at the section head, not on every step.
-3. **Location**: `temp/walkthrough/<branch-slug>.md` in the repo when `git check-ignore -q temp` succeeds. Otherwise write it to the session scratchpad and say so. If the file exists, read it first, and ask with the Guided decisions rule before overwriting it, because the reader may have ticked boxes in it.
+3. **One action per checkbox**: the reader runs the guide live as a checklist, so a sentence that chains actions makes them lose their place. A numbered step is a plain bullet holding its number and a short label, never a checkbox, and every action is its own nested checkbox: each button press, each value typed or set, each command, each page opened, each thing to point out or show, each wait, and each **Expect**. Things seen in one place on one screen share one **Expect**; things in different places get one each. A note that requires no action is a plain nested bullet. A retry branch is a plain nested bullet stating its condition, with one plain bullet per action under it, placed above the **Expect** it leads to, because it may run zero times or many.
+4. **Location**: `temp/walkthrough/<branch-slug>.md` in the repo when `git check-ignore -q temp` succeeds. Otherwise write it to the session scratchpad and say so. If the file exists, read it first, and ask with the Guided decisions rule before overwriting it, because the reader may have ticked boxes in it.
 
 **Demo mode.** Use the same outline and step style, and write to `temp/walkthrough/<branch-slug>-demo.md`. End the guide with "Not shown in this demo" in place of "Not walked" and "Not covered": one line for each feature left out, with the reason. An audience does not need the edge-behaviour list.
 
@@ -140,7 +141,8 @@ Run every check. Fix what fails, then re-run them all.
 3. **Labels and strings**: script this; do not grep line by line. Join the guide's wrapped lines into one string first, because a bold term or quoted message often spans a line break. Extract every bold term and quoted message, then split each one on its placeholders (`…`, `<handle>`, values the reader typed, persona names) and search for each fixed fragment in the UI source and message catalogues at `HEAD`. Many on-screen sentences are assembled from parts (`${label} could not be saved...`, an actor's display name taken from a seeded record). For each fragment a literal search misses, open the code that builds it and confirm the guide's wording against it. Fix or drop a term that matches nothing.
 4. **Commands**: every make target appears in the `Makefile`, and every script path exists at `HEAD`. Every flag or variable used is read by that script.
 5. **Coverage**: every `F#` in the inventory has at least one step, or a "Not covered" entry with a reason, and every edge behaviour from Phase 2 is listed under "Not walked". No step walks an edge behaviour.
-6. **Blind walk**: dispatch one fresh read-only subagent whose prompt is only the guide's path plus `references/blind-walk.md`. It reads the guide top to bottom as a state machine and reports every step it could not perform from what came before: a missing precondition, an undefined handle, an ambiguous instruction, a missing persona, or a pointer elsewhere. Fix every report, then rerun the mechanical checks. If subagents are unavailable, do the walk yourself, step by step, in a fresh pass that ignores your Phase 5 notes.
+6. **One action per checkbox**: script this. Join each checkbox's wrapped lines, then flag any checkbox with two or more action words (`Press`, `Type`, `Run`, `Open`, `Choose`, `Set`, `Leave`, `Clear`, `Point out`, `Show`, `Wait`, `Write`) or with **Expect** anywhere but its start. Split every true hit. Also flag a numbered step that is itself a checkbox or holds an action.
+7. **Blind walk**: dispatch one fresh read-only subagent whose prompt is only the guide's path plus `references/blind-walk.md`. It reads the guide top to bottom as a state machine and reports every step it could not perform from what came before: a missing precondition, an undefined handle, an ambiguous instruction, a missing persona, or a pointer elsewhere. Fix every report, then rerun the mechanical checks. If subagents are unavailable, do the walk yourself, step by step, in a fresh pass that ignores your Phase 5 notes.
 
 **Demo mode.**
 
@@ -155,7 +157,7 @@ Walkthrough for <branch> (<N> commits ahead of <default>, PR #<n> | no PR)
 File: <path>
 Walk: <S> sections, <K> steps, <H> handles; personas: <list>
 Coverage: <F> features, <C> walked, <X> not covered; <E> edge behaviours not walked, <U> with no test found
-Lint: forward refs 0, handle errors 0, unmatched labels 0, blind-walk issues fixed <n>
+Lint: forward refs 0, handle errors 0, unmatched labels 0, bundled checkboxes 0, blind-walk issues fixed <n>
 Before you start: <app reachable at URL | app not running -- start with `<cmd>`>
 ```
 
@@ -168,7 +170,7 @@ Demo guide for <branch>
 File: <path>
 Walk: <M> moments in <S> sections, <K> steps, <H> handles; personas: <list>
 Left out: <X> features (listed under "Not shown in this demo")
-Lint: forward refs 0, handle errors 0, unmatched labels 0, blind-walk issues fixed <n>
+Lint: forward refs 0, handle errors 0, unmatched labels 0, bundled checkboxes 0, blind-walk issues fixed <n>
 ```
 
 Then list the moments in order (one line each), and the left-out features with their reasons.
@@ -188,7 +190,8 @@ Then list the moments in order (one line each), and the left-out features with t
 **ALWAYS:**
 
 - Give every created record a handle, and say where its value appears
-- Make setup its own checked step with its own "Expect"
+- Give every action its own checkbox: one button press, one typed value, one point-out, or one "Expect"
+- Make setup its own numbered step with its own "Expect"
 - Restore any setting the walk changes
 - Lint the guide, including the blind walk, before reporting
 - List what is not walked or not covered, and why

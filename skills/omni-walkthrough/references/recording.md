@@ -110,16 +110,42 @@ The guide's repeat-until loops have no cap, because a person is watching. A driv
    | A wrong selector in the driver | Fix the driver |
    | The guide says something the app does not do, and the app is right | Fix the guide, and tell the person each change |
    | Prep left out something a step needs | Fix prep |
-   | The app does not do what its spec says | Stop and report it; this skill never edits tracked files |
+   | The app is wrong, or a step shows a problem | Treat it as a finding: see "Address what the run finds" |
    | The environment is blocked: credits, a container, a credential | Stop and ask |
 
    Never loosen an **Expect** to get a pass, and never skip a step.
 
 3. Delete the rehearsal outputs, restore, and run the whole guide once with a new tag. That is the take you report. A take that retried, or fixed itself along the way, is fine as long as the log shows it. If the driver changes after it, it is no longer the take of record: run it again.
 
+## Address what the run finds
+
+A finding is anything wrong the run turns up, on or off the walk's own steps: a failed **Expect** the app is to blame for, a `LOOK` row (a page error, a console error, or a 5xx response, which the recorder logs without stopping), wrong or misleading words on screen, a flash of wrong content, or a user guide that disagrees with the app. Keep a numbered list of them in the scratchpad as you go. Do not leave one behind because the take can pass without it.
+
+Read the project's `AGENTS.md` before the first fix, because its rules bind these edits. For each finding, in order:
+
+1. **Confirm it.** Reproduce it, find the root cause in the code, and read the governing spec: the latest feature whose `## Supersedes` section claims the requirement, or the original when none does. A `LOOK` row that the app causes on purpose, such as an expected refusal logged to the console, is not a defect; note why and move on.
+2. **Sort it.**
+
+   | The finding is | Do this |
+   | -------------- | ------- |
+   | The code contradicts the spec, or a plain defect with one clear right answer: a crash, a 5xx, a wrong state, a broken label | Fix it now |
+   | A user guide or other doc that disagrees with correct code | Fix the doc now |
+   | The spec is wrong or silent, and the fix changes what the product does | Ask with the Guided decisions rule; a chosen spec change goes through the project's spec workflow before the code |
+   | The fix needs a new dependency, weakens a security check, or has more than one reasonable design | Ask with the Guided decisions rule |
+   | The fix belongs outside this repository, such as in a read-only submodule | Do not edit it. Report it with the workaround the project's rules call for, and let the person file it |
+
+3. **Fix it.** Write a test that fails against the unfixed code, make the smallest change that passes it, and run the layer's own tests and linter. Update the docs the change affects. Restart a service only when it does not pick up the change on its own, and never reset data to do so. A migration follows the project's rules for generating one.
+4. **See it work.** Rehearse the moment where it showed. A fix that does not hold after two attempts stays open: back it out, and report what you tried. If an open finding stops the walk, stop the run there and report it, rather than recording around it.
+
+With no user present, fix only what the first two rows allow, and return each open decision for the session that has one.
+
+**Nothing is committed.** Fixes stay uncommitted in the working tree on the target branch, one finding's files listed apart from another's, until the person approves a commit plan at the end. Never commit, push, or file anything from here. Fix only findings: an improvement that nothing went wrong to reveal is not one.
+
 ## Confirm the take
 
-A green take shows only that the screen said the right words. Check three more things before reporting it:
+A green take shows only that the screen said the right words. Check four more things before reporting it:
+
+- **No finding is left unexplained.** Every `LOOK` row in the take of record is either confirmed harmless, with the reason, or an open finding in the report. A fix made after a take makes that take stale: record again.
 
 - **Step coverage.** Every numbered step in the guide ran:
 

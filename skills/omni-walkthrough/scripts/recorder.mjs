@@ -40,6 +40,7 @@ export class Take {
     this.step = '';
     this.results = [];
     this.frames = 0;
+    this.seen = new Set();
   }
 
   /** Open the browser and start recording. Frames are written only while not paused, which is how waits are cut. */
@@ -56,6 +57,11 @@ export class Take {
     this.page = await this.context.newPage();
     this.page.setDefaultTimeout(20000);
     this.page.on('load', () => this.paint().catch((e) => this.#ignoreNavigation(e)));
+    this.page.on('pageerror', (e) => this.#finding(`page error: ${e.message.split('\n')[0]}`));
+    this.page.on('console', (m) => { if (m.type() === 'error') this.#finding(`console error: ${m.text().slice(0, 300)}`); });
+    this.page.on('response', (r) => {
+      if (r.status() >= 500) this.#finding(`${r.status()} ${r.request().method()} ${new URL(r.url()).pathname}`);
+    });
     this.encoder = spawn(findFfmpeg(browserPath), ['-y', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg',
       '-i', 'pipe:0', '-an', '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuv420p', '-deadline', 'realtime', '-cpu-used', '8',
       '-crf', '32', '-b:v', '0', '-threads', '4', `${this.out}.webm`], { stdio: ['pipe', 'ignore', 'ignore'] });
@@ -87,6 +93,13 @@ export class Take {
     return { seconds: Math.round(this.frames / FPS), bytes: statSync(`${this.out}.webm`).size };
   }
 
+  /** Something went wrong behind the screen. It does not stop the take, and each one is logged once to be looked at. */
+  #finding(text) {
+    if (this.seen.has(text)) return;
+    this.seen.add(text);
+    this.log('finding', this.step, text);
+  }
+
   #ignoreNavigation(error) {
     if (this.stopping || CONTEXT_GONE.test(error.message)) return;
     this.log('warning', this.step, error.message.split('\n')[0], false);
@@ -95,7 +108,8 @@ export class Take {
   /** Add one row to the log and the results file. */
   log(kind, step, text, ok = true) {
     this.results.push({ at: new Date().toISOString(), kind, step, text, ok });
-    const line = `${ok ? 'ok  ' : 'FAIL'} ${kind.padEnd(7)} ${step} ${text}`;
+    const mark = !ok ? 'FAIL' : kind === 'finding' ? 'LOOK' : 'ok  ';
+    const line = `${mark} ${kind.padEnd(7)} ${step} ${text}`;
     console.log(line);
     appendFileSync(`${this.out}.log`, `${line}\n`);
   }
@@ -317,7 +331,9 @@ export async function runTake(take, moments, only) {
   }
   const video = await take.stop();
   const bad = take.results.filter((row) => !row.ok);
-  console.log(`\nrows ${take.results.length}, failures ${bad.length}, video ${video.seconds}s, ${video.bytes} bytes`);
+  const findings = take.results.filter((row) => row.kind === 'finding');
+  console.log(`\nrows ${take.results.length}, failures ${bad.length}, findings ${findings.length}, video ${video.seconds}s, ${video.bytes} bytes`);
+  for (const row of findings) console.log('LOOK', row.step, row.text);
   for (const row of bad) console.log('FAIL', row.step, row.text);
   return failed || bad.length ? 1 : 0;
 }

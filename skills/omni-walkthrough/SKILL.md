@@ -1,19 +1,19 @@
 ---
 name: omni-walkthrough
-description: Write a hands-on, top-to-bottom tour of every user-facing feature implemented on a branch -- UI, API, CLI, settings, notifications, background effects -- each on its happy path, with every step depending only on steps above it, then run that guide in a real browser against the local dev stack and record a video of it. Edge cases are listed, not walked. Writes the checkbox Markdown guide and the video to the repo's gitignored temp/. A demo mode keeps only the branch's headline features, for showing the work to clients or management. Use when the user wants to walk through, get hands-on with, demo, or watch a recording of what an agent built on a branch -- phrases like "walk me through what was implemented", "show me what we built", "give me a tour of this branch", "demo guide", "show the client what we built", "run the guide and record a video", "record a demo". Not a manual QA or test script, not automated tests (use brs-test), and not an architecture explanation (use brs-pr-architecture).
+description: Write a hands-on, top-to-bottom tour of every user-facing feature implemented on a branch -- UI, API, CLI, settings, notifications, background effects -- each on its happy path, with every step depending only on steps above it, then run that guide in a real browser on the local dev stack, fix what the run finds, and record a video. Edge cases are listed, not walked. Writes the checkbox Markdown guide and the video to the repo's gitignored temp/. A demo mode keeps only the branch's headline features, for showing the work to clients or management. Use when the user wants to walk through, get hands-on with, demo, or watch a recording of what an agent built on a branch -- phrases like "walk me through what was implemented", "show me what we built", "give me a tour of this branch", "demo guide", "show the client what we built", "run the guide and record a video", "record a demo". Not a manual QA or test script, not automated tests (use brs-test), and not an architecture explanation (use brs-pr-architecture).
 ---
 
 # omni-walkthrough
 
 ## Overview
 
-Produce a guide a person can follow blindly, top to bottom, to see every user-facing feature a branch implements working on its happy path, then run that guide in a real browser and record a video of the run. The reader's goal is first-hand awareness of what was built, not verification: rejection paths and edge cases are what automated tests pin down, so the guide lists them instead of walking them. The reader should never have to stop, read ahead, or jump around.
+Produce a guide a person can follow blindly, top to bottom, to see every user-facing feature a branch implements working on its happy path, then run that guide in a real browser, fix what the run finds, and record a video of the working result. The reader's goal is first-hand awareness of what was built, not verification: rejection paths and edge cases are what automated tests pin down, so the guide lists them instead of walking them. The reader should never have to stop, read ahead, or jump around.
 
 ```text
 resolve branch -> inventory user-facing features -> discover the dev environment
   -> model each check (requires / produces) -> order as a waterfall
   -> write the guide -> lint it (mechanical + blind walk) -> report the guide
-  -> confirm the run -> rehearse -> record one clean take -> confirm it -> report
+  -> confirm the run -> rehearse and fix what it finds -> record one clean take -> confirm it -> report
 ```
 
 **The waterfall rule is the point of this skill.** A guide that says "run the follow-up (section 4, first step)" inside section 2, or "on a prospect that auto-declined" before any step declined one, makes the reader jump around. Every step's preconditions are satisfied by the "Before you start" block or by a step above it. A step never refers to a later one, never says "if you have not yet...", and never folds setup inside the check that needs it.
@@ -48,7 +48,7 @@ Either mode takes one of these arguments:
 
 ## Ground Rules
 
-- **Read-only toward the repository.** Read from git objects and the working tree. The only files this skill writes are the guide, and from Phase 10 its prep script, driver and video, all in a gitignored directory. No checkout, no commits, no edits to tracked files.
+- **Read-only toward the repository until a fix.** Read from git objects and the working tree. The guide, prep script, driver and video all go in a gitignored directory. No checkout, and no commit without the person's approval. Tracked files change only in Phase 10, to fix a finding, and those edits stay uncommitted until the person approves a commit plan.
 - **Nothing runs before the person confirms.** Phases 1-8 may run only read-only probes (for example `curl -s -o /dev/null -w '%{http_code}'` against the dev URL, `make help`). Nothing that creates records, sends messages, costs money (LLM workflow runs, paid APIs), or changes app state runs until the person selects **Run and record** at Phase 9.
 - **Local dev stack only.** A run touches this machine's dev stack and nothing else, never a shared or production system. Its email goes to a local mail catcher. It never runs a command that destroys data, such as a volume reset, unless the person selected that command at Phase 9. It never reads `.env` or prints a secret.
 - **Every "Expect" is sourced.** Each expected result comes from the branch's user docs, its spec's acceptance scenarios, or the code (UI copy, error strings, status names). Never invent an expected message. If two sources disagree, use the code's string and note the disagreement in the report. Never paper over it in the guide.
@@ -195,6 +195,7 @@ Check these first, read-only. If one fails, report it and what would fix it, and
 
 - `git check-ignore -q temp/walkthrough/video` succeeds, so nothing the run writes can reach a commit.
 - The target branch is checked out, because the dev stack serves the working tree. Never check it out yourself.
+- `git status --porcelain` is empty, so the run's fixes stay apart from the person's own work.
 - The app's URL and every other URL the guide opens are on this machine.
 - Outbound email goes to a local mail catcher, from the dev configuration in the code, when the guide sends any. If you cannot establish this from the code, the guide runs only with the person's say-so at this gate, stated in the payload.
 - `node --version` is 20 or newer.
@@ -208,10 +209,11 @@ Print, in full, what the run will do:
 - each email and where it lands
 - each setup command it needs, such as starting the stack or a seed, and what that command resets
 - what it installs under `temp/walkthrough/video/`, including the browser download (about 190 MB when not already cached)
+- that it fixes what it finds in the working tree, uncommitted, and asks first about anything that needs a decision
 
 Then ask with the Guided decisions rule:
 
-- **Run and record (Recommended)**: you see the features working for real, and rehearsal catches what would have stopped a live walk. It costs the paid runs listed and leaves the listed records in the dev database.
+- **Run and record (Recommended)**: you see the features working for real, and what the run finds gets fixed before a live walk would have hit it. It costs the paid runs listed, leaves the listed records in the dev database, and may leave code changes in the working tree for you to review.
 - **Guide only**: nothing runs and nothing is spent, but the guide stays unproven against the running app.
 
 ### Phase 10: Rehearse and Record
@@ -219,30 +221,36 @@ Then ask with the Guided decisions rule:
 Read `references/recording.md` now and follow it. In order:
 
 1. **Install** the recorder and write the prep script, when the guide needs one, and the driver. When a prep script replaces setup steps in the guide, update "Before you start" to run it, then re-run lint checks 1-4 and 6.
-2. **Rehearse** moment by moment, and sort every failure by what it is. A wrong driver, guide, or prep script is yours to fix. An app that breaks its spec, or a blocked environment, stops the run and goes to the person. Never loosen an **Expect**, and never skip a step.
-3. **Record one clean take** of the whole guide with a new run tag, ending with the restore. Delete the rehearsal outputs.
-4. **Confirm the take**: every numbered step ran, the background work ran for real according to the app's own records, and the sampled stills show what the log says.
+2. **Rehearse** moment by moment, and sort every failure by what it is. A wrong driver, guide, or prep script is yours to fix. A blocked environment stops the run and goes to the person. Never loosen an **Expect**, and never skip a step.
+3. **Address what the run finds.** Anything wrong in the app or its docs is a finding, whether or not it fails a step. Confirm it, then fix it with a test that first fails against the unfixed code, or ask when it needs a decision. `recording.md` says which is which. Rehearse the moment again after each fix.
+4. **Record one clean take** of the whole guide on the fixed code, with a new run tag, ending with the restore. Delete the rehearsal outputs.
+5. **Confirm the take**: every numbered step ran, every logged problem is explained, the background work ran for real according to the app's own records, and the sampled stills show what the log says.
 
 The video only ever shows what really happened: panels hold real output, and every wait that was cut says so on screen.
 
 ### Phase 11: Report the Take
 
-Confirm `git status --porcelain` still matches the Phase 1 baseline. Send the video with the harness's file-sending tool, when it has one. Publishing or sharing it beyond the person is theirs to decide. Then report:
+Confirm that `git status --porcelain` differs from the Phase 1 baseline only by the files the fixes changed. Send the video with the harness's file-sending tool, when it has one. Publishing or sharing it beyond the person is theirs to decide. Then report:
 
 ```text
-Recording of <guide path> at <short sha>, run tag <tag>
+Recording of <guide path> at <short sha> <plus uncommitted fixes, when there are any>, run tag <tag>
 Video: <path> (<length>, no audio; <n> waits cut, <t> s total)
-Take: <rows> actions and checks, <f> failures, <r> retries
+Take: <rows> actions and checks, <f> failures, <r> retries, <l> logged problems
+Findings: <n> found, <x> fixed, <o> open
 Steps: <ran> of <K> ran; not run: <reference-only steps, named>
 Confirmed from the app's records: <the background work, each with where it was seen>
 ```
 
 Then list, separately:
 
-- **What rehearsal found**: each gap that would have stopped a live walk, and each change it made to the guide or prep script.
+- **What the run fixed**: each finding, with its root cause, the files changed, and the test that failed before the fix and passes now.
+- **What is still open**: each finding not fixed, why, and the decision or issue it needs.
+- **What rehearsal found in the guide**: each change it made to the guide or prep script.
 - **What may surprise a viewer**: on-screen warnings, leftovers from earlier takes, values the app took from simulated input.
 - **The environment now**: setup commands run, paid runs spent including rehearsal, records and emails left behind, settings restored, and the exact command to prepare for a live walk.
-- **Not done**: anything skipped, and that nothing was committed.
+- **Not done**: anything skipped, each suite not run, and that nothing was committed.
+
+When the run changed tracked files, end by proposing them as a commit plan through `omni-commit`, and commit only what the person approves.
 
 ## Important Rules
 
@@ -253,8 +261,10 @@ Then list, separately:
 - Invent an expected message, label, or behaviour
 - Run the guide's steps, or anything that changes app state or costs money, before the person selects **Run and record**
 - Run against anything but this machine's dev stack
-- Write the guide, prep script, driver, or video to a tracked path, or edit tracked files
-- Loosen an **Expect**, skip a step, or fix the app to make a take pass
+- Write the guide, prep script, driver, or video to a tracked path
+- Commit, push, or file anything without the person's approval
+- Loosen an **Expect**, skip a step, or change what the app does just so a take passes: a fix makes the app match its spec
+- Make a product or design decision for the person, or edit a spec outside the project's spec workflow
 - Show a wait as if it did not happen, or put anything but real output in a panel
 - Walk a validation error, permission denial, race, limit, or duplicate: list it under "Not walked"
 - Leave a happy-path result to chance: an uncertain step repeats until it shows
@@ -267,5 +277,7 @@ Then list, separately:
 - Restore any setting the walk changes
 - Lint the guide, including the blind walk, before reporting
 - Cap a driver's retries, and read why a paid run missed before paying for it again
-- Report one clean take, confirmed against the app's own records and the video's stills
+- Address everything the run finds, or report why it stays open
+- Prove each code fix with a test that first fails against the unfixed code
+- Report one clean take on the fixed code, confirmed against the app's own records and the video's stills
 - List what is not walked or not covered, and why

@@ -154,12 +154,35 @@ export class Take {
   /** Draw a red ring around an element, so a viewer sees what is about to be used or checked. */
   async ring(locator) {
     await locator.scrollIntoViewIfNeeded();
+    await this.clearCaption(locator);
     await locator.evaluate((e) => {
       e.style.outline = '3px solid #ef4444';
       e.style.outlineOffset = '2px';
       setTimeout(() => { e.style.outline = ''; }, 1400);
     });
     await this.hold(600);
+  }
+
+  /**
+   * Keep the caption bar off an element. "Into view if needed" counts an element under the fixed bar as
+   * visible, so centre it when the bar covers it, and move the bar to the top when it still does (a dialog
+   * with nothing to scroll). The bar returns to the bottom for the next element.
+   */
+  async clearCaption(locator) {
+    const place = (top) => this.page.evaluate((atTop) => {
+      const bar = document.getElementById('take-caption');
+      if (bar) { bar.style.top = atTop ? '0' : ''; bar.style.bottom = atTop ? 'auto' : '0'; }
+    }, top);
+    const covered = () => locator.evaluate((e) => {
+      const bar = document.getElementById('take-caption');
+      if (!bar || bar.style.display === 'none') return false;
+      const r = e.getBoundingClientRect();
+      const c = bar.getBoundingClientRect();
+      return r.bottom > c.top && r.top < c.bottom;
+    });
+    await place(false);
+    if (await covered()) await locator.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    if (await covered()) await place(true);
   }
 
   /** Press a button by name. The last match wins, which is a dialog's confirm when a name repeats. */

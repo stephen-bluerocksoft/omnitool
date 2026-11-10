@@ -433,7 +433,7 @@ D deferred, X declined, B blocked -- omitting any zero count.>
 
 **Verification:** <what was actually run, with results>. <What was NOT run, and who covers it.>
 
-<sub>Not treated as findings: <one clause per DISCARD, with why>.</sub>
+<sub>Not treated as findings: <one clause per DISCARD that had content, with why>.</sub>
 ```
 
 - **Group findings under one heading per verdict, in the order shown, each with its count.** The heading is the disposition: a reader sees what happened to every finding without reading a bullet. Omit a group with no findings; never print `(0)`. Within a group, keep source-severity order.
@@ -443,6 +443,7 @@ D deferred, X declined, B blocked -- omitting any zero count.>
 - An `Accepted` bullet opens with `Fixed in <sha>`; a `Rejected` bullet carries the evidence, not just the conclusion; a `Deferred` bullet opens with the destination the verdict named. No reason may be new -- each restates what was on the Phase 4 table.
 - **No "also cleaned up" bullet.** Every bullet maps to a finding the gate approved. A change with no finding behind it should not have survived Phase 6's scope check, and disclosing it here launders it into the record instead of removing it.
 - The trailing not-run sentence in **Verification** is mandatory.
+- **The `Not treated as findings` line names only discards that had content** -- a self-disclaimed observation, the reviewer's report of what it did not check, a scanner's remediation block. Leave out the reviewer's summary, praise, and notes, and any section that holds only `None.` or nothing: none of them could hide a finding, so listing them on every comment is template noise. Omit the line when nothing is left. The Phase 4 gate still prints every discard, and that is where the anti-cherry-picking check is read, before anything posts.
 - When zero findings were accepted there is no commit: title the comment `### Review findings evaluated -- no code changes`.
 - If the run produced more than one commit, the title carries HEAD; each `Accepted` bullet already names its own sha.
 

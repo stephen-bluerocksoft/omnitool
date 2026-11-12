@@ -54,6 +54,7 @@ DEPRECATED_SKILLS=(
     "omni-pr-explain"        # renamed to omni-pr-architecture
     "omni-pr-architecture"   # promoted to BRS brs-pr-architecture
     "omni-compact"           # retired: unused
+    "omni-walkthrough"       # promoted to BRS brs-walkthrough
 )
 
 echo "Omnitool Installer"

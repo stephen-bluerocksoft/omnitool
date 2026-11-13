@@ -1,6 +1,6 @@
 ---
 name: omni-prd-review
-description: Adversarial review of a PRD (a .docx, PDF, or Markdown product brief) for its product owner, before any program or epic is planned. Reads the whole PRD, figures included, checks what it says exists against the codebase, and reports only what a PRD design review can settle -- domain and legal gaps, ambiguities, internal contradictions, and the questions the product owner must answer. Leaves engineering decisions, work the team can do alone, and platform or vendor dependencies to planning (omni-prd-program) and implementation. Read-only -- writes one review file to temp/ and publishes nothing without a go-ahead. Use when the user has a new PRD and asks whether it is sound -- phrases like "review this PRD", "is this PRD sound", "adversarial review of the PRD", "poke holes in this PRD", "prep the PRD design review". Do NOT use to split a PRD into epics (use omni-prd-program, which reads this review), to review code (use brs-review), or to author specs.
+description: Adversarial review of a PRD (a .docx, PDF, or Markdown product brief) for its product owner, before any program or epic is planned. Reads the whole PRD, figures included, checks what it says exists against the codebase, and reports only what a PRD design review can settle -- domain gaps (legal and regulatory included), ambiguities, internal contradictions, and the questions the product owner must answer. Leaves engineering decisions, work the team can do alone, and platform or vendor dependencies to planning (omni-prd-program) and implementation. Read-only -- writes one review file to temp/ and publishes nothing without a go-ahead. Use when the user has a new PRD and asks whether it is sound -- phrases like "review this PRD", "is this PRD sound", "adversarial review of the PRD", "poke holes in this PRD", "prep the PRD design review". Do NOT use to split a PRD into epics (use omni-prd-program, which reads this review), to review code (use brs-review), or to author specs.
 ---
 
 # omni.prd.review
@@ -40,8 +40,8 @@ review cannot settle is out of scope, and the next stages own it:
   anywhere -- an artifact, a doc, a channel -- is an outward action: offer it and wait for the
   user's selection.
 - **Only what a PRD design review can settle.** Every finding is something the product owner, or a
-  domain authority the owner brings (legal, compliance), can answer by changing or clarifying the
-  PRD. Anything else is left to the owners in the table above.
+  domain authority the owner brings (legal, regulatory, compliance, clinical), can answer by
+  changing or clarifying the PRD. Anything else is left to the owners in the table above.
 - **Findings, not answers.** A finding says what is missing, unclear, or in conflict. A question
   asks; it never proposes options or recommends an answer.
 - **Executed, not reasoned.** A finding that rests on what the code has or lacks cites the file
@@ -97,11 +97,11 @@ directory:
 | ---- | -------- |
 | Defined by reference | A requirement defined only by pointing elsewhere: "existing X behavior", "consistent with the Y experience", "established Z handling" |
 | Terms | A term that names a whole capability but is never defined |
-| Conditions | A rule whose source the PRD never names and that needs a domain authority's ruling ("applicable rules", "applicable scope and frequency rules") |
-| States and obligations | A state, deadline, or obligation a domain rule requires that the PRD never mentions, and an event the domain treats specially that the PRD never addresses (a reclassification, a missing verification) |
-| Actors and authority | "authorized user" and similar, where who may act is firm practice the PRD never names |
+| Conditions | A rule whose source the PRD never names and that needs a domain authority's decision ("applicable rules", "applicable scope and frequency rules") |
+| States and obligations | A state, deadline, or obligation a domain rule requires that the PRD never mentions, and an event the domain treats specially that the PRD never addresses (a reclassification, a missing signature or verification, a consent withdrawn) |
+| Actors and authority | "authorized user" and similar, where who may act is the customer's own practice and the PRD never names it |
 | Scope exclusions | Everything in an out-of-scope list, checked against what the in-scope features lead users toward |
-| Firm-specific rules | Positions a single client holds, stated as product behavior in a product meant to be generic, unless the PRD already makes them firm-configured |
+| Customer-specific rules | Positions one customer holds, stated as product behavior in a product meant for many customers, unless the PRD already makes them configurable |
 
 ## Step 4: Check references against the code
 
@@ -123,8 +123,8 @@ cited lines of any finding that rests on its word.
 **Domain knowledge or program shape.** Engineering cannot work out a domain rule; the PRD has to
 state it. A finding is reported, at any level of detail, when either:
 
-- it needs knowledge a domain expert supplies -- legal, regulatory, professional practice, or the
-  firm's own practice -- and the PRD does not supply it; or
+- it needs knowledge a domain expert supplies -- legal, regulatory, clinical, professional practice,
+  or the customer's own practice -- and the PRD does not supply it; or
 - its answer changes which epics exist, where their boundaries fall, or what spans them.
 
 Only a question engineering can settle without a domain expert is left out with its finding:
@@ -132,19 +132,20 @@ Only a question engineering can settle without a domain expert is left out with 
 
 Each section lists findings most consequential first. Leave out any section with no findings.
 
-1. **Domain and legal gaps.** What a practitioner in the PRD's domain would say the product does or
-   omits for its users. Check each scope exclusion against what the in-scope features imply: an
-   excluded item the product will visibly lead users toward (a deadline it hides while showing the
-   process that protects it) is the strongest kind of finding. When the PRD records why it excluded
-   something (an agreement, a ruling), the finding cites that record and asks the owner to confirm
+1. **Domain gaps.** What a practitioner in the PRD's domain would say the product does or omits for
+   its users, legal, regulatory, and compliance gaps included. Check each scope exclusion against
+   what the in-scope features imply: an excluded item the product will visibly lead users toward
+   (a deadline it hides while showing the process that protects it) is the strongest kind of
+   finding. When the PRD records why it excluded
+   something (an agreement, a decision), the finding cites that record and asks the owner to confirm
    the risk. Look for states, deadlines, and obligations a domain rule requires that the PRD never
    mentions. Never how the system achieves a behavior the PRD already states.
 2. **Ambiguities.** Requirements the PRD leaves undefined: a capability named but never defined, a
-   condition whose source needs a domain authority's ruling, an event the domain treats specially
-   that the PRD never addresses, an actor whose authority is firm practice the PRD never names, a
-   firm's position stated as product behavior that the PRD does not make firm-configured, and a
-   requirement defined by reference to something Step 4 found does not exist. Each cites the PRD wording, and the code
-   evidence where Step 4 supplied it.
+   condition whose source needs a domain authority's decision, an event the domain treats specially
+   that the PRD never addresses, an actor whose authority is the customer's own practice and the
+   PRD never names, one customer's position stated as product behavior that the PRD does not make
+   configurable, and a requirement defined by reference to something Step 4 found does not exist.
+   Each cites the PRD wording, and the code evidence where Step 4 supplied it.
 3. **Internal contradictions.** Only conflicts no precedence rule settles. Each cites both sides.
 4. **Questions for the product owner.** Every finding above as one question, most consequential
    first. Each cites the finding it comes from and asks; it lists no options and recommends no

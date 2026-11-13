@@ -12,7 +12,7 @@ Reviewed against `<repo>` at `<short sha>` (`<branch>`), <date>.
 **Verdict:** <one or two sentences: is the PRD ready to plan, and if not, what the design review
 must settle>. <Q> questions for the product owner.
 
-## Domain and legal gaps
+## Domain gaps
 
 - **<Gap> (<PRD citation>).** <What the product does or omits for its users, and why it matters in
   the domain.>

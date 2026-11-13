@@ -22,6 +22,7 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-spec-modify` | Change an in-flight (unmerged) feature's spec before implementation, cascading edits through the artifacts -- or any feature's, when the project constitution records Living Spec |
 | `omni-spec-implement` | Implement a feature from its spec with post-implementation verification |
 | `omni-plan-implement` | Execute an approved plan-mode plan with verification and proactive test creation |
+| `omni-prd-review` | Adversarial review of a PRD against the codebase -- verifies its reuse claims, finds blockers, gaps and contradictions, and recommends the decisions to settle before planning |
 | `omni-prd-program` | Turn a PRD into a program of devbot epics -- program.md, design.md, and per-epic seeds |
 | `omni-spec-align` | Audit and sync an in-flight feature's spec artifacts with the implementation on its branch (any feature's, when the project constitution records Living Spec) |
 | `omni-commit` | Group changes into conventional commits, propose them for approval, and commit what is approved |

@@ -250,6 +250,11 @@ hires' job at run time. Cite grep evidence where it settles a question. Where a 
 contradicts the code, flag it and prefer the code. Never fabricate a path or a symbol; an
 unverifiable claim is an open question.
 
+If `/omni-prd-review` has reviewed this PRD (`temp/prd-review-<slug>.md`, or a review the user
+names), read it first. Re-check each of its blockers against the code as it stands now, since the
+review is pinned to the ref it records, and treat its recommended decisions as open questions for
+this stage unless the user has since settled them.
+
 ### Step P3: Split into epics
 
 1. Start from the PRD's epic list. Merge PRD epics that cannot ship alone. Size each epic by the

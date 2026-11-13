@@ -251,9 +251,10 @@ contradicts the code, flag it and prefer the code. Never fabricate a path or a s
 unverifiable claim is an open question.
 
 If `/omni-prd-review` has reviewed this PRD (`temp/prd-review-<slug>.md`, or a review the user
-names), read it first. Re-check each of its blockers against the code as it stands now, since the
-review is pinned to the ref it records, and treat its recommended decisions as open questions for
-this stage unless the user has since settled them.
+names), read it first. The review covers only what a PRD design review can settle, so this step
+still grounds the PRD's claims itself, and records platform, vendor, and sibling-program
+dependencies as "Outside the repo" rows. Treat the review's questions for the product owner as open
+questions for this stage unless the user has since answered them.
 
 ### Step P3: Split into epics
 

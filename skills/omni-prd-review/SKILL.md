@@ -101,7 +101,7 @@ directory:
 | States and obligations | A state, deadline, or obligation a domain rule requires that the PRD never mentions, and an event the domain treats specially that the PRD never addresses (a reclassification, a missing signature or verification, a consent withdrawn) |
 | Actors and authority | "authorized user" and similar, where who may act is the customer's own practice and the PRD never names it |
 | Scope exclusions | Everything in an out-of-scope list, checked against what the in-scope features lead users toward |
-| Customer-specific rules | Positions one customer holds, stated as product behavior in a product meant for many customers, unless the PRD already makes them configurable |
+| Customer-specific rules | In a product meant for many customers: positions one customer holds, stated as product behavior, unless the PRD already makes them configurable. In a product for one customer: a setting, template, or list the PRD asks to be editable whose value has one known answer -- whether it needs an editor or can be a seeded value. When the PRD does not say which kind of product it is, that is the finding |
 
 ## Step 4: Check references against the code
 
@@ -144,7 +144,9 @@ Each section lists findings most consequential first. Leave out any section with
    condition whose source needs a domain authority's decision, an event the domain treats specially
    that the PRD never addresses, an actor whose authority is the customer's own practice and the
    PRD never names, one customer's position stated as product behavior that the PRD does not make
-   configurable, and a requirement defined by reference to something Step 4 found does not exist.
+   configurable (a product for many customers), an editor the PRD asks for over a value with one
+   known answer (a product for one customer -- its answer changes which screens the program
+   builds), and a requirement defined by reference to something Step 4 found does not exist.
    Each cites the PRD wording, and the code evidence where Step 4 supplied it.
 3. **Internal contradictions.** Only conflicts no precedence rule settles. Each cites both sides.
 4. **Questions for the product owner.** Every finding above as one question, most consequential

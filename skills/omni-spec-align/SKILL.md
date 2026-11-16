@@ -67,13 +67,19 @@ Compare spec claims against implementation reality. For each deviation, record t
 | Category | What to look for |
 | -------- | ---------------- |
 | Behavior changes | Endpoint/function does more or less than spec says |
-| New features | Implemented functionality not mentioned in any spec artifact |
+| New features | Implemented functionality not mentioned in any spec artifact -- never aligned; see below |
 | Modified signatures | Function parameters, return types, API contracts changed from spec |
 | New files | Scripts, tooling, config files added but not in project structure |
 | Removed features | Spec describes functionality that was not implemented or was removed |
 | Edge cases | New edge cases discovered and handled during implementation |
 | Assumptions invalidated | Spec assumptions that turned out wrong during implementation |
 | Data model changes | Fields added/removed, types changed, new relationships |
+
+**A new feature is not aligned into the spec.** Code nobody asked for is `unrequested` work, which `omni-spec-implement` removes by default. Writing it into the spec would turn it into a requirement no one approved. Report it under Remaining Gaps instead, and ask the user with the Guided decisions rule: **Remove it (Recommended)**, or **Add it to the spec with `/omni-spec-modify`**, naming who needs it.
+
+**Hardening is recorded where the code lives, not as an FR.** A lock, retry, dedupe, recovery path, or concurrency guard added during implementation goes in `plan.md` (key technical decisions) and its tests, not into `spec.md` -- unless a user or caller can observe the behavior, such as a refusal message or a status they see. Only a person promotes hardening to a requirement.
+
+**Process rules never become FRs.** A file-size limit, file name, test mechanic, documentation row, or migration rule the implementation followed belongs in the constitution, `AGENTS.md`, or a linter -- never in `spec.md`, even when the code was shaped by it. Name any such rule under Remaining Gaps with where it belongs.
 
 Do NOT flag trivial differences (variable naming, internal refactoring that preserves behavior). Focus on deviations that would mislead someone reading the spec.
 
@@ -85,7 +91,7 @@ For **each** deviation identified in Phase 3, update the spec to match what was 
 
 | Artifact | What to update |
 | -------- | -------------- |
-| `spec.md` | Add/update functional requirements (FR-NNN), acceptance scenarios, edge cases, assumptions. New FRs get sequential IDs continuing from the last one. |
+| `spec.md` | Add/update functional requirements (FR-NNN) for behavior a user or caller can observe, acceptance scenarios, edge cases, assumptions. New FRs get sequential IDs continuing from the last one. Where the spec tags its FRs `[<class>; <source>]`, a new or changed FR keeps the tag, with this alignment as its source. |
 | `contracts/` | Update request/response schemas, status codes, handled event types, notes. Add new contract files if new APIs were introduced. |
 | `plan.md` | Update key technical decisions, project structure listing. Add new files. Remove files that were not created. |
 | `research.md` | Add new decisions with rationale. Remove or update invalidated decisions. |
@@ -107,7 +113,7 @@ For **each** deviation identified in Phase 3, update the spec to match what was 
 
 Before producing output, verify completeness:
 
-1. **Deviation coverage**: Confirm every deviation from Phase 3 has a corresponding spec update in Phase 4. If any was missed, update now.
+1. **Deviation coverage**: Confirm every deviation from Phase 3 has a corresponding spec update in Phase 4, except an unrequested feature (a Remaining Gap) and hardening no user or caller can observe (`plan.md` only). If any was missed, update now.
 
 2. **ID continuity**: Verify new FR and task IDs are sequential with no gaps or duplicates.
 

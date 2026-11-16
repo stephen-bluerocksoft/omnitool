@@ -83,9 +83,12 @@ open, awaiting input, deferred, covered -- the earliest is what someone must act
 others in Decision.
 A "narrowed" or "dropped" row with no cited decision is a defect: make it "open" instead.]
 
-| Item | PRD text (short quote) | Owner | Status | Decision or evidence |
-| ---- | ---------------------- | ----- | ------ | -------------------- |
-| [ID, section, figure, or acceptance criterion] | "[quote]" | `[epic-slug]` | covered | [PRD ref, decision ref, or code evidence] |
+Class is core, safety, basic, nice-to-have, or speculative, judged against the project's Operating
+context, or "--" for a non-goal or an outside input.
+
+| Item | PRD text (short quote) | Owner | Class | Status | Decision or evidence |
+| ---- | ---------------------- | ----- | ----- | ------ | -------------------- |
+| [ID, section, figure, or acceptance criterion] | "[quote]" | `[epic-slug]` | core | covered | [PRD ref, decision ref, or code evidence] |
 
 [If this matrix would push program.md past about 600 lines, it lives in coverage.md beside this file.
 coverage.md opens with a title ("[Program name]: PRD Coverage"), the same Status paragraph as

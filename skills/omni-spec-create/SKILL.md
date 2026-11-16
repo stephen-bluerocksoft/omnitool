@@ -105,6 +105,7 @@ reason: the plan should be built on answers, not on guesses.
 - **Skip it only when the user says to**, or when the spec genuinely has no underspecified areas -- and
   say which, rather than skipping silently
 - Do not answer its questions on the user's behalf. An unanswered question is not approval
+- **Put scope to the user here too.** `spec-creator` returns a **Requirements** line: the `## Deferred` items it set aside and the deferral candidates -- `nice-to-have` or `speculative` FRs the brief or a ruling put in scope. Show both lists and ask, with the Guided decisions rule, which candidates to defer (**Keep them as requirements** listed first when the brief records an owner's ruling, **Defer them** otherwise) and whether to promote any deferred item. Apply the answers to `spec.md`. When it says `No Operating context`, tell the user the constitution needs that section before anything can be deferred
 - Where the session is non-interactive and nobody can answer, **stop before Step 3** and report the
   open questions, each in the shape the Guided decisions rule in the core standards gives it.
   Planning past them writes guesses into the artifacts that everything downstream treats as

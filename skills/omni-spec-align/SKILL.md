@@ -79,6 +79,8 @@ Compare spec claims against implementation reality. For each deviation, record t
 
 **Hardening is recorded where the code lives, not as an FR.** A lock, retry, dedupe, recovery path, or concurrency guard added during implementation goes in `plan.md` (key technical decisions) and its tests, not into `spec.md` -- unless a user or caller can observe the behavior, such as a refusal message or a status they see. Only a person promotes hardening to a requirement.
 
+**Process rules never become FRs.** A file-size limit, file name, test mechanic, documentation row, or migration rule the implementation followed belongs in the constitution, `AGENTS.md`, or a linter -- never in `spec.md`, even when the code was shaped by it. Name any such rule under Remaining Gaps with where it belongs.
+
 Do NOT flag trivial differences (variable naming, internal refactoring that preserves behavior). Focus on deviations that would mislead someone reading the spec.
 
 **Open convergence gaps are NOT deviations.** If `tasks.md` contains a `## Phase N: Convergence` section with unchecked `[ ]` tasks, those are known, tracked gaps that `speckit-converge` recorded -- work the spec demanded and nobody has built yet. A requirement is only a "removed feature" when the team decided not to build it, never merely because the code does not implement it yet. Before classifying anything as a removed feature, check whether an open Convergence task traces to it (via its `source-ref`, e.g. `FR-003`, `US1/AC2`, `Constitution II`). If one does, exclude it from Phase 3 entirely and carry it into Remaining Gaps instead.

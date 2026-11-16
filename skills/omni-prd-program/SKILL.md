@@ -286,8 +286,14 @@ questions for this stage unless the user has since answered them.
 
 ### Step P4: Map coverage
 
-Give every inventory item one row: owning epics, status, and the decision or evidence behind the
-status. An item several epics carry (a goal, a non-goal, a shared behavior) lists them all, or "all
+Give every inventory item one row: owning epics, class, status, and the decision or evidence behind
+the status. The class is the one BRS `spec-creator` gives a requirement -- `core`, `safety`,
+`basic`, `nice-to-have`, or `speculative` -- judged against the project's `## Operating context`
+(the constitution, or `AGENTS.md`); a non-goal or an outside input takes `--`. The PRD put every
+item in scope, so the class never changes its status by itself: when the Operating context records
+a stage, the `nice-to-have` and `speculative` rows are one program-mode question in Step P6 --
+which to defer -- and an answer to defer one makes it "dropped" or "deferred" with that answer as
+its Decision. An item several epics carry (a goal, a non-goal, a shared behavior) lists them all, or "all
 epics". Apply the full-width rules above. For an adopted epic, compare each item with what the epic
 built and recorded as out of scope: a narrower delivery with a citable decision is "narrowed"; one
 without is "open" and a Finding with a recommended action (accept and record the decision, change a

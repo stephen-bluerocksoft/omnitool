@@ -83,7 +83,7 @@ open, awaiting input, deferred, covered -- the earliest is what someone must act
 others in Decision.
 A "narrowed" or "dropped" row with no cited decision is a defect: make it "open" instead.]
 
-Class is core, safety, basic, nice-to-have, or speculative, judged against the project's Operating
+Class is core, safety, basic, maintainability, nice-to-have, or speculative, judged against the project's Operating
 context, or "--" for a non-goal or an outside input.
 
 | Item | PRD text (short quote) | Owner | Class | Status | Decision or evidence |

@@ -288,7 +288,7 @@ questions for this stage unless the user has since answered them.
 
 Give every inventory item one row: owning epics, class, status, and the decision or evidence behind
 the status. The class is the one BRS `spec-creator` gives a requirement -- `core`, `safety`,
-`basic`, `nice-to-have`, or `speculative` -- judged against the project's `## Operating context`
+`basic`, `maintainability`, `nice-to-have`, or `speculative` -- judged against the project's `## Operating context`
 (the constitution, or `AGENTS.md`); a non-goal or an outside input takes `--`. The PRD put every
 item in scope, so the class never changes its status by itself: when the Operating context records
 a stage, the `nice-to-have` and `speculative` rows are one program-mode question in Step P6 --

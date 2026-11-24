@@ -51,6 +51,8 @@ The project was scaffolded by a Speckit version that installs slash commands. Th
 >
 > Re-run `/omni-spec-modify` once the upgrade is done.
 
+**The directory is curated, not appended to.** Read BRS Codex's `spec-curation.md` (`~/.claude/skills/brs-review/references/spec-curation.md`) before editing, and follow it: rewrite in place, delete what the change makes obsolete, and leave the directory smaller or say why it grew.
+
 ## Step 2: Read the Current Spec
 
 Read every file in the spec directory and understand the current state before changing anything:
@@ -65,7 +67,7 @@ Read every file in the spec directory and understand the current state before ch
 | `tasks.md` | Task breakdown, completion status (`[ ]`/`[X]`), dependency graph |
 | `quickstart.md` | Setup steps, validation scenarios |
 
-Record the last FR ID (e.g. FR-011) and last task ID (e.g. T018) so new IDs continue sequentially. Include any `## Phase N: Convergence` section when computing the maximum -- its tasks are real task IDs, and new tasks must continue past them rather than collide. Do not renumber or reorder that section. Restate the requested change concretely. If it is ambiguous, resolve it before editing: run the `speckit-clarify` skill when the ambiguity is in the requirement itself, and put any other open choice to the user with the Guided decisions rule in the core standards. Where no one can answer, stop and report the open questions in that rule's shape rather than editing on a guess.
+Record the last FR ID (e.g. FR-011) and last task ID (e.g. T018) so new IDs continue sequentially. Include any `## Phase N: Convergence` section and the `Not in use` lines when computing the maximum -- those IDs are real, and new ones must continue past them rather than collide. Never touch a Convergence section that has an open task, and never renumber anything. Restate the requested change concretely. If it is ambiguous, resolve it before editing: run the `speckit-clarify` skill when the ambiguity is in the requirement itself, and put any other open choice to the user with the Guided decisions rule in the core standards. Where no one can answer, stop and report the open questions in that rule's shape rather than editing on a guess.
 
 ## Step 3: Apply the Change Top-Down
 
@@ -88,14 +90,14 @@ If no conforming version exists, there is nothing to choose: stop, report the co
 
 For the requested change:
 
-1. **`spec.md` first** -- add, modify, or remove functional requirements (FR-NNN), user stories, acceptance scenarios, edge cases, and assumptions. New FRs get sequential IDs continuing from the last one. When removing scope, mark it removed rather than silently deleting history. Where the spec tags its FRs `[<class>; <source>]` (BRS `spec-creator` defines them), a new FR carries a tag too, with the change request as its source, and a clause added to an existing FR states its own class in that FR's tag (`[core, speculative clause; ...]`) so a needed requirement never carries a speculative or process rider unseen. A process rule -- file sizes, names, test mechanics, documentation rows -- never becomes an FR: tell the user where it belongs instead.
+1. **`spec.md` first** -- add, modify, or remove functional requirements (FR-NNN), user stories, acceptance scenarios, edge cases, and assumptions. New FRs get sequential IDs continuing from the last one. When removing scope, delete it; its IDs stay in the `Not in use` line so none is reused. Where the spec tags its FRs `[<class>; <source>]` (BRS `spec-creator` defines them), a new FR carries a tag too, with the change request as its source, and a clause added to an existing FR states its own class in that FR's tag (`[core, speculative clause; ...]`) so a needed requirement never carries a speculative or process rider unseen. A process rule -- file sizes, names, test mechanics, documentation rows -- never becomes an FR: tell the user where it belongs instead.
 2. **Cascade downward** -- update `plan.md` (technical decisions, project structure), `data-model.md` (entities, fields, relationships), and `contracts/` (schemas, status codes) so each stays consistent with the revised `spec.md`.
-3. **`tasks.md` last** -- add tasks for new work (sequential IDs, cross-referenced to the FRs they implement), update tasks whose scope changed, and mark tasks that the change makes obsolete. Preserve `[X]` tasks that are still valid; do not reset completed work that the change does not touch. Cut each new or rescoped task as [the task-splitting reference](../omni-spec-create/references/task-splitting.md) describes.
+3. **`tasks.md` last** -- add tasks for new work (sequential IDs, cross-referenced to the FRs they implement), rewrite tasks whose scope changed, and delete tasks that the change makes obsolete (their IDs go in the `Not in use` line). Do not reset completed work: a `[X]` task the change does not touch keeps its ID and tick, as one line. Cut each new or rescoped task as [the task-splitting reference](../omni-spec-create/references/task-splitting.md) describes.
 
 ## Step 4: Analyze and Remediate
 
 1. Run the Speckit analyze phase (the `speckit-analyze` skill).
-2. Remediate ALL findings using the same CRITICAL/HIGH/MEDIUM/LOW severity rules as `omni-spec-create` Step 3d (Analyze and Remediate) -- update the relevant artifact, reconcile inconsistencies, resolve an ambiguity yourself only where the artifacts, constitution, or code settle it (citing the evidence) and ask the user the rest as that step describes, and accept LOW findings only with a documented rationale.
+2. Remediate ALL findings using the same CRITICAL/HIGH/MEDIUM/LOW severity rules as `omni-spec-create` Step 3d (Analyze and Remediate) -- update the relevant artifact, reconcile inconsistencies, resolve an ambiguity yourself only where the artifacts, constitution, or code settle it (citing the evidence) and ask the user the rest as that step describes, and accept LOW findings in the Step 6 summary, never with a note in a spec file. Resolve a finding by deleting or correcting the text that caused it before adding any.
 3. Re-run the analysis until zero CRITICAL, HIGH, and MEDIUM findings remain. If new findings emerge from edits, repeat the cycle.
 
 ## Step 5: Enforce Test Coverage
@@ -109,11 +111,11 @@ Review `tasks.md` and verify every new or changed user story has at least one co
 
 ## Step 6: Verify and Summarize (Text Only)
 
-1. Run `git branch --show-current` to confirm you are on the feature branch matching the spec folder.
+1. Run `bash ~/.claude/skills/brs-review/scripts/check-spec.sh --dir specs/NNN-name <base>`. Curate until it passes, or carry the failure into the summary. If the run removed or shortened text beyond the requested change, dispatch one read-only subagent with the two versions and not your reasoning to list every requirement, scenario, owner decision, limit that is still true, and outside citation that was lost or weakened, and restore what it finds. Then run `git branch --show-current` to confirm you are on the feature branch matching the spec folder.
 2. **OUTPUT a summary and END your turn. Do NOT call any more tools.**
    - Lead with a short prose paragraph describing what the change is and how it flows through the spec (the mechanism, not a bullet list).
    - Requirements added / modified / removed (by FR ID).
-   - Artifacts updated: [list].
+   - Artifacts updated: [list], with lines before and after.
    - Table of analysis findings addressed and how each was resolved; list any LOW findings accepted with rationale.
    - Confirm test tasks are present for each new or changed user story.
    - Tell the user to run `/omni-spec-implement` when they are ready to build the change.

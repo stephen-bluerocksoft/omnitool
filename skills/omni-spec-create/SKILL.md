@@ -119,7 +119,7 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 
 1. Run `git checkout <branch>` to ensure you are on the feature branch
 2. Run the Speckit plan phase (`speckit-plan`)
-3. This fills: plan.md, research.md, data-model.md, contracts/, quickstart.md
+3. This fills: plan.md, research.md, data-model.md, contracts/, quickstart.md. Then curate what it wrote as BRS Codex's `spec-curation.md` (`~/.claude/skills/brs-review/references/spec-curation.md`) says: one home per fact, rejected options one line each, and delete a file that repeats another
 
 ### 3b: Checklist
 
@@ -131,7 +131,7 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 ### 3c: Tasks
 
 1. Run the Speckit tasks phase (`speckit-tasks`)
-2. This generates tasks.md from the plan
+2. This generates tasks.md from the plan. Then shorten each task to what, where, and which requirement
 3. Check every task against [references/task-splitting.md](references/task-splitting.md), and split or rewrite any that fail it before analysis
 
 ### 3d: Analyze and Remediate
@@ -148,7 +148,7 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 
 **MEDIUM** -- Must be resolved. For each finding:
 
-- Coverage gap: add explicit mention in task descriptions in tasks.md
+- Coverage gap: name the requirement ID in the task that does the work
 - Underspecification: add the concrete decision to spec.md and ensure tasks.md reflects it when the spec or code determines it; otherwise ask the user, as for a CRITICAL/HIGH ambiguity
 - Inconsistency: update lower-authority artifact to match higher-authority one
 - Ambiguity: same test as CRITICAL/HIGH -- derivable means resolve it with the evidence cited; anything that is a design decision goes to the user
@@ -156,7 +156,7 @@ Execute these phases in order using the spec directory from Step 2. Invoke the `
 **LOW** -- For each finding, choose one:
 
 - Fix if the change is small (add a type annotation, clarify a sentence)
-- Accept by adding a note in spec.md under "Known Limitations" or "Deferred Items" with rationale
+- Accept it in the Step 4 summary, with the reason. Never with a note in a spec file
 
 3. Re-run the analysis until zero CRITICAL, HIGH, and MEDIUM findings remain
 4. If new findings emerge from edits, repeat the cycle

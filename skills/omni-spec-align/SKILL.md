@@ -87,15 +87,15 @@ Do NOT flag trivial differences (variable naming, internal refactoring that pres
 
 ### Phase 4: Update Spec Artifacts
 
-For **each** deviation identified in Phase 3, update the spec to match what was built. The implementation is the source of truth.
+For **each** deviation identified in Phase 3, update the spec to match what was built. The implementation is the source of truth for how the feature is built, not for what it owes a user: where a requirement and the code disagree and no recorded decision or test settles it, leave the requirement and carry the disagreement into Remaining Gaps as a decision.
 
 | Artifact | What to update |
 | -------- | -------------- |
 | `spec.md` | Add/update functional requirements (FR-NNN) for behavior a user or caller can observe, acceptance scenarios, edge cases, assumptions. New FRs get sequential IDs continuing from the last one. Where the spec tags its FRs `[<class>; <source>]`, a new or changed FR keeps the tag, with this alignment as its source. |
 | `contracts/` | Update request/response schemas, status codes, handled event types, notes. Add new contract files if new APIs were introduced. |
 | `plan.md` | Update key technical decisions, project structure listing. Add new files. Remove files that were not created. |
-| `research.md` | Add new decisions with rationale. Remove or update invalidated decisions. |
-| `tasks.md` | Mark completed tasks as `[X]`. Add new tasks for work done outside the original plan. New tasks get sequential IDs continuing from the last one. |
+| `research.md` | Update a decision that changed and delete one that no longer explains anything. A new decision goes in `plan.md`. |
+| `tasks.md` | Reduce each completed task to one `[X]` line. Add a task for work done outside the plan only where nothing else in the directory names that work, as one line, with the next ID. Delete a task whose subject no longer exists. |
 | `quickstart.md` | Add validation scenarios for new behavior. Update setup steps if they changed. |
 | `data-model.md` | Update entities, fields, relationships, constraints to match actual schema. |
 
@@ -103,11 +103,10 @@ For **each** deviation identified in Phase 3, update the spec to match what was 
 
 - New FRs get sequential IDs continuing from the last (e.g., FR-012, FR-013).
 - New tasks get sequential IDs continuing from the last (e.g., T019, T020).
-- Group new tasks into a new phase if they represent a distinct body of work.
 - Cross-reference new FRs in the tasks that implement them.
-- Preserve existing content that is still accurate -- do not rewrite sections unnecessarily.
+- Keep facts that are still true and delete text that only tells how they came to be, as BRS Codex's `spec-curation.md` (`~/.claude/skills/brs-review/references/spec-curation.md`) says: run results, dated notes, withdrawn scope, superseded wording. Rewrite in place; never add a correction beside the text it corrects.
 - Match the style and formatting of existing content in each artifact.
-- **Never weaken or delete a requirement that an open Convergence task traces to**, and never rewrite, renumber, or reorder an existing `## Phase N: Convergence` section. Deleting an unmet requirement makes the next converge run report `converged` against a spec that no longer asks for the missing work -- the gap disappears silently instead of being built.
+- **Never weaken or delete a requirement that an open Convergence task traces to**, and never rewrite, renumber, or reorder a `## Phase N: Convergence` section that has an open task. Once every task in it is ticked and converge reports `converged`, its tasks join the one-line list and the heading may go. Deleting an unmet requirement makes the next converge run report `converged` against a spec that no longer asks for the missing work -- the gap disappears silently instead of being built.
 
 ### Phase 5: Self-Verification
 
@@ -115,13 +114,17 @@ Before producing output, verify completeness:
 
 1. **Deviation coverage**: Confirm every deviation from Phase 3 has a corresponding spec update in Phase 4, except an unrequested feature (a Remaining Gap) and hardening no user or caller can observe (`plan.md` only). If any was missed, update now.
 
-2. **ID continuity**: Verify new FR and task IDs are sequential with no gaps or duplicates.
+2. **ID continuity**: Verify new FR and task IDs continue past every ID in the directory, including those in a `Not in use` line, with no duplicates.
 
 3. **Cross-reference integrity**: Verify new tasks reference the FRs they implement and vice versa.
 
 4. **No spec-only fabrication**: Confirm every spec update reflects actual implemented behavior, not aspirational or planned work. This governs what you *add* -- never invent a requirement for work that does not exist. It is not licence to *delete* an unmet requirement the spec legitimately demands: if an open Convergence task traces to it, it stays.
 
-5. **Artifact consistency**: After all updates, confirm artifacts do not contradict each other (e.g., `data-model.md` matches `contracts/`, `tasks.md` aligns with `plan.md`).
+5. **Curated**: `bash ~/.claude/skills/brs-review/scripts/check-spec.sh --dir specs/NNN-name <base>` passes, or its failure is in Remaining Gaps.
+
+6. **Checked by a second reader**: when the run removed or shortened text beyond the deviations it aligned, dispatch one read-only subagent with the two versions and not your reasoning. It lists every requirement, scenario, owner decision, limit that is still true, and outside citation that was lost or weakened. Restore what it finds, and carry anything you disagree with into Remaining Gaps. Run as a subagent, which cannot dispatch one, return the removed and reworded text instead.
+
+7. **Artifact consistency**: After all updates, confirm artifacts do not contradict each other (e.g., `data-model.md` matches `contracts/`, `tasks.md` aligns with `plan.md`).
 
 ## Output Format
 

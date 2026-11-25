@@ -27,7 +27,7 @@ This copies skills and agents into `~/.claude/` and injects the global rules int
 | `omni-prd-program` | Turn a PRD into a program of devbot epics -- program.md, design.md, and per-epic seeds |
 | `omni-spec-align` | Audit and sync an in-flight feature's spec artifacts with the implementation on its branch (any feature's, when the project constitution records Living Spec) |
 | `omni-commit` | Group changes into conventional commits, propose them for approval, and commit what is approved |
-| `omni-pr-create` | Create a pull request from the current branch using gh CLI |
+| `omni-pr-create` | Create a pull request from the current branch using gh CLI, with a body checked for commit hashes, commit lists, and check numbers |
 | `omni-pr-address` | Evaluate review feedback on a pull request, implement what holds up, and report back |
 | `omni-release` | Review what ships since the last tag, check migrations, configuration and rollback safety, then tag and confirm the release after approval |
 | `omni-timetrack` | Generate a timetrack entry summarizing work for management, for a day or any range, from commits on every branch (pushed or not), pull requests, reviews, comments, issues, Claude Code sessions and Slack |

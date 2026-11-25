@@ -120,6 +120,17 @@ All git and gh commands that modify state (push, pr create) require write permis
    - Test plan should be actionable and specific to the changes.
    - If a spec exists for the branch (check `specs/<branch-name>/`), reference acceptance criteria from `spec.md`.
    - Do NOT fabricate changes -- only describe what is actually in the diff.
+   - No head or base commit hash, no list of commits, and no check or gate number: GitHub shows the first two, the checks show the third, and the next push makes all three wrong. A commit on a long-lived branch may be cited when the body says why, as in a revert.
+
+   Check the finished body, and fix each line it names, before showing it or sending it -- also when step 11 edits it or the PR is updated later:
+
+   ```sh
+   bash ~/.claude/skills/omni-pr-create/scripts/check-pr-body.sh <<'PRBODY'
+   <pr-body>
+   PRBODY
+   ```
+
+   Name a commit cited for a reason with `--cite <hash>`. Exit 1 lists the lines to fix; exit 2 means nothing was checked. A line it names that is none of the three may stay: list it under Flags in the step 10 plan.
 
 9. **If the branch name matches a spec folder** (e.g., branch `017-infra-cleanup` has `specs/017-infra-cleanup/`):
    - Read `spec.md` for user stories and acceptance criteria
@@ -144,7 +155,7 @@ All git and gh commands that modify state (push, pr create) require write permis
     <full PR body preview>
 
     Flags:
-      - <base is main/master, or possible secrets in the diff -- omit this section when there are none>
+      - <base is main/master, possible secrets in the diff, or a body line the check named that stays -- omit this section when there are none>
     ```
 
 11. **Ask the user to confirm** with the Guided decisions rule in the core standards. Selecting the first option is the go-ahead for the push and the PR shown in the plan, and nothing else:

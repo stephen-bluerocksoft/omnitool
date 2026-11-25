@@ -137,7 +137,9 @@ gate "test -f one.txt && grep -q changed-by-one shared.txt && echo \"\$1\" >>'$h
 git -C "$repo" tag -a -m private private-tag s/one
 before=$(state)
 before_remote=$(remote_heads)
+git config --global clone.defaultRemoteName elsewhere
 record 0 "$(build)" "a build exits 0"
+git config --global --unset clone.defaultRemoteName
 record "$before" "$(state)" "the person's branches, worktrees, index, and files are as they were"
 record "$before_remote" "$(remote_heads)" "nothing was pushed"
 record "s/one s/two s/three" "$(paste -sd ' ' "$here/gated")" "the gates ran on every head, bottom first"
@@ -156,11 +158,13 @@ record no "$(yes_if grep -qE -e '--force|-f |\+[0-9a-f]{40}|HEAD|--all|--mirror'
 record 1 "$(bash "$LAND" verify --work "$here/land" >/dev/null 2>&1; echo $?)" "verify fails before the push"
 record 0 "$(ready)" "and ready passes"
 git config --global push.followTags true
+git config --global push.recurseSubmodules only
 eval "$push" 2>/dev/null
 record 0 "$(bash "$LAND" verify --work "$here/land" >/dev/null 2>&1; echo $?)" "and passes after it"
 record "$full" "$(git -C "$here/remote.git" rev-parse s/two)" "the remote holds the approved commit"
 record "" "$(git -C "$here/remote.git" tag)" "and nothing else, whatever the person's push settings"
 git config --global --unset push.followTags
+git config --global --unset push.recurseSubmodules
 record 1 "$(ready)" "ready fails once the heads have moved"
 record "$before" "$(state)" "the person's repository is still as it was"
 rm -rf "$here/land"
@@ -310,6 +314,9 @@ commit_file "$repo" .gitignore cache "chore: ignore cache"
 git -C "$repo" checkout -q main
 gate 'test -f two.txt || { mkdir -p cache; echo ok >cache/ok; }; test -f cache/ok'
 record 1 "$(build)" "what one head's gates leave behind never passes the next"
+rm -rf "${here:?}/land"
+gate 'test -f two.txt || { git init -q nested; git -C nested -c user.name=G -c user.email=g@example.com commit -q --allow-empty -m gate; }; test -d nested'
+record 1 "$(build)" "nor a repository they made"
 new_stack submodule
 git init -q "$here/sub"
 git -C "$here/sub" config user.name Test

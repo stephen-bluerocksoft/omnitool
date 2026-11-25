@@ -111,7 +111,7 @@ Review `tasks.md` and verify every new or changed user story has at least one co
 
 ## Step 6: Verify and Summarize (Text Only)
 
-1. Run `bash ~/.claude/skills/brs-review/scripts/check-spec.sh --dir specs/NNN-name <base>`. Curate until it passes, or carry the failure into the summary. If the run removed or shortened text beyond the requested change, dispatch one read-only subagent with the two versions and not your reasoning to list every requirement, scenario, owner decision, limit that is still true, and outside citation that was lost or weakened, and restore what it finds. Then run `git branch --show-current` to confirm you are on the feature branch matching the spec folder.
+1. Run `bash ~/.claude/skills/brs-review/scripts/check-spec.sh --dir specs/NNN-name <base>`. Curate until it passes, or carry the failure into the summary. If the run removed or shortened text beyond the requested change, dispatch BRS Codex's `second-reader` agent with the two versions, the decisions the user made in this session, the base, and whether this is the first read or the re-read, and not your reasoning. Restore what was lost or weakened and follow the last line of its report: one re-read at most, and LOW findings are listed, not looped. Compare each credit the check prints with the exact words the user was shown. Then run `git branch --show-current` to confirm you are on the feature branch matching the spec folder.
 2. **OUTPUT a summary and END your turn. Do NOT call any more tools.**
    - Lead with a short prose paragraph describing what the change is and how it flows through the spec (the mechanism, not a bullet list).
    - Requirements added / modified / removed (by FR ID).

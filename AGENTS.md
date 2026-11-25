@@ -6,7 +6,7 @@ This file guides AI coding agents working on the Omnitool repository. For human-
 
 Omnitool is a personal collection of AI coding tools, skills, agents, and workflows. It is built for Claude Code, and installs skills, agents, and rules globally for use across all projects.
 
-This is a **content-only repository** -- it contains Markdown files, shell scripts, and a Makefile. There is no application code, no package manager, and no test suite. There is one exception. `skills/omni-timetrack/scripts/collect.py` is a standard-library-only Python script: it converts timestamps across timezones, removes duplicate commits left by rebases, and streams large session transcripts, which bash would spread across hard-to-read `date` and `jq` workarounds.
+This is a **content-only repository** -- it contains Markdown files, shell scripts, and a Makefile. There is no application code and no package manager. Some skills bundle a shell script, and one a standard-library-only Python script, `skills/omni-timetrack/scripts/collect.py`: it converts timestamps across timezones, removes duplicate commits left by rebases, and streams large session transcripts, which bash would spread across hard-to-read `date` and `jq` workarounds.
 
 Skills follow the open [Agent Skills](https://agentskills.io/) standard. This repository follows the [AGENTS.md](https://agents.md/) open format for agent guidance.
 
@@ -15,6 +15,7 @@ Root `CLAUDE.md` is a one-line shim containing `@AGENTS.md`. Claude Code's built
 ## Setup Commands
 
 - Check skill frontmatter (description length, no angle brackets) and the always-loaded rules' size ceiling: `make check`. The rules load into every session, so `RULES_MAX_LINES` and `RULES_MAX_WORDS` in `scripts/check-skills.sh` only move down; a PR that grows the rules raises them with its reason
+- Run the tests of the skills' scripts: `make test`
 - Lint every Markdown file: `make lint`
 - Install globally: `make install`
 - Pull latest and reinstall: `make update`
@@ -28,13 +29,14 @@ omnitool/
   skills/     # Skill directories ({name}/SKILL.md, installed to ~/.claude/skills/)
   rules/      # Global rules (injected into ~/.claude/CLAUDE.md by install.sh)
   scripts/    # Installation scripts
+  tests/      # Tests run by make test, mirroring the path of the script they test
   templates/  # Template for new agents (repo-only; not installed by install.sh)
 ```
 
 ## Code Style
 
 - All content files are Markdown (`.md`)
-- Shell scripts use `bash` with `set -e` and `set -o pipefail`
+- Shell scripts use `bash` with `set -e` and `set -o pipefail`; one a skill runs is in that skill's `scripts/`, runs under bash 3.2, and has a test at the mirrored path under `tests/`
 - Python scripts use only the standard library, need Python 3.11 or newer, and pass Ruff with the BRS Codex `templates/python/ruff.toml`
 - No emojis in any Markdown file
 - Follow markdownlint standards -- `make lint` enforces them, and the rules the repo turns off are documented with their reasons in `.markdownlint.jsonc`

@@ -1,4 +1,4 @@
-.PHONY: help check lint install update
+.PHONY: help check test lint install update
 
 help:
 	@echo "Omnitool"
@@ -7,12 +7,16 @@ help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "  check      Check skill frontmatter (one-line descriptions, at most 1,024 characters, no angle brackets) and the always-loaded rules size"
+	@echo "  test       Run the tests of the skills' scripts"
 	@echo "  lint       Check every Markdown file against .markdownlint.jsonc"
 	@echo "  install    Install skills and agents to ~/.claude/ and inject rules into ~/.claude/CLAUDE.md"
 	@echo "  update     Pull latest changes and run install"
 
 check:
 	@./scripts/check-skills.sh
+
+test:
+	@for t in tests/skills/*/scripts/test-*.sh; do "$$t" || exit 1; done
 
 # Pinned to an exact version for the same reason CI pins it: a new upstream
 # release must not change what passes without a commit here.

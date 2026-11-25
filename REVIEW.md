@@ -21,7 +21,7 @@
 
 ## Do not report
 
-- What CI already enforces: `make check` (skill frontmatter limits and the rules size ceiling) and `make lint`
+- What CI already enforces: `make check` (skill frontmatter limits and the rules size ceiling), `make lint`, and `make test` (the tests of the skills' scripts)
 
 ## Evidence
 

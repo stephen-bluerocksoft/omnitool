@@ -122,7 +122,7 @@ Before producing output, verify completeness:
 
 5. **Curated**: `bash ~/.claude/skills/brs-review/scripts/check-spec.sh --dir specs/NNN-name <base>` passes, or its failure is in Remaining Gaps.
 
-6. **Checked by a second reader**: when the run removed or shortened text beyond the deviations it aligned, dispatch one read-only subagent with the two versions and not your reasoning. It lists every requirement, scenario, owner decision, limit that is still true, and outside citation that was lost or weakened. Restore what it finds, and carry anything you disagree with into Remaining Gaps. Run as a subagent, which cannot dispatch one, return the removed and reworded text instead.
+6. **Checked by a second reader**: when the run removed or shortened text beyond the deviations it aligned, dispatch BRS Codex's `second-reader` agent with the two versions, the decisions the user made in this session, the base, and whether this is the first read or the re-read, and not your reasoning. Restore what was lost or weakened and follow the last line of its report: one re-read at most, and LOW findings are listed, not looped. Carry anything you disagree with into Remaining Gaps, and compare each credit the check prints with the exact words the user was shown. Run as a subagent, which cannot dispatch one, return the removed and reworded text instead.
 
 7. **Artifact consistency**: After all updates, confirm artifacts do not contradict each other (e.g., `data-model.md` matches `contracts/`, `tasks.md` aligns with `plan.md`).
 

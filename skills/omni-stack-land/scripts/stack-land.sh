@@ -150,7 +150,7 @@ done
 
 mkdir "$work"
 clone="$work/clone"
-git clone -q --no-hardlinks --no-checkout "$repo" "$clone"
+git clone -q --origin origin --no-hardlinks --no-checkout "$repo" "$clone"
 in_clone() {
     git -C "$clone" -c rerere.enabled=false -c advice.detachedHead=false "$@"
 }

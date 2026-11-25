@@ -62,10 +62,10 @@ words=$(awk '{
         if (length(word) >= 7 && length(word) <= 40 && word ~ /^[0-9a-f]+$/) print NR, word
     }
 }' <<<"$body")
+# A test, not a case: bash 3.2 ends a substitution at a pattern's parenthesis.
 hashes=$(while read -r number word; do
     [ -n "$number" ] || continue
     commit=$(git rev-parse --verify --quiet "$word^{commit}") || continue
-    # Not a case: inside $(...), bash 3.2 ends at the pattern's parenthesis.
     [[ " $cited " == *" $commit "* ]] || echo "line $number: a commit hash: $word"
 done <<<"$words")
 

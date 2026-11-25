@@ -17,6 +17,10 @@ CHECK="$REPO_DIR/skills/omni-pr-create/scripts/check-pr-body.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
+# Git exports these to a rebase's commands and to hooks in a linked worktree,
+# where they would aim every git command below at that repository.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR
+
 # The person's own git settings must not decide a test.
 export GIT_CONFIG_GLOBAL=/dev/null
 
